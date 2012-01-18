@@ -1,0 +1,112 @@
+# Makefile for Microsoft Visual C++
+# usage:
+#	nmake -f win32\Makefile.msc
+#	nmake -f win32\Makefile.msc clean
+# 	nmake -f win32\Makefile.msc CRT=MD
+
+#optional build flags
+LOC =
+CRT = MT
+
+#variables
+NAME = pe
+LIBNAME	= libpe
+STATICLIB = $(LIBNAME).lib
+SHAREDLIB = $(NAME).dll
+IMPLIB    = $(NAME).lib
+DEF	= $(LIBNAME).def
+RCFILE	= $(LIBNAME).rc
+PYDFILE = py$(NAME).pyd
+
+CC = cl
+AS = ml
+LD = link
+AR = lib
+RC = rc
+PYTHON	= python
+CFLAGS  = -nologo -$(CRT) -W3 -Od -Oy- -Zi -Fd$(LIBNAME) $(LOC) /DWIN32
+WFLAGS  = -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE
+ASFLAGS = -coff -Zi $(LOC)
+LDFLAGS = -nologo -debug -incremental:no -opt:ref -manifest:no
+ARFLAGS = -nologo
+RCFLAGS = /dWIN32 /r
+
+OBJS = $(LIBNAME).obj
+OBJA =
+
+#targets
+all: $(STATICLIB) $(SHAREDLIB) $(IMPLIB) \
+     example.exe example_d.exe $(PYDFILE)
+
+$(STATICLIB): $(OBJS) $(OBJA)
+	$(AR) $(ARFLAGS) -out:$@ $(OBJS) $(OBJA)
+
+$(IMPLIB): $(SHAREDLIB)
+
+$(SHAREDLIB): $(DEF) $(OBJS) $(OBJA) $(LIBNAME).res filemap.obj
+	$(LD) $(LDFLAGS) -def:$(DEF) -dll -implib:$(IMPLIB) \
+	  -out:$@ $(OBJS) $(OBJA) filemap.obj $(LIBNAME).res
+	if exist $@.manifest \
+	  mt -nologo -manifest $@.manifest -outputresource:$@;2
+
+example.exe: example.obj $(STATICLIB) filemap.obj
+	$(LD) $(LDFLAGS) example.obj $(STATICLIB) filemap.obj
+	if exist $@.manifest \
+	  mt -nologo -manifest $@.manifest -outputresource:$@;1
+
+example_d.exe: example.obj $(IMPLIB) filemap.obj
+	$(LD) $(LDFLAGS) -out:$@ example.obj filemap.obj $(IMPLIB)
+	if exist $@.manifest \
+	  mt -nologo -manifest $@.manifest -outputresource:$@;1
+
+.c.obj:
+	$(CC) -c $(WFLAGS) $(CFLAGS) $<
+
+.cpp.obj:
+	$(CC) -c $(WFLAGS) $(CFLAGS) $<
+
+filemap.obj:
+	$(CC) -c $(WFLAGS) $(CFLAGS) base/filemap.c
+
+{$(LIBNAME)}.c.obj:
+	$(CC) -c $(WFLAGS) $(CFLAGS) $<
+
+{$(LIBNAME)}.cpp.obj:
+	$(CC) -c $(WFLAGS) $(CFLAGS) $<
+
+$(LIBNAME).res: $(RCFILE)
+	$(RC) $(RCFLAGS) /fo$@ $(RCFILE)
+
+$(PYDFILE):
+	cd py$(NAME)
+	$(PYTHON) setup.py build
+	cd ..
+	copy /Y py$(NAME)\build\lib.win32-2.7\py$(NAME).pyd py$(NAME)\py$(NAME).pyd
+	copy /Y py$(NAME)\build\lib.win32-2.7\py$(NAME).pdb py$(NAME)\py$(NAME).pdb
+
+# testing
+test: example.exe
+	example
+
+testdll: example_d.exe
+	example_d
+
+# cleanup
+clean:
+	cd py$(NAME)
+	-del *.pyd
+	-del *.pdb
+	cd ..
+
+	-del $(STATICLIB)
+	-del $(SHAREDLIB)
+	-del $(IMPLIB)
+	-del *.obj
+	-del *.res
+	-del *.lib
+	-del *.a
+	-del *.exp
+	-del *.exe
+	-del *.pdb
+	-del *.manifest
+	-del foo.gz
