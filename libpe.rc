@@ -1,6 +1,6 @@
 #include <winver.h>
 
-#define LIBPE_VERSION "0.3.0"
+#define LIBPE_VERSION "0.3.1"
 #define LIBPE_VERNUM 0x0030
 #define LIBPE_VER_MAJOR 0
 #define LIBPE_VER_MINOR 3

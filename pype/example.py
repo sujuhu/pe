@@ -2,14 +2,15 @@ import os
 import pype
 
 #test_file = r'../examples/0c94b325dca948dcdf81036a5306901b.sample'
-test_file = r'../examples/test.bin'
+test_file = r'../examples/87f6447ba9b75486969b59e1c911ac72.sample'
+#test_file = r'../examples/test.bin'
 
 fd = file(test_file, 'rb')
 data = fd.read()
 fd.close()
 
 data_size = os.path.getsize(test_file)
-	
+
 sections = pype.sections( data, data_size )
 for section in sections:
     print "%-8s\t%08X\t%08X\t%08X\t%08X\t%08X" % ( section['name'],
@@ -55,4 +56,4 @@ if not pype.icon( data,data_size, os.path.abspath(ico_file)):
 else:
     print ico_file
 
-print "test passed"        
+print "test passed"

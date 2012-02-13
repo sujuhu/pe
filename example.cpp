@@ -211,6 +211,11 @@ int main(int argc, char* argv[])
     return 0;
   }
 
+  if (!IsValidPE((const char*)view.data, view.size)) {
+    printf( "file is not pe format");
+    return 0;
+  }
+
   if( strcmp( argv[1], "-overlay" ) == 0 ) {
     //dump¸½¼ÓÊý¾Ý
     raw_t overlay_offset = 0;

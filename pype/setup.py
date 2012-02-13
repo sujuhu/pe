@@ -7,7 +7,7 @@ module1 = Extension('pype',
                     library_dirs=[r'c:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib',"../"],
                     libraries=["libpe"],
                     extra_objects = [],
-                    extra_compile_args=["/MT", "/W3", "/Ox", "/Oy", "/Zi"],
+                    extra_compile_args=["/MT", "/W3", "/Od", "/Oy", "/Zi"],
                     extra_link_args=["/nologo",
                                      "/debug",
                                      "/incremental:no",
@@ -15,6 +15,6 @@ module1 = Extension('pype',
                                     ]
 )
 setup ( name = 'PackageName',
-        version = '0.1',
+        version = '0.3.1',
         description = 'Python module wrapping libpe',
         ext_modules = [module1])

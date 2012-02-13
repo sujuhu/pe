@@ -51,7 +51,7 @@ bool IsValidPE(
 
   //读取PE头部数据
   if (dos_header->e_magic != IMAGE_DOS_SIGNATURE) {
-    return true;
+    return false;
   }
 
   if ((size_t)dos_header->e_lfanew >= (size_t)stream_size)  {
