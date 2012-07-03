@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include <errno.h>
 #include <assert.h>
 #include "imgfmt.h"
-#include "libpe.h"
+#include "pe.h"
 
 
 //用于字节边界对齐
@@ -471,76 +471,76 @@ char* GetResourceTypeName(
   switch(typeOfResource)
   {
   case 1:
-    return "CURSOR";
+    return (char*)"CURSOR";
     break;
   case 2:
-    return "BITMAP";
+    return (char*)"BITMAP";
     break;
   case 3:
-    return "ICON";
+    return (char*)"ICON";
     break;
   case 4:
-    return "MENU";
+    return (char*)"MENU";
     break;
   case 5:
-    return "DIALOG";
+    return (char*)"DIALOG";
     break;
   case 6:
-    return "STRING";
+    return (char*)"STRING";
     break;
   case 7:
-    return "FONTDIR";
+    return (char*)"FONTDIR";
     break;
   case 8:
-    return "FONT";
+    return (char*)"FONT";
     break;
   case 9:
-    return "ACCELERATOR";
+    return (char*)"ACCELERATOR";
     break;
   case 10:
-    return "RCDATA";
+    return (char*)"RCDATA";
     break;
   case 11:
-    return "MESSAGETABLE";
+    return (char*)"MESSAGETABLE";
     break;
   case 12:
-    return "GROUP_CURSOR";
+    return (char*)"GROUP_CURSOR";
     break;
   case 14:
-    return "GROUP_ICON";
+    return (char*)"GROUP_ICON";
     break;
   case 16:
-    return "VERSION";
+    return (char*)"VERSION";
     break;
   case 17:
-    return "DLGINCLUDE";
+    return (char*)"DLGINCLUDE";
     break;
   case 19:
-    return "PLUGPLAY";
+    return (char*)"PLUGPLAY";
     break;
   case 20:
-    return "VXD";
+    return (char*)"VXD";
     break;
   case 21:
-    return "ANICURSOR";
+    return (char*)"ANICURSOR";
     break;
   case 22:
-    return "ANIICON";
+    return (char*)"ANIICON";
     break;
   case 23:
-    return "RT_HTML";
+    return (char*)"RT_HTML";
     break;
   case 24:
-    return "MANIFEST";
+    return (char*)"MANIFEST";
     break;
   case 0xF0:
-    return "DIALOG_DATA";
+    return (char*)"DIALOG_DATA";
     break;
   case 0xF1:
-    return "TOOLBAR";
+    return (char*)"TOOLBAR";
     break;
   default:
-    return "UNKNOWN";
+    return (char*)"UNKNOWN";
     break;
   }
 }
@@ -1235,9 +1235,7 @@ bool RemoveLastSection(
   return true;
 }
 
-#include <stdio.h>
-#include <stdlib.h>
-#pragma comment( lib, "version.lib")
+
 bool QueryValue(
     LPCTSTR szQuery,
     LPVOID pBlock,

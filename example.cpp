@@ -1,4 +1,4 @@
-// pefile.cpp : Defines the entry point for the console application.
+ï»¿// pefile.cpp : Defines the entry point for the console application.
 //
 #pragma  warning(disable:4996)
 #include <windows.h>
@@ -18,7 +18,7 @@ typedef struct _COMPILER
 
 bool match_compiler( COMPILER* compile, FILE_VIEW* view )
 {
-  //½«×Ö·û´®×ª»»³É¶ş½øÖÆÊı¾İ
+  //å°†å­—ç¬¦ä¸²è½¬æ¢æˆäºŒè¿›åˆ¶æ•°æ®
   int nLen = compile->sign.size();
   int nbyte = nLen >> 1;
   unsigned char* buffer = (unsigned char*)malloc( nbyte );
@@ -38,17 +38,17 @@ bool match_compiler( COMPILER* compile, FILE_VIEW* view )
     }
   }
 
-  //»ñÈ¡Èë¿Úµã
+  //è·å–å…¥å£ç‚¹
   IMAGE_NT_HEADERS* nt = GET_NT_HEADER( view->lpData );
   DWORD va = nt->OptionalHeader.AddressOfEntryPoint
              + nt->OptionalHeader.ImageBase;
   DWORD raw = GetFileOffSet( view->lpData, va, view->SizeOfFile );
 
-  //Ã¿¸ö×Ö½Ú½øĞĞÆ¥Åä
+  //æ¯ä¸ªå­—èŠ‚è¿›è¡ŒåŒ¹é…
   bool matched = true;
   for(  i = 0; i < nbyte; i++ ) {
     if( ignore[i] == 1 ) {
-      //Í¨Åä·ûºÅ
+      //é€šé…ç¬¦å·
       continue;
     } else {
       if ( buffer[i] == *( unsigned char *)((char*)view->lpData + raw + i) ) {
@@ -71,7 +71,7 @@ bool match_compiler( COMPILER* compile, FILE_VIEW* view )
 
 bool doscan(char* sample_file, char* dbfile, char* compiler_name, int bufsize)
 {
-  //´ò¿ªÊı¾İ¿âÎÄ¼ş
+  //æ‰“å¼€æ•°æ®åº“æ–‡ä»¶
   ifstream ifs;
   ifs.open( dbfile, ios::in | ios::_Nocreate );
   if( ifs.bad() ) {
@@ -82,7 +82,7 @@ bool doscan(char* sample_file, char* dbfile, char* compiler_name, int bufsize)
   vector<COMPILER> ctCompiler;
   string line;
   while( ::getline( ifs, line ) ) {
-    //½âÎöĞĞÊı¾İ
+    //è§£æè¡Œæ•°æ®
     regex::match_results results;
     regex::rpattern partten( "^(.+)=(.+)$" );
     // Match a dollar sign followed by one or more digits,
@@ -95,7 +95,7 @@ bool doscan(char* sample_file, char* dbfile, char* compiler_name, int bufsize)
       compile.sign = results.backref(2).str();
       ctCompiler.push_back( compile );
     } else {
-      //Ò»¸ö¶¼Ã»ÕÒµ½
+      //ä¸€ä¸ªéƒ½æ²¡æ‰¾åˆ°
       continue;
     }
   }
@@ -108,7 +108,7 @@ bool doscan(char* sample_file, char* dbfile, char* compiler_name, int bufsize)
     return false;
   }
 
-  //½øĞĞÆ¥Åä
+  //è¿›è¡ŒåŒ¹é…
   std::vector<COMPILER>::iterator it = ctCompiler.begin();
   for( ; it != ctCompiler.end(); it++ ) {
     if( match_compiler( &(*it), &view ) ) {
@@ -164,14 +164,14 @@ BOOL WalkRes( MAPPED_FILE* view, vector<RESITEM>* ctItem )
   return TRUE;
 }
 
-//Ã¶¾Ùµ¼ÈëÄ£¿é»Øµ÷º¯Êı
+//æšä¸¾å¯¼å…¥æ¨¡å—å›è°ƒå‡½æ•°
 bool ImportModuleCallback( PIMPORT_MODULE pImportModule, void* lpParam )
 {
   //printf( "[MODULE]%s\n", pImportModule->ModuleName );
   return TRUE;
 }
 
-//Ã¶¾Ùµ¼Èëº¯Êı»Øµ÷º¯Êı
+//æšä¸¾å¯¼å…¥å‡½æ•°å›è°ƒå‡½æ•°
 bool ImportFunctionRoutine( PIMPORT_FUNCTION pImportFunction,
                PIMPORT_MODULE pImportModule, void* lpParam )
 {
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
   }
 
   if( strcmp( argv[1], "-overlay" ) == 0 ) {
-    //dump¸½¼ÓÊı¾İ
+    //dumpé™„åŠ æ•°æ®
     raw_t overlay_offset = 0;
     size_t overlay_size = 0;
     if( !GetOverlay( (const char*)view.data,
@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
     }
 
   } else if( strcmp( argv[1], "-section" ) == 0 ){
-    //dump½Ú±í
+    //dumpèŠ‚è¡¨
     IMAGE_NT_HEADERS* nt = GET_NT_HEADER( view.data );
     WORD i = 0;
     for( ; i < nt->FileHeader.NumberOfSections; i++ ) {
@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
         header.SizeOfRawData );
     }
   } else if( strcmp( argv[1], "-export" ) == 0 ) {
-    //dumpµ¼³ö±í
+    //dumpå¯¼å‡ºè¡¨
     char DllName[256] = {0};
     if( GetExportDllName((const char*)view.data,
                          view.size,
@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
       exports = NULL;
     }
   } else if ( strcmp( argv[1], "-import" ) == 0 ) {
-    //dumpµ¼Èë±í
+    //dumpå¯¼å…¥è¡¨
     if( !EnumImportModuleAndFunction((const char*)view.data,
                                      view.size,
                                      ImportModuleCallback,
@@ -283,10 +283,10 @@ int main(int argc, char* argv[])
         printf( "get import information failed\n" );
     }
   } else if ( strcmp( argv[1], "-entry" ) == 0 ) {
-    //dumpÈë¿Úµã
+    //dumpå…¥å£ç‚¹
     IMAGE_NT_HEADERS* nt = GET_NT_HEADER( view.data );
     DWORD rva = nt->OptionalHeader.AddressOfEntryPoint;
-    //¼ÆËãÈë¿ÚµãÔÚµÚ¼¸¸ö½ÚÖĞ
+    //è®¡ç®—å…¥å£ç‚¹åœ¨ç¬¬å‡ ä¸ªèŠ‚ä¸­
     int iSection = GetSectionIndexByRva((const char*)view.data, rva );
 
     printf( "[ENTRY RVA]=%08X,[ENTRY SECTION]=%d\n", rva );
@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
   //  int raw_len = 512;
   //  while( raw_len > 0 ) {
   //    t_disasm da = {0};
-  //    //»ñÈ¡·´»ã±àÖ¸Áî³¤¶È
+  //    //è·å–åæ±‡ç¼–æŒ‡ä»¤é•¿åº¦
   //    int len = Disasm( (unsigned char*)view.lpData + raw,
   //                      raw_len, va, &da, 4 );
   //    if( len <= 0 )
@@ -310,7 +310,7 @@ int main(int argc, char* argv[])
   //    printf( "[DISASM]%s==%s\n", da.dump, da.result );
   //  }
   } else if( strcmp( argv[1], "-gap") == 0 ) {
-    //dump½Ú·ìÏ¶
+    //dumpèŠ‚ç¼éš™
     DWORD size = 0;
     SECTION_GAP gaps[256] = {0};
     size = EnumSectionGap( (const char*)view.data,
@@ -366,11 +366,11 @@ int main(int argc, char* argv[])
       }
     }
   } else if( strcmp( argv[1], "-version") == 0 ) {
-    //dump°æ±¾ĞÅÏ¢
+    //dumpç‰ˆæœ¬ä¿¡æ¯
     PE_VERSION verinfo;
     memset( &verinfo, 0, sizeof( verinfo ) );
     if ( GetVersionInfo( argv[2], &verinfo ) ) {
-      //»ñÈ¡°æ±¾ĞÅÏ¢Ê§°Ü
+      //è·å–ç‰ˆæœ¬ä¿¡æ¯å¤±è´¥
       if( strlen( verinfo.FileVersion ) > 0 ) {
         printf( "FileVersion==%s", verinfo.FileVersion );
       }

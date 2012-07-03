@@ -233,7 +233,7 @@ static PyObject* exports( PyObject* self, PyObject* args )
 
   size_t size = 0;
   EnumExportFunction(data, data_len, NULL, &size);
-  if( GetLastError() == ERROR_INSUFFICIENT_BUFFER ) {
+  if( errno == EINVAL ) {
     if( size != 0 ) {
       EXPORT_FUNCTION* exports = (EXPORT_FUNCTION*)malloc( size );
       memset( exports, 0, size );
