@@ -137,7 +137,7 @@ typedef bool (*fnEnumImportFunctionCallback)(
  * Return:      TRUE    是PE文件
  *              FALSE   不是PE文件
  */
-bool IsValidPE(
+int IsValidPE(
     const char* stream,
     size_t stream_size);
 
@@ -436,7 +436,11 @@ bool GetVersionInfo(
  *            image_size    内存缓冲区地址
  * Return:    间隙描述符的长度
  */
-bool LoadPEImage(const char* stream, size_t stream_size, char* image, size_t image_size);
+bool LoadPEImage(
+    const char* stream, 
+    size_t stream_size, 
+    char* image, 
+    size_t image_size);
 
 
 #ifdef __cplusplus

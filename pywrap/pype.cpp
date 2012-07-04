@@ -1,9 +1,10 @@
 ﻿// pefile.cpp : Defines the entry point for the console application.
 //
-#pragma  warning( disable:4996 )
+//#pragma  warning( disable:4996 )
 #include <windows.h>
+#include <string>
 #include <python.h>
-#include "../libpe.h"
+#include "../src/pe.h"
 #include <vector>
 using namespace std;
 
@@ -64,7 +65,7 @@ PyObject *check_object(PyObject *pObject)
 
 //dump节表
 extern "C"
-static PyObject* sections(PyObject* self, PyObject* args)
+PyObject* sections(PyObject* self, PyObject* args)
 {
   IMAGE_NT_HEADERS* nt = NULL;
   PyObject* pTuple = NULL;
@@ -152,7 +153,7 @@ bool ImportFunctionRoutine( PIMPORT_FUNCTION pImportFunction,
 
 
 extern "C"
-static PyObject* imports(PyObject* self, PyObject* args)
+PyObject* imports(PyObject* self, PyObject* args)
 {
   if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
@@ -192,7 +193,7 @@ static PyObject* imports(PyObject* self, PyObject* args)
 }
 
 extern "C"
-static PyObject* exports( PyObject* self, PyObject* args )
+PyObject* exports( PyObject* self, PyObject* args )
 {
   if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
@@ -270,7 +271,7 @@ static PyObject* exports( PyObject* self, PyObject* args )
 }
 
 extern "C"
-static PyObject* overlay( PyObject* self, PyObject* args )
+PyObject* overlay( PyObject* self, PyObject* args )
 {
   if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
@@ -320,7 +321,7 @@ static PyObject* overlay( PyObject* self, PyObject* args )
 }
 
 extern "C"
-static PyObject* entrypoint( PyObject* self, PyObject* args )
+PyObject* entrypoint( PyObject* self, PyObject* args )
 {
   if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
@@ -363,7 +364,7 @@ static PyObject* entrypoint( PyObject* self, PyObject* args )
 }
 
 extern "C"
-static PyObject* icon( PyObject* self, PyObject* args )
+PyObject* icon( PyObject* self, PyObject* args )
 {
   if (!args || PyObject_Length(args)!=3) {
     PyErr_SetString(PyExc_TypeError,
@@ -411,7 +412,7 @@ static PyObject* icon( PyObject* self, PyObject* args )
 }
 
 extern "C"
-static PyObject* resource( PyObject* self, PyObject* args )
+PyObject* resource( PyObject* self, PyObject* args )
 {
   if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
@@ -462,7 +463,7 @@ static PyObject* resource( PyObject* self, PyObject* args )
 }
 
 extern "C"
-static PyObject* verinfo( PyObject* self, PyObject* args )
+PyObject* verinfo( PyObject* self, PyObject* args )
 {
   if (!args || PyObject_Length(args)!=1) {
     PyErr_SetString(PyExc_TypeError,

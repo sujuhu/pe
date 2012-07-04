@@ -4,7 +4,7 @@ import pype
 #test_file = r'../examples/0c94b325dca948dcdf81036a5306901b.sample'
 #test_file = r'../examples/87f6447ba9b75486969b59e1c911ac72.sample'
 #test_file = r'../examples/test.bin'
-test_file = r'kernel32.dll'
+test_file = r'../examples/kernel32.dll'
 fd = file(test_file, 'rb')
 data = fd.read()
 fd.close()

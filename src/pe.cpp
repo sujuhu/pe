@@ -42,7 +42,7 @@ GNU General Public License for more details.
 #define DIRECTORY_ENTRY(s, i) \
 (&(GET_NT_HEADER(s)->OptionalHeader.DataDirectory[i]))
 
-bool IsValidPE(
+int IsValidPE(
     const char* stream,
     size_t stream_size)
 {
