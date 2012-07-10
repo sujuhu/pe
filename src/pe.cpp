@@ -16,11 +16,22 @@ GNU General Public License for more details.
 #pragma warning(disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
 #include <errno.h>
 #include <assert.h>
 #include "imgfmt.h"
 #include "pe.h"
 
+#ifdef __GNUC__
+#ifdef __MINGW32__
+
+#else
+//linux or linux
+#define _snprintf snprintf
+#define _snwprintf swprintf
+#endif
+#endif
 
 //用于字节边界对齐
 #define ALIGN(o,a)  (((a))?(((o)/(a)+((o)%(a)!=0))*(a)):(o))
@@ -141,7 +152,7 @@ bool GetExportDllName(
     size_t bufsize)
 {
   if (stream == NULL
-   || IsBadReadPtr(stream, stream_size)
+   /*|| IsBadReadPtr(stream, stream_size)*/
    || dll_name == NULL
    || bufsize == 0) {
     errno = EINVAL;
@@ -185,9 +196,9 @@ bool EnumExportFunction(
     size_t* bufsize )
 {
   if (stream == NULL
-   || IsBadReadPtr(stream, stream_size)
+   /*|| IsBadReadPtr(stream, stream_size)*/
    || bufsize == NULL
-   || IsBadWritePtr(bufsize , sizeof(size_t))) {
+   /*|| IsBadWritePtr(bufsize , sizeof(size_t))*/) {
     errno = EINVAL;
     return false;
   }
@@ -222,11 +233,12 @@ bool EnumExportFunction(
     errno = EINVAL;
     return false;
   }
-
+  /*
   if (IsBadWritePtr(exports, *bufsize)) {
     errno = EINVAL;
     return false;
   }
+  */
   memset(exports, 0, *bufsize);
   *bufsize =  export_header->NumberOfFunctions * sizeof(EXPORT_FUNCTION);
 
@@ -288,7 +300,7 @@ bool EnumImportModuleAndFunction(
     fnEnumImportFunctionCallback api_routine,
     void* api_param)
 {
-  if (stream == NULL || IsBadReadPtr(stream, stream_size)) {
+  if (stream == NULL /*|| IsBadReadPtr(stream, stream_size)*/) {
     errno = EINVAL;
     return false;
   }
@@ -328,10 +340,12 @@ bool EnumImportModuleAndFunction(
                                  + raw
                                  + num_module * sizeof(IMAGE_IMPORT_DESCRIPTOR));
 
+    /*
     if (IsBadReadPtr((char*)import_descriptor, sizeof(IMAGE_IMPORT_DESCRIPTOR))) {
       errno = ERANGE;
       break;
     }
+    */
 
     //获取导入模块名称
     raw_t raw_name = RvaToRaw(stream, stream_size, import_descriptor->Name);
@@ -340,10 +354,12 @@ bool EnumImportModuleAndFunction(
       break;
     }
 
+    /*
     if (IsBadReadPtr((char*)(stream + raw_name), 1)) {
       errno = ERANGE;
       break;
     }
+    */
 
     IMPORT_MODULE module = {0};
     strncpy(module.ModuleName,
@@ -433,7 +449,7 @@ int  GetImportModuleCount(
     const char* stream,
     size_t stream_size)
 {
-  if (stream == NULL || IsBadReadPtr(stream, stream_size)) {
+  if (stream == NULL /*|| IsBadReadPtr(stream, stream_size)*/) {
     errno = EINVAL;
     return -1;
   }
@@ -596,12 +612,12 @@ bool WalkResource(
         //资源目录顶层
         char* name = GetResourceTypeName(Entry[i].Id);
         if (name == NULL)
-          itoa(Entry[i].Id, strid, 10);
+          sprintf(strid, "%d", Entry[i].Id);
         else
           strncpy(strid, name, sizeof(strid) - 1 );
       } else {
         //非资源目录顶层
-        itoa(Entry[i].Id, strid, 10);
+        sprintf(strid, "%d", Entry[i].Id);
       }
 
       NewSize = NameLen + sizeof(wchar_t) + strlen(strid) * sizeof(wchar_t);
@@ -662,7 +678,7 @@ bool EnumResource(
     void* lpParam)
 {
   if (stream == NULL
-   || IsBadReadPtr(stream, stream_size)
+   /*|| IsBadReadPtr(stream, stream_size)*/
    || pfnRoutine == NULL) {
     errno = EINVAL;
     return false;
@@ -706,17 +722,17 @@ bool EnumRelocation(
     RELOC_ITEM_CALLBACK item_routine,
     void* lpItemParam )
 {
-  if (stream == NULL || IsBadReadPtr(stream, stream_size)) {
+  if (stream == NULL /*|| IsBadReadPtr(stream, stream_size)*/) {
     errno = EINVAL;
     return false;
   }
 
-  if (block_routine != NULL && IsBadCodePtr((FARPROC)block_routine)) {
+  if (block_routine != NULL /*&& IsBadCodePtr((FARPROC)block_routine)*/) {
     errno = EINVAL;
     return false;
   }
 
-  if (item_routine != NULL && IsBadCodePtr((FARPROC)item_routine)) {
+  if (item_routine != NULL /*&& IsBadCodePtr((FARPROC)item_routine)*/) {
     errno = EINVAL;
     return false;
   }
@@ -785,13 +801,13 @@ bool EnumBound(
     PPE_BOUND pBounds,
     size_t* pcbSize)
 {
-  if (stream == NULL || IsBadReadPtr(stream, stream_size)) {
-    SetLastError(ERROR_INVALID_PARAMETER);
+  if (stream == NULL /*|| IsBadReadPtr(stream, stream_size)*/) {
+    //SetLastError(ERROR_INVALID_PARAMETER);
     return false;
   }
 
-  if (pcbSize == NULL || IsBadWritePtr(pcbSize , sizeof(size_t))) {
-    SetLastError(ERROR_INVALID_PARAMETER);
+  if (pcbSize == NULL /*|| IsBadWritePtr(pcbSize , sizeof(size_t))*/) {
+    //SetLastError(ERROR_INVALID_PARAMETER);
     return false;
   }
 
@@ -800,7 +816,7 @@ bool EnumBound(
   rva_t block_size
     = GET_NT_HEADER(stream)->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT].Size;
   if (block_rva >= stream_size) {
-    SetLastError(ERROR_BAD_EXE_FORMAT);
+    //SetLastError(ERROR_BAD_EXE_FORMAT);
     return false;
   }
 
@@ -822,14 +838,16 @@ bool EnumBound(
 
   if (*pcbSize < cBound * sizeof(IMAGE_BOUND_IMPORT_DESCRIPTOR)) {
     *pcbSize = cBound * sizeof(IMAGE_BOUND_IMPORT_DESCRIPTOR);
-    SetLastError(ERROR_INSUFFICIENT_BUFFER);
+    //SetLastError(ERROR_INSUFFICIENT_BUFFER);
     return false;
   }
 
+  /*
   if (IsBadWritePtr(pBounds, *pcbSize)) {
     SetLastError(ERROR_INVALID_PARAMETER);
     return false;
   }
+  */
 
   memset(pBounds, 0, *pcbSize);
   *pcbSize = cBound * sizeof(IMAGE_BOUND_IMPORT_DESCRIPTOR);
@@ -916,7 +934,7 @@ bool GetSectionHeader(
   */
 
   if (section_header == NULL
-    || IsBadWritePtr(section_header, sizeof(IMAGE_SECTION_HEADER))) {
+    /*|| IsBadWritePtr(section_header, sizeof(IMAGE_SECTION_HEADER))*/) {
     errno = EINVAL;
     return false;
   }
@@ -1235,35 +1253,37 @@ bool RemoveLastSection(
   return true;
 }
 
-
+#if (defined(__MINGW32__) || defined(__MSC_VER__))
 bool QueryValue(
-    LPCTSTR szQuery,
+    const char* szQuery,
     LPVOID pBlock,
-    LPTSTR lpszValue,
+    char* lpszValue,
     DWORD cbValueSize)
 {
   LPVOID pValueInBlock = NULL;
   UINT nLen = 0;
-  if( !VerQueryValue( pBlock, (LPSTR)szQuery, (LPVOID*)&pValueInBlock, &nLen ))
+  if( !VerQueryValue( pBlock, (char*)szQuery, (LPVOID*)&pValueInBlock, &nLen ))
     return false;
 
   //缓冲区足够
-  strncpy( lpszValue, (PCHAR)pValueInBlock, (cbValueSize - 1) < nLen ? ( cbValueSize - 1 ): nLen  );
+  strncpy( lpszValue, (char*)pValueInBlock, (cbValueSize - 1) < nLen ? ( cbValueSize - 1 ): nLen  );
   return true;
 }
+#endif
 
 bool GetVersionInfo(
     const char* filename,
     PE_VERSION *verinfo)
 {
+#if (defined(__MINGW32__) || defined(__MSC_VER__))
   //检验参数
-  if (filename == NULL || IsBadStringPtr( filename, -1)) {
-    SetLastError( ERROR_INVALID_PARAMETER );
+  if (filename == NULL /*|| IsBadStringPtr( filename, -1)*/) {
+    //SetLastError( ERROR_INVALID_PARAMETER );
     return false;
   }
 
-  if (verinfo == NULL || IsBadWritePtr( verinfo, sizeof(PE_VERSION))) {
-    SetLastError( ERROR_INVALID_PARAMETER );
+  if (verinfo == NULL /*|| IsBadWritePtr( verinfo, sizeof(PE_VERSION))*/) {
+    //SetLastError( ERROR_INVALID_PARAMETER );
     return false;
   }
 
@@ -1272,16 +1292,16 @@ bool GetVersionInfo(
   if (0 == (dwInfoSize = GetFileVersionInfoSize(filename,  &dwHandle)))
     return false;
 
-  LPVOID pData = new char[dwInfoSize];
+  LPVOID pData = (LPVOID)malloc(dwInfoSize);
   if( pData == NULL ) {
-    SetLastError( ERROR_NOT_ENOUGH_MEMORY );
+    //SetLastError( ERROR_NOT_ENOUGH_MEMORY );
     return false;
   }
   memset(pData, 0, dwInfoSize);
 
   //获取文件信息块
-  if( 0 == GetFileVersionInfo(filename, NULL, dwInfoSize, pData)) {
-    delete[] pData;
+  if( 0 == GetFileVersionInfo(filename, 0, dwInfoSize, pData)) {
+    free(pData);
     pData = NULL;
     return false;
   }
@@ -1293,9 +1313,9 @@ bool GetVersionInfo(
 
   UINT  nLen = 0;
   LANGANDCODEPAGE *pTranslate = NULL;
-  if(!VerQueryValue(pData,  TEXT("\\VarFileInfo\\Translation"),
+  if(!VerQueryValue(pData, "\\VarFileInfo\\Translation",
                     (LPVOID*)&pTranslate, &nLen)) {
-    delete[] pData;
+    free(pData);
     pData = NULL;
     return false;
   }
@@ -1381,9 +1401,12 @@ bool GetVersionInfo(
              verinfo->OriginalFilename,
              sizeof(verinfo->OriginalFilename));
 
-  delete[] pData;
+  free(pData);
   pData = NULL;
   return true;
+#else
+  return false;
+#endif 
 }
 
 bool LoadPERelocRoutine(
@@ -1403,6 +1426,9 @@ bool LoadPE_IATRoutine(
     PIMPORT_MODULE pImportModule,
     void* lpParam )
 {
+#ifdef __GNUC__
+  return false;
+#else
   char* image = (char*)lpParam;
   IMAGE_NT_HEADERS *nt = (IMAGE_NT_HEADERS*)image;
 
@@ -1420,10 +1446,15 @@ bool LoadPE_IATRoutine(
   printf("%-60s0x%08X\n", pImportFunction->FunctionName, pImportFunction->iat);
   //*(rva_t*)(image + pImportFunction->ThunkRVA) = addr;
   return true;
+#endif
 }
 
 bool LoadPEImage(const char* stream, size_t stream_size, char* image, size_t image_size)
 {
+#ifdef __GNUC__
+  return false;
+#else
+
   IMAGE_NT_HEADERS *nt = GET_NT_HEADER(stream);
   if (image_size < nt->OptionalHeader.SizeOfImage){
     return false;
@@ -1470,4 +1501,5 @@ bool LoadPEImage(const char* stream, size_t stream_size, char* image, size_t ima
   image_nt->OptionalHeader.FileAlignment = nt->OptionalHeader.SectionAlignment;
 
   return true;
+#endif
 }

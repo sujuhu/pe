@@ -1,0 +1,807 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"PYTHON_LIB",
+				"PYTHON_LIBRARY_PATH"
+			],
+			[
+				"inclu",
+				"INCLUDE_DIRECTORIES"
+			],
+			[
+				"ole_han",
+				"ole_handle_t"
+			],
+			[
+				"ole_",
+				"ole_handle_t"
+			],
+			[
+				"vsd_se",
+				"vsd_section_t"
+			],
+			[
+				"pack",
+				"packed_object_header_v2000_t"
+			],
+			[
+				"location_record",
+				"location_record_legacy_t"
+			],
+			[
+				"decomp",
+				"decompressor"
+			],
+			[
+				"OLESS",
+				"OLESSDirectoryEntry"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "petool/petool.cpp",
+			"settings":
+			{
+				"buffer_size": 12334,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "test/87f6447ba9b75486969b59e1c911ac72.sample",
+			"settings":
+			{
+				"buffer_size": 2621222,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/0c94b325dca948dcdf81036a5306901b.sample",
+			"settings":
+			{
+				"buffer_size": 102400,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 528,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/src/autoit/autoit.cpp",
+			"settings":
+			{
+				"buffer_size": 11755,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "pe.sublime-project",
+			"settings":
+			{
+				"buffer_size": 570,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "test/testpe.cpp",
+			"settings":
+			{
+				"buffer_size": 1775,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 384,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "pywrap/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 2263,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "pywrap/pype.cpp",
+			"settings":
+			{
+				"buffer_size": 16156,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "pywrap/example.py",
+			"settings":
+			{
+				"buffer_size": 1939,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/pe.h",
+			"settings":
+			{
+				"buffer_size": 10627,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "Packages/User/mingw_make.sublime-build",
+	"command_palette":
+	{
+		"height": 311.0,
+		"selected_items":
+		[
+			[
+				"gdb",
+				"SublimeGDB: Start Debugging"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control:",
+				"Package Control: List Packages"
+			],
+			[
+				"sublime",
+				"Sublime Files: Open Navigator"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"Cscope: ",
+				"Cscope: Look up symbol"
+			],
+			[
+				"Snippet: ",
+				"Snippet: Do While Loop"
+			],
+			[
+				"",
+				"Project: Save As"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 277.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/D/src/pe/test/test.cpp",
+		"/D/app/sublime/Data/Packages/SublimeGDB/SublimeGDB.sublime-settings",
+		"/D/src/pe/petool/CMakeLists.txt",
+		"/D/src/pe/test/CMakeLists.txt",
+		"/D/src/pe/src/CMakeLists.txt",
+		"/D/app/sublime/Data/Packages/SublimeGDB/Default.sublime-keymap",
+		"/D/src/pe/src/pe.cpp",
+		"/D/src/pe/pe.sublime-project",
+		"/D/app/sublime/Data/Packages/User/cmake.sublime-build",
+		"/D/src/pe/pe.sublime-workspace",
+		"/D/src/pe/CMakeLists.txt",
+		"/D/app/sublime/Data/Packages/User/mingw_make.sublime-build",
+		"/D/src/pe/Makefile",
+		"/D/src/pe/CMakeCache.txt",
+		"/D/src/pe/install_manifest.txt",
+		"/D/src/pe/pywrap/setup.py",
+		"/D/src/pe/pywrap/setup.cfg",
+		"/D/src/pe/pywrap/CMakeLists.txt",
+		"/D/src/pe/src/pe.h",
+		"/D/app/sublime/Data/Packages/SublimeGDB/sublimegdb.py",
+		"/D/src/pe/sublimegdb.txt",
+		"/D/app/sublime/Data/Packages/User/Default (Windows).sublime-keymap",
+		"/D/app/sublime/Data/Packages/User/SublimeGDB.sublime-settings",
+		"/D/src/pe/CMake Error at pybuild/cmake_install.cmake",
+		"/D/src/pe/pype.cpp",
+		"/C/Users/analyst004/Desktop/pype-141032.cpp",
+		"/D/src/pe/python/pype.cpp",
+		"/D/src/pe/python/pe.cpp",
+		"/D/src/pe/python/CMakeLists.txt",
+		"/D/src/pe/python/setup.py",
+		"/D/src/pe/python/example.py",
+		"/D/src/pe/python/pype.i",
+		"/D/src/pe/python/pype.pyd",
+		"/D/src/pe/python/setup.cfg",
+		"/D/src/pe/pype/pype.pyd",
+		"/D/src/pe/pype/pype.cpp",
+		"/D/src/pe/pype/setup.cfg",
+		"/D/src/pe/pe.cpp",
+		"/D/src/pe/pywrapper/setup.py",
+		"/D/src/pe/pywrarpper/example.py",
+		"/D/src/pe/pywrapper/CMakeLists.txt",
+		"/D/src/pe/pywrarpper/CMakeLists.txt",
+		"/D/src/pe/pype/CMakeLists.txt",
+		"/D/src/cvescan/CMake Error at src/CMakeLists.txt",
+		"/D/src/cvescan/src/example.cpp",
+		"/D/src/cvescan/src/cvescan.cpp",
+		"/D/src/include/msvisio.h",
+		"/D/src/include/oless.h",
+		"/D/src/include/msttf.h",
+		"/D/src/cvescan/src/cve_2012_0018.cpp",
+		"/D/src/cvescan/src/cve_2012_0143.cpp",
+		"/D/src/cvescan/src/cve_2012_0158.cpp",
+		"/D/src/cvescan/src/cve_2012_0159.cpp",
+		"/D/src/cvescan/src/cve_2012_0183.cpp",
+		"/D/src/cvescan/src/cve_2012_0184.cpp",
+		"/D/src/cvescan/cmake_install.cmake",
+		"/D/src/cvescan/CMakeCache.txt",
+		"/D/src/cvescan/CMakeLists.txt",
+		"/D/src/cvescan/src/CMakeLists.txt",
+		"/D/src/cvescan/src/cve_2012_0185.cpp",
+		"/D/app/sublime/Data/Packages/User/cmake.bat",
+		"/D/app/sublime/Data/Packages/User/untitled.sublime-build",
+		"/D/src/msoffice/src/msword.cpp",
+		"/D/src/msoffice/src/msword.h",
+		"/D/src/msoffice/src/oless.cpp",
+		"/D/src/msoffice/src/oless.h",
+		"/D/src/msoffice/msword.h",
+		"/D/src/msoffice/libmsoffice.rc",
+		"/D/src/msoffice/libmsoffice.cpp",
+		"/C/MinGW/msys/1.0/src/mingw/main.c",
+		"/D/src/msoffice/msttf.cpp",
+		"/D/src/msoffice/msvisio.cpp",
+		"/D/src/msoffice/cve_2012_0018.cpp",
+		"/D/src/msoffice/msrtf.h",
+		"/D/src/msoffice/cve_2012_0158.cpp",
+		"/D/src/msoffice/oless.h",
+		"/D/src/msoffice/cve_2012_0184.cpp",
+		"/D/src/msoffice/cve_2012_0185.cpp",
+		"/D/src/msoffice/filemap.h",
+		"/D/src/msoffice/filemap.c",
+		"/D/src/msoffice/getopt.c",
+		"/D/src/msoffice/libmsoffice.h",
+		"/D/src/msoffice/example.cpp",
+		"/D/src/msoffice/win32/Makefile.mingw",
+		"/D/src/libpng/scripts/makefile.mingw",
+		"/D/app/sublime/Data/Packages/FileTemplates/Templates/H.h",
+		"/D/src/libautoit/test.h",
+		"/D/src/libautoit/test.cpp",
+		"/D/src/libautoit/ctags.tmp",
+		"/D/src/libautoit/pyautoit/example.py",
+		"/D/src/libautoit/libautoit.exp",
+		"/D/app/sublime/Data/Packages/User/C++.sublime-settings",
+		"/D/app/sublime/Data/Packages/Default/Default (Windows).sublime-keymap",
+		"/D/src/libautoit/test.java",
+		"/D/src/libautoit/libautoit.sublime-project",
+		"/D/src/libautoit/Makefile.msc",
+		"/D/src/libautoit/libautoit.rc",
+		"/D/app/sublime/Data/Packages/User/JSON.sublime-settings",
+		"/D/app/sublime/Data/Packages/User/Preferences.sublime-settings",
+		"/D/app/sublime/Data/Packages/User/Distraction Free.sublime-settings",
+		"/D/app/sublime/Data/Packages/Default/Preferences.sublime-settings",
+		"/D/src/libautoit/example.cpp",
+		"/D/src/libautoit/libautoit.def",
+		"/D/src/libautoit/libautoit.h",
+		"/D/app/sublime/Data/Packages/Default File Type/Default.sublime-keymap",
+		"/D/src/libautoit/libautoit.cpp"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"        \"",
+			"sourcedir",
+			"workingdir",
+			"get_setting",
+			"system",
+			"DEBUG",
+			"DEBUG_FILE",
+			"expand_path",
+			"/tmp",
+			"workingdir",
+			"gdblaunch",
+			"gdboutput",
+			"pipe",
+			"gdboutput",
+			"Launch",
+			"run_cmd",
+			"exec-run",
+			"exec_run",
+			"exec_cmd",
+			"interpreter",
+			"compiler",
+			"get_strdump",
+			"get_icon",
+			"get_resource",
+			"get_import",
+			"get_entry",
+			"analysis_autoit",
+			"get_overlay",
+			"sections",
+			"initpype",
+			"_*[package]*_",
+			"cvescan",
+			"install",
+			"src",
+			"LIBNAME",
+			"ALIGN",
+			"CFLAGS",
+			"WINDOWS",
+			"-lmingw32",
+			"%",
+			"LDSFLAGS",
+			"objsdll",
+			"LIBXSLT_MAJOR_VERSION",
+			"ctrl+alt+a",
+			"+a"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"pype"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 6,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "petool/petool.cpp",
+					"settings":
+					{
+						"buffer_size": 12334,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12314,
+								12314
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7556.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "test/87f6447ba9b75486969b59e1c911ac72.sample",
+					"settings":
+					{
+						"buffer_size": 2621222,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "test/0c94b325dca948dcdf81036a5306901b.sample",
+					"settings":
+					{
+						"buffer_size": 102400,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "test/CMakeLists.txt",
+					"settings":
+					{
+						"buffer_size": 528,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								341,
+								373
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/D/src/autoit/autoit.cpp",
+					"settings":
+					{
+						"buffer_size": 11755,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								340,
+								340
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2538.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "pe.sublime-project",
+					"settings":
+					{
+						"buffer_size": 570,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								567,
+								567
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "test/testpe.cpp",
+					"settings":
+					{
+						"buffer_size": 1775,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								510,
+								510
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 270.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "CMakeLists.txt",
+					"settings":
+					{
+						"buffer_size": 384,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								384,
+								384
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "pywrap/CMakeLists.txt",
+					"settings":
+					{
+						"buffer_size": 2263,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2077,
+								1917
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CMake/CMake.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 756.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "pywrap/pype.cpp",
+					"settings":
+					{
+						"buffer_size": 16156,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "pywrap/example.py",
+					"settings":
+					{
+						"buffer_size": 1939,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 11,
+					"file": "src/pe.h",
+					"settings":
+					{
+						"buffer_size": 10627,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								523,
+								523
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1944.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.5,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 228.0
+	},
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"",
+				"libautoit.h"
+			],
+			[
+				"ex",
+				"example.cpp"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 161.0,
+	"status_bar_visible": true
+}

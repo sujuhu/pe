@@ -15,6 +15,7 @@ GNU General Public License for more details.
 #ifndef LIB_PE_H_
 #define LIB_PE_H_
 
+#include "imgfmt.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

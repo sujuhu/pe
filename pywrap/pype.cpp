@@ -1,9 +1,10 @@
 ﻿// pefile.cpp : Defines the entry point for the console application.
 //
 //#pragma  warning( disable:4996 )
-#include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
-#include <python.h>
+#include <Python.h>
 #include "../src/pe.h"
 #include <vector>
 using namespace std;
@@ -104,7 +105,8 @@ PyObject* sections(PyObject* self, PyObject* args)
   assert(PyTuple_Size(pTuple) == nt->FileHeader.NumberOfSections );
   for( ; i < nt->FileHeader.NumberOfSections; i++ ) {
 
-    IMAGE_SECTION_HEADER header = {0};
+    IMAGE_SECTION_HEADER header;
+    memset(&header, 0, sizeof(IMAGE_SECTION_HEADER));
     if( GetSectionHeader( data, i, &header ) ) {
       PyObject* item = NULL;
       item = PyDict_New();
@@ -401,8 +403,8 @@ PyObject* icon( PyObject* self, PyObject* args )
     return NULL;
   }
 
-  raw_t icon_raw = 0;
-  size_t icon_len = 0;
+  //raw_t icon_raw = 0;
+  //size_t icon_len = 0;
   if (!GetIcon(data, data_len, ico_file)) {
     //get icon fail
     Py_RETURN_FALSE;

@@ -8,7 +8,7 @@ module1 = Extension('pype',
                     #              "../build"],
                     #library_dirs = ["../build"],
                     libraries=["version"],
-                    extra_objects = ["../build/libpe.a"],
+                    extra_objects = ["../../lib/libpe.a"],
                     #extra_compile_args=["/MT", "/W3", "/Od", "/Oy", "/Zi"],
                     #extra_link_args=["/nologo",
                     #                 "/debug",
@@ -16,7 +16,7 @@ module1 = Extension('pype',
                     #                 "/opt:ref",
                     #                ]
 )
-setup ( name = 'PackageName',
-        version = '0.3.1',
+setup ( name = 'pype',
+        version = '0.3.2',
         description = 'Python module wrapping libpe',
         ext_modules = [module1])

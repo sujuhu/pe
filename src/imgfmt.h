@@ -2,11 +2,15 @@
 # include <windows.h>
 #else
 
-#include <cpprt.h>
+//#include <cpprt.h>
 
 #ifndef __windows_image_formats_h__
 #define __windows_image_formats_h__
-
+typedef int 					BOOLEAN;
+typedef wchar_t					WCHAR;
+typedef short 					SHORT;
+typedef char 					CHAR;
+typedef long 					LONG;
 typedef unsigned long       	DWORD;
 typedef int                 	BOOL;
 typedef unsigned char       	BYTE;
@@ -25,11 +29,24 @@ typedef long          		*LPLONG;
 typedef DWORD         		*PDWORD;
 typedef DWORD         		*LPDWORD;
 typedef void          		*LPVOID;
-typedef CONST void       	*LPCVOID;
+typedef void 				VOID;
+typedef const void       	*LPCVOID;
 
 typedef int                 	INT;
 typedef unsigned int        	UINT;
 typedef unsigned int        	*PUINT;
+typedef unsigned long long      ULONGLONG;
+
+#if ! (defined _GUID_DEFINED || defined GUID_DEFINED) /* also defined in basetyps.h */
+#define GUID_DEFINED
+typedef struct _GUID {
+  unsigned long  Data1;
+  unsigned short Data2;
+  unsigned short Data3;
+  unsigned char  Data4[8];
+} GUID, *REFGUID, *LPGUID; 
+typedef GUID CLSID;
+#endif
 
 #ifndef _MAC
 
@@ -561,7 +578,7 @@ typedef struct _IMAGE_SYMBOL {
 	BYTE    StorageClass;
 	BYTE    NumberOfAuxSymbols;
 } IMAGE_SYMBOL;
-typedef IMAGE_SYMBOL UNALIGNED *PIMAGE_SYMBOL;
+//typedef IMAGE_SYMBOL UNALIGNED *PIMAGE_SYMBOL;
 
 
 #define IMAGE_SIZEOF_SYMBOL                  18
@@ -722,7 +739,7 @@ typedef union _IMAGE_AUX_SYMBOL {
 		BYTE    Selection;                      // communal selection type
 	} Section;
 } IMAGE_AUX_SYMBOL;
-typedef IMAGE_AUX_SYMBOL UNALIGNED *PIMAGE_AUX_SYMBOL;
+//typedef IMAGE_AUX_SYMBOL UNALIGNED *PIMAGE_AUX_SYMBOL;
 
 #define IMAGE_SIZEOF_AUX_SYMBOL             18
 
@@ -730,7 +747,7 @@ typedef enum IMAGE_AUX_SYMBOL_TYPE {
 	IMAGE_AUX_SYMBOL_TYPE_TOKEN_DEF = 1,
 } IMAGE_AUX_SYMBOL_TYPE;
 
-#include <pshpack2.h>
+#include "pshpack2.h"
 
 typedef struct IMAGE_AUX_SYMBOL_TOKEN_DEF {
 	BYTE  bAuxType;                  // IMAGE_AUX_SYMBOL_TYPE
@@ -739,9 +756,9 @@ typedef struct IMAGE_AUX_SYMBOL_TOKEN_DEF {
 	BYTE  rgbReserved[12];           // Must be 0
 } IMAGE_AUX_SYMBOL_TOKEN_DEF;
 
-typedef IMAGE_AUX_SYMBOL_TOKEN_DEF UNALIGNED *PIMAGE_AUX_SYMBOL_TOKEN_DEF;
+//typedef IMAGE_AUX_SYMBOL_TOKEN_DEF UNALIGNED *PIMAGE_AUX_SYMBOL_TOKEN_DEF;
 
-#include <poppack.h>
+#include "poppack.h"
 
 //
 // Communal selection types.
@@ -771,7 +788,7 @@ typedef struct _IMAGE_RELOCATION {
 	DWORD   SymbolTableIndex;
 	WORD    Type;
 } IMAGE_RELOCATION;
-typedef IMAGE_RELOCATION UNALIGNED *PIMAGE_RELOCATION;
+//typedef IMAGE_RELOCATION UNALIGNED *PIMAGE_RELOCATION;
 
 #define IMAGE_SIZEOF_RELOCATION         10
 
@@ -1125,7 +1142,7 @@ typedef struct _IMAGE_LINENUMBER {
 	} Type;
 	WORD    Linenumber;                         // Line number.
 } IMAGE_LINENUMBER;
-typedef IMAGE_LINENUMBER UNALIGNED *PIMAGE_LINENUMBER;
+//typedef IMAGE_LINENUMBER UNALIGNED *PIMAGE_LINENUMBER;
 
 #define IMAGE_SIZEOF_LINENUMBER              6
 
@@ -1142,7 +1159,7 @@ typedef struct _IMAGE_BASE_RELOCATION {
 	DWORD   SizeOfBlock;
 	//  WORD    TypeOffset[1];
 } IMAGE_BASE_RELOCATION;
-typedef IMAGE_BASE_RELOCATION UNALIGNED * PIMAGE_BASE_RELOCATION;
+//typedef IMAGE_BASE_RELOCATION UNALIGNED * PIMAGE_BASE_RELOCATION;
 
 #define IMAGE_SIZEOF_BASE_RELOCATION         8
 
@@ -1225,7 +1242,7 @@ typedef struct _IMAGE_THUNK_DATA64 {
 		ULONGLONG AddressOfData;    // PIMAGE_IMPORT_BY_NAME
 	} u1;
 } IMAGE_THUNK_DATA64;
-typedef IMAGE_THUNK_DATA64 * PIMAGE_THUNK_DATA64;
+//typedef IMAGE_THUNK_DATA64 * PIMAGE_THUNK_DATA64;
 
 #include "poppack.h"                        // Back to 4 byte packing
 
@@ -1237,7 +1254,7 @@ typedef struct _IMAGE_THUNK_DATA32 {
 		DWORD AddressOfData;        // PIMAGE_IMPORT_BY_NAME
 	} u1;
 } IMAGE_THUNK_DATA32;
-typedef IMAGE_THUNK_DATA32 * PIMAGE_THUNK_DATA32;
+//typedef IMAGE_THUNK_DATA32 * PIMAGE_THUNK_DATA32;
 
 #define IMAGE_ORDINAL_FLAG64 0x8000000000000000
 #define IMAGE_ORDINAL_FLAG32 0x80000000
@@ -1251,10 +1268,10 @@ typedef IMAGE_THUNK_DATA32 * PIMAGE_THUNK_DATA32;
 //
 
 typedef VOID
-(NTAPI *PIMAGE_TLS_CALLBACK) (
-			      PVOID DllHandle,
+(/*NTAPI*/ *PIMAGE_TLS_CALLBACK) (
+			      void* DllHandle,
 			      DWORD Reason,
-			      PVOID Reserved
+			      void* Reserved
 			      );
 
 typedef struct _IMAGE_TLS_DIRECTORY64 {
@@ -1265,7 +1282,7 @@ typedef struct _IMAGE_TLS_DIRECTORY64 {
 	DWORD   SizeOfZeroFill;
 	DWORD   Characteristics;
 } IMAGE_TLS_DIRECTORY64;
-typedef IMAGE_TLS_DIRECTORY64 * PIMAGE_TLS_DIRECTORY64;
+//typedef IMAGE_TLS_DIRECTORY64 * PIMAGE_TLS_DIRECTORY64;
 
 typedef struct _IMAGE_TLS_DIRECTORY32 {
 	DWORD   StartAddressOfRawData;
@@ -1275,7 +1292,7 @@ typedef struct _IMAGE_TLS_DIRECTORY32 {
 	DWORD   SizeOfZeroFill;
 	DWORD   Characteristics;
 } IMAGE_TLS_DIRECTORY32;
-typedef IMAGE_TLS_DIRECTORY32 * PIMAGE_TLS_DIRECTORY32;
+//typedef IMAGE_TLS_DIRECTORY32 * PIMAGE_TLS_DIRECTORY32;
 
 #ifdef _WIN64
 #define IMAGE_ORDINAL_FLAG              IMAGE_ORDINAL_FLAG64
@@ -1289,10 +1306,10 @@ typedef PIMAGE_TLS_DIRECTORY64          PIMAGE_TLS_DIRECTORY;
 #define IMAGE_ORDINAL_FLAG              IMAGE_ORDINAL_FLAG32
 #define IMAGE_ORDINAL(Ordinal)          IMAGE_ORDINAL32(Ordinal)
 typedef IMAGE_THUNK_DATA32              IMAGE_THUNK_DATA;
-typedef PIMAGE_THUNK_DATA32             PIMAGE_THUNK_DATA;
+typedef IMAGE_THUNK_DATA32*             PIMAGE_THUNK_DATA;
 #define IMAGE_SNAP_BY_ORDINAL(Ordinal)  IMAGE_SNAP_BY_ORDINAL32(Ordinal)
 typedef IMAGE_TLS_DIRECTORY32           IMAGE_TLS_DIRECTORY;
-typedef PIMAGE_TLS_DIRECTORY32          PIMAGE_TLS_DIRECTORY;
+typedef IMAGE_TLS_DIRECTORY32*          PIMAGE_TLS_DIRECTORY;
 #endif
 
 typedef struct _IMAGE_IMPORT_DESCRIPTOR {
@@ -1309,7 +1326,7 @@ typedef struct _IMAGE_IMPORT_DESCRIPTOR {
 	DWORD   Name;
 	DWORD   FirstThunk;                     // RVA to IAT (if bound this IAT has actual addresses)
 } IMAGE_IMPORT_DESCRIPTOR;
-typedef IMAGE_IMPORT_DESCRIPTOR UNALIGNED *PIMAGE_IMPORT_DESCRIPTOR;
+//typedef IMAGE_IMPORT_DESCRIPTOR UNALIGNED *PIMAGE_IMPORT_DESCRIPTOR;
 
 //
 // New format import descriptors pointed to by DataDirectory[ IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT ]
