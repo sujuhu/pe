@@ -1,1 +1,0 @@
-/usr/bin/c++    -O0 -g -ggdb   CMakeFiles/petool.dir/petool.cpp.o CMakeFiles/petool.dir/strconv.cpp.o  -o petool -rdynamic -L/usr/local/lib libpe.a -lfilemap -Wl,-rpath,/usr/local/lib: 

@@ -1,1 +1,0 @@
-/usr/bin/c++    -O0 -g -ggdb   CMakeFiles/testpe.dir/testpe.cpp.o  -o testpe -rdynamic -L/usr/local/lib ../lib/libpe.a -lcppunit -lfilemap -ldl -Wl,-rpath,/usr/local/lib: 
