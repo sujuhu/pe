@@ -1,0 +1,5 @@
+/home/analyst004/pe/build/lib/CMakeFiles/pe_dynamic.dir
+/home/analyst004/pe/build/lib/CMakeFiles/pe_static.dir
+/home/analyst004/pe/build/lib/CMakeFiles/petool.dir
+/home/analyst004/pe/build/pywrap/CMakeFiles/python.dir
+/home/analyst004/pe/build/test/CMakeFiles/testpe.dir

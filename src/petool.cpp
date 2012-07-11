@@ -8,6 +8,7 @@
 #include <string>
 #include <filemap.h>
 #include <vector>
+#include "strconv.h"
 using namespace std;
 #include "../src/pe.h"
 
@@ -144,14 +145,12 @@ bool ResourceRoutine(
   memset(&item, 0, sizeof(RESITEM));
   char* name = (char*)malloc( (NameLen >> 1) + 1 );
   memset( name, 0, (NameLen >> 1) + 1  );
-  wcstombs( name, wName, (NameLen >> 1) );
+  _wcstombs( name, wName, (NameLen >> 1) );
   strncpy( item.name, name, sizeof(item.name) - 1);
   //item.name = name;
   item.offset = DataEntry->OffsetToData;
   item.size = DataEntry->Size;
   item.codepage = DataEntry->CodePage;
-  printf("%s\n", item.name);
-  fflush(stdout);
   ctItem->push_back( item );
   free( name );
   name = NULL;

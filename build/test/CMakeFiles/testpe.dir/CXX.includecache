@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/analyst004/pe/test/testpe.cpp
+iostream
+-
+cppunit/TestRunner.h
+-
+cppunit/TestResult.h
+-
+cppunit/TestResultCollector.h
+-
+cppunit/extensions/HelperMacros.h
+-
+cppunit/BriefTestProgressListener.h
+-
+cppunit/extensions/TestFactoryRegistry.h
+-
+filemap.h
+-
+
+/usr/local/include/filemap.h
+windows.h
+-
+stdlib.h
+/usr/local/include/stdlib.h
+

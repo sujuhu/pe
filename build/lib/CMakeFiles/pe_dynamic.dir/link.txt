@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC  -O0 -g -ggdb  -shared -Wl,-soname,libpe.so.1 -o libpe.so.0.3 CMakeFiles/pe_dynamic.dir/pe.cpp.o CMakeFiles/pe_dynamic.dir/strconv.cpp.o -L/usr/local/lib 

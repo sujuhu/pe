@@ -1,6 +1,7 @@
 
 SET(SRC_LIST
-pe.cpp)
+pe.cpp
+strconv.cpp)
 
 
 
@@ -20,10 +21,11 @@ SET_TARGET_PROPERTIES(pe_dynamic PROPERTIES VERSION 0.3 SOVERSION 1)
 
 #tool 
 SET(TOOL_SRC_LIST
-petool.cpp)
+petool.cpp
+strconv.cpp)
 
 ADD_EXECUTABLE(petool ${TOOL_SRC_LIST})
-TARGET_LINK_LIBRARIES(petool pe_dynamic)
+TARGET_LINK_LIBRARIES(petool pe_static)
 TARGET_LINK_LIBRARIES(petool filemap)
 IF(WIN32)
 TARGET_LINK_LIBRARIES(petool version)
@@ -32,7 +34,7 @@ ENDIF(WIN32)
 #install
 INSTALL(TARGETS pe_static pe_dynamic
 	ARCHIVE DESTINATION lib
-	LIBRARY DESTINATION lib
+	LIBRARY DESTINATION bin
 	RUNTIME DESTINATION bin)
 INSTALL(FILES pe.h DESTINATION include)
 INSTALL(FILES imgfmt.h DESTINATION include)	

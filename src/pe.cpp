@@ -20,8 +20,7 @@ GNU General Public License for more details.
 #include <wchar.h>
 #include <errno.h>
 #include <assert.h>
-#include <locale.h>
-#include <iconv.h>
+#include "strconv.h"
 #include "imgfmt.h"
 #include "pe.h"
 
@@ -630,36 +629,9 @@ bool WalkResource(
       memset(NewName, 0, NewSize );
       memcpy(NewName, wName, NameLen);
       NewName[NameLen>>1] = L'\\';
-      //setlocale(LC_ALL,"chs");
-      
-      //printf( "%s %d + %d + %d == %d\n", strid, mbstowcs(NULL, strid, 0) * sizeof(wchar_t), sizeof(wchar_t), NameLen, NewSize);
+    
       int rest = (NewSize - NameLen - sizeof(wchar_t)) / sizeof(wchar_t) -1;
-      /*
-      setlocale(LC_CTYPE, " "); 
-      mbstowcs((wchar_t*)((char*)NewName + sizeof(wchar_t) + NameLen,
-                strid,
-                rest);x
-      */
-      iconv_t cd = iconv_open("UNICODE", "ASCII");
-      if(cd == (iconv_t)(-1)) {
-        printf("iconv_open failed");
-        free(NewName);
-        NewName = NULL;
-        return false;
-      } else {  
-        char* in = strid;
-        size_t in_len = strlen(strid);
-        wchar_t* out = (wchar_t*)((char*)NewName);
-        size_t out_len = (size_t)(in_len * sizeof(wchar_t));
-        if ( -1 == iconv(cd , &in, &in_len, (char**)&out, &out_len)) {
-            printf("iconv failed %d", errno);
-
-        }
-
-
-        printf("mbstowcs total_size = %d %S rest = %d\n", NewSize, out, rest);
-      }
-      iconv_close(cd);
+      _mbstowcs( (wchar_t*)((char*)NewName + sizeof(wchar_t) + NameLen), strid, rest);
     }
 
     if (Entry[i].DataIsDirectory) {

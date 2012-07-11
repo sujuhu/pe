@@ -1,0 +1,2 @@
+/usr/bin/ar cr libpe.a  CMakeFiles/pe_static.dir/pe.cpp.o CMakeFiles/pe_static.dir/strconv.cpp.o
+/usr/bin/ranlib libpe.a
