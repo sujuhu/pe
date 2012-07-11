@@ -1,4 +1,12 @@
 from distutils.core import setup, Extension
+import platform 
+osname = platform.system()
+
+if osname == "Windows":
+    shared_libs = ["version"]
+else:
+    shared_libs = []
+
 module1 = Extension('pype',
                     sources = ['pype.cpp'],
                     #define_macros = [('WIN32',None),
@@ -7,8 +15,8 @@ module1 = Extension('pype',
                     #library_dirs=[r'c:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib',
                     #              "../build"],
                     #library_dirs = ["../build"],
-                    libraries=["version"],
-                    extra_objects = ["../../lib/libpe.a"],
+                    libraries = shared_libs,
+                    extra_objects = ["../build/lib/libpe.a"],
                     #extra_compile_args=["/MT", "/W3", "/Od", "/Oy", "/Zi"],
                     #extra_link_args=["/nologo",
                     #                 "/debug",

@@ -1,4 +1,4 @@
-﻿/*
+/*
 
 Copyright(c) 2011. Kim Zhang[analyst004@gmail.com].
 
@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include <wchar.h>
 #include <errno.h>
 #include <assert.h>
+#include <locale.h>
+#include <iconv.h>
 #include "imgfmt.h"
 #include "pe.h"
 
@@ -598,7 +600,7 @@ bool WalkResource(
         (IMAGE_RESOURCE_DIR_STRING_U*)(root->lpFileData
                                      + root->ResRootOffset
                                      + Entry[i].NameOffset);
-      NewSize = NameLen + pString->Length + sizeof(wchar_t);
+      NewSize = NameLen + pString->Length + sizeof(wchar_t) + sizeof(wchar_t);
       NewName = (wchar_t*)malloc(NewSize);
       memset(NewName, 0, NewSize );
       memcpy(NewName, wName, NameLen);
@@ -606,6 +608,7 @@ bool WalkResource(
       memcpy((char*)NewName + NameLen + sizeof(wchar_t),
           pString->NameString,
           pString->Length);
+
     } else {
       char strid[64] = {0};
       if (wName==NULL && NameLen == 0) {
@@ -620,14 +623,43 @@ bool WalkResource(
         sprintf(strid, "%d", Entry[i].Id);
       }
 
-      NewSize = NameLen + sizeof(wchar_t) + strlen(strid) * sizeof(wchar_t);
+      int id_size = strlen(strid);
+      NewSize = NameLen + sizeof(wchar_t) + ( id_size + 1)* sizeof(wchar_t) ;
+
       NewName = (wchar_t*)malloc(NewSize);
       memset(NewName, 0, NewSize );
       memcpy(NewName, wName, NameLen);
       NewName[NameLen>>1] = L'\\';
-      mbstowcs((wchar_t*)((char*)NewName + NameLen + sizeof(wchar_t)),
+      //setlocale(LC_ALL,"chs");
+      
+      //printf( "%s %d + %d + %d == %d\n", strid, mbstowcs(NULL, strid, 0) * sizeof(wchar_t), sizeof(wchar_t), NameLen, NewSize);
+      int rest = (NewSize - NameLen - sizeof(wchar_t)) / sizeof(wchar_t) -1;
+      /*
+      setlocale(LC_CTYPE, " "); 
+      mbstowcs((wchar_t*)((char*)NewName + sizeof(wchar_t) + NameLen,
                 strid,
-                strlen(strid));
+                rest);x
+      */
+      iconv_t cd = iconv_open("UNICODE", "ASCII");
+      if(cd == (iconv_t)(-1)) {
+        printf("iconv_open failed");
+        free(NewName);
+        NewName = NULL;
+        return false;
+      } else {  
+        char* in = strid;
+        size_t in_len = strlen(strid);
+        wchar_t* out = (wchar_t*)((char*)NewName);
+        size_t out_len = (size_t)(in_len * sizeof(wchar_t));
+        if ( -1 == iconv(cd , &in, &in_len, (char**)&out, &out_len)) {
+            printf("iconv failed %d", errno);
+
+        }
+
+
+        printf("mbstowcs total_size = %d %S rest = %d\n", NewSize, out, rest);
+      }
+      iconv_close(cd);
     }
 
     if (Entry[i].DataIsDirectory) {
@@ -644,7 +676,6 @@ bool WalkResource(
             //用户取消递归
             free(NewName);
             NewName = NULL;
-            errno = ECANCELED;
             return false;
           }
         }
@@ -1063,7 +1094,7 @@ bool EnumIconRoutine(
 {
   PE_RES_FINDER* icon = (PE_RES_FINDER*)lpParam;
   wchar_t resname[16] = {0};
-  _snwprintf( resname, 16 - 1, L"\\ICON\\%d\\", icon->idres );
+  _snwprintf( (wchar_t*)resname, 16 - 1, L"\\ICON\\%d\\", icon->idres );
   //printf("%S==%S\t", resname, wName);
   if (wcsncmp( wName, resname, wcslen(resname)) == 0 ) {
     //printf("TRUE\n");
