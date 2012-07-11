@@ -3,8 +3,6 @@ SET(SRC_LIST
 pe.cpp
 strconv.cpp)
 
-
-
 #static library
 ADD_LIBRARY(pe_static STATIC ${SRC_LIST})
 SET_TARGET_PROPERTIES(pe_static PROPERTIES OUTPUT_NAME "pe")
@@ -38,6 +36,11 @@ INSTALL(TARGETS pe_static pe_dynamic
 	RUNTIME DESTINATION bin)
 INSTALL(FILES pe.h DESTINATION include)
 INSTALL(FILES imgfmt.h DESTINATION include)	
+INSTALL(FILES poppack.h DESTINATION include)
+INSTALL(FILES pshpack1.h DESTINATION include)
+INSTALL(FILES pshpack2.h DESTINATION include)
+INSTALL(FILES pshpack4.h DESTINATION include)
+INSTALL(FILES pshpack8.h DESTINATION include)
 INSTALL(TARGETS petool RUNTIME DESTINATION bin)
 
 
