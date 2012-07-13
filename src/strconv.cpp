@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
-#ifdef __MSC_VER__
+#if (defined __MSC_VER__) || (defined __MINGW32__)
 
 #else
 #include <locale.h>
@@ -10,7 +10,7 @@
 
 int _mbstowcs(wchar_t* wcs, char*mbs, size_t max_wc_count)
 {
-#ifdef  __MSC_VER__
+#if (defined __MSC_VER__) || (defined __MINGW32__)
   return mbstowcs(wcs, mbs, max_wc_count);
 #else
   iconv_t cd = iconv_open("UCS-2", "ASCII");
@@ -41,7 +41,7 @@ int _mbstowcs(wchar_t* wcs, char*mbs, size_t max_wc_count)
 
 int _wcstombs(char *mbs, const wchar_t* wcs, size_t max_mbs_count)
 {
-#ifdef __MSC_VER__
+#if (defined __MSC_VER__) || (defined __MINGW32__)
   return _wcstombs(mbs, wcs, max_mbs_count);
 #else
   iconv_t cd = iconv_open("ASCII", "UCS-2");

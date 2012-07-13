@@ -444,6 +444,22 @@ bool LoadPEImage(
     size_t image_size);
 
 
+typedef struct _ver_info
+{ 
+  wchar_t name[128];
+  wchar_t value[512];
+}ver_info_t;
+
+
+#define version_t   void*
+
+void* PEOpenVersion(const char* version, size_t versize);
+
+bool PENextVersion(void* ver_handle, ver_info_t* verinfo);
+
+void PECloseVersion(void* ver_handle);
+
+
 #ifdef __cplusplus
 }
 #endif

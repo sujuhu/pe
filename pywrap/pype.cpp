@@ -467,101 +467,51 @@ PyObject* resource( PyObject* self, PyObject* args )
 extern "C"
 PyObject* verinfo( PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args)!=1) {
+  if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 1 expected:(filename)" );
+      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
     return NULL;
   }
 
-  PyObject *filename = PyTuple_GetItem(args, 0);
-  if (!check_object(filename)){
+  PyObject *stream = PyTuple_GetItem(args, 0);
+  if (!check_object(stream)){
     PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
     return NULL;
   }
 
-  char* file = NULL;
-  file=PyString_AsString(filename);
+  PyObject *stream_len = PyTuple_GetItem(args, 1);
+  if (!check_object(stream_len)){
+    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+    return NULL;
+  }
+
+  char* data = NULL;
+  size_t data_len = 0;
+  data = PyString_AsString(stream);
+  data_len = PyLong_AsLong(stream_len);
+
+  if (!IsValidPE(data, data_len)) {
+    PyErr_SetString(PyExc_ValueError, "file is not pe");
+    return NULL;
+  }
 
   //dump版本信息
-  PE_VERSION verinfo;
-  memset( &verinfo, 0, sizeof( verinfo ) );
-  if (!GetVersionInfo(file, &verinfo)) {
-    Py_RETURN_NONE;
-  }
-
   PyObject* pDict = PyDict_New();
-
-  //获取版本信息失败
-  if( strlen( verinfo.FileVersion ) > 0 ) {
+  void* ver_handle = PEOpenVersion((const char*)data, data_len);
+  if (ver_handle == NULL) {
+    //没有版本信息或者解析版本信息的时候出错
+    /*
+    PyErr_SetString(PyExc_ValueError, "open version faile");
+    return NULL;
+    */
+  } else {
+    ver_info_t verinfo = {0};
+    while(PENextVersion(ver_handle, &verinfo)) {
     PyDict_SetItem( pDict,
-    Py_BuildValue("s","FileVersion"),
-    Py_BuildValue( "s", verinfo.FileVersion ) );
-  }
-
-  if( strlen( verinfo.CompanyName ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue("s","CompanyName"),
-      Py_BuildValue( "s", verinfo.CompanyName ) );
-  }
-
-  if( strlen( verinfo.FileDescription ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue("s","FileDescription"),
-      Py_BuildValue( "s", verinfo.FileDescription ) );
-  }
-
-  if( strlen( verinfo.ProductName ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue("s","ProductName"),
-      Py_BuildValue( "s", verinfo.ProductName ) );
-  }
-
-  if( strlen( verinfo.LegalCopyright ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","LegalCopyright"),
-      Py_BuildValue( "s", verinfo.LegalCopyright ) );
-  }
-
-  if( strlen( verinfo.InternalName ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","InternalName"),
-      Py_BuildValue( "s", verinfo.InternalName ) );
-  }
-
-  if( strlen( verinfo.Comments ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","Comments"),
-      Py_BuildValue( "s", verinfo.Comments ) );
-  }
-
-  if( strlen( verinfo.SpecialBuild ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","SpecialBuild"),
-      Py_BuildValue( "s", verinfo.SpecialBuild ) );
-  }
-
-  if( strlen( verinfo.LegalTrademarks ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","LegalTrademarks"),
-      Py_BuildValue( "s", verinfo.LegalTrademarks ) );
-  }
-
-  if( strlen( verinfo.PrivateBuild ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","PrivateBuild"),
-      Py_BuildValue( "s", verinfo.PrivateBuild ) );
-  }
-
-  if( strlen( verinfo.ProductVersion ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","ProductVersion"),
-      Py_BuildValue( "s", verinfo.ProductVersion ) );
-  }
-
-  if( strlen( verinfo.OriginalFilename ) > 0 ) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue( "s","OriginalFilename"),
-      Py_BuildValue( "s", verinfo.OriginalFilename ) );
+      Py_BuildValue("u", verinfo.name),
+      Py_BuildValue( "u",verinfo.value));
+    }
+    PECloseVersion(ver_handle);
   }
 
   return pDict;

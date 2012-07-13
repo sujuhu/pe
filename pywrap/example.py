@@ -35,7 +35,7 @@ overlay = pype.overlay( data, data_size )
 if overlay is not None:
     print "Overlay Offset: 0x%08X, Size: 0x%08X" % (overlay['offset'], overlay['size'] )
 
-verinfo = pype.verinfo( test_file )
+verinfo = pype.verinfo( data, data_size )
 if verinfo is not None:
     for item in verinfo.items():
         print "%-32s = %s" %( item[0], item[1] )

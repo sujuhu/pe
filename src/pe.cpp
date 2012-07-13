@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include <errno.h>
 #include <assert.h>
 #include "strconv.h"
+#include "slist.h"
 #include "imgfmt.h"
 #include "pe.h"
 
@@ -1506,3 +1507,305 @@ bool LoadPEImage(const char* stream, size_t stream_size, char* image, size_t ima
   return true;
 #endif
 }
+
+typedef struct _VS_VERSIONINFO
+{
+    WORD  wLength;
+    WORD  wValueLength;
+    WORD  wType;
+    WCHAR szKey[1];
+    WORD  Padding1[1];
+    VS_FIXEDFILEINFO Value;
+    WORD  Padding2[1];
+    WORD  Children[1];
+}VS_VERSIONINFO;
+
+typedef struct _String
+{
+    WORD   wLength;
+    WORD   wValueLength;
+    WORD   wType;
+    WCHAR  szKey[1];
+    WORD   Padding[1];
+    WORD   Value[1];
+}String;
+
+typedef struct _StringTable
+{
+    WORD   wLength;
+    WORD   wValueLength;
+    WORD   wType;
+    WCHAR  szKey[1];
+    WORD   Padding[1];
+    String Children[1];
+}StringTable;
+
+typedef struct _StringFileInfo
+{
+    WORD        wLength;
+    WORD        wValueLength;
+    WORD        wType;
+    WCHAR       szKey[1];
+    WORD        Padding[1];
+    StringTable Children[1];
+}StringFileInfo;
+
+typedef struct _Var
+{
+    WORD  wLength;
+    WORD  wValueLength;
+    WORD  wType;
+    WCHAR szKey[1];
+    WORD  Padding[1];
+    DWORD Value[1];
+}Var;
+
+typedef struct _VarFileInfo
+{
+    WORD  wLength;
+    WORD  wValueLength;
+    WORD  wType;
+    WCHAR szKey[1];
+    WORD  Padding[1];
+    Var   Children[1];
+}VarFileInfo; 
+
+void ParseFixedFileInfo(VS_FIXEDFILEINFO* pValue)
+{
+    if(VS_FFI_SIGNATURE != pValue->dwSignature ) {
+      return;
+    }
+
+    if(VS_FFI_STRUCVERSION != pValue->dwStrucVersion ) {
+      return;
+    }
+    /*
+    // 输出 VS_FIXEDFILEINFO 结构体信息
+    printf("  Signature:       %08x\n", pValue->dwSignature);
+    printf("  StrucVersion:    %d.%d\n",
+        pValue->dwStrucVersion >> 16,
+        pValue->dwStrucVersion & 0xFFFF
+        );
+    printf("  FileVersion:     %d.%d.%d.%d\n",
+        pValue->dwFileVersionMS >> 16,
+        pValue->dwFileVersionMS & 0xFFFF,
+        pValue->dwFileVersionLS >> 16,
+        pValue->dwFileVersionLS & 0xFFFF
+        );
+    printf("  ProductVersion:  %d.%d.%d.%d\n",
+        pValue->dwProductVersionMS >> 16,
+        pValue->dwProductVersionMS & 0xFFFF,
+        pValue->dwProductVersionLS >> 16,
+        pValue->dwProductVersionLS & 0xFFFF
+        );
+    printf("  FileFlagsMask:   %s%x\n",
+        pValue->dwFileFlagsMask ? "0x" : "",
+        pValue->dwFileFlagsMask);
+
+    printf("  FileDate:        %x.%x\n", pValue->dwFileDateMS, pValue->dwFileDateLS);
+    */
+}
+
+
+#define ROUND_OFFSET(a,b,r)    (((LPBYTE)(b) - (LPBYTE)(a) + ((r) - 1)) & ~((r) - 1))
+#define ROUND_POS(b, a, r)    (((LPBYTE)(a)) + ROUND_OFFSET(a, b, r))
+
+// 获取版本号信息入口点
+PIMAGE_RESOURCE_DATA_ENTRY GetVersionInfoEntry( PIMAGE_RESOURCE_DIRECTORY pRootRec )
+{
+    WORD nCount = pRootRec->NumberOfIdEntries + pRootRec->NumberOfNamedEntries;
+    for ( WORD i = 0; i < nCount; ++i )
+    {
+        PIMAGE_RESOURCE_DIRECTORY_ENTRY pFirstEntry = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)( (LPDWORD)pRootRec +
+            sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(DWORD) ) + i;
+        
+        WORD id_ver = pFirstEntry->Id;
+        if (  id_ver != 16 )
+            continue;
+
+        // 进入目录
+        if ( pFirstEntry->DataIsDirectory == 0x01 )
+        {
+            PIMAGE_RESOURCE_DIRECTORY pFirstDir = (PIMAGE_RESOURCE_DIRECTORY) ( (LPBYTE)pRootRec + pFirstEntry->OffsetToDirectory );
+            WORD nDirCount = pFirstDir->NumberOfNamedEntries + pFirstDir->NumberOfIdEntries;
+
+            // 第二层目录(资源代码页)
+            for ( WORD nIndex = 0; nIndex < nDirCount; ++nIndex )
+            {
+                PIMAGE_RESOURCE_DIRECTORY_ENTRY pSecondEntry = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)( (LPDWORD)pFirstDir +
+                    sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(DWORD) ) + nIndex;
+
+                // 取第三层目录(资源数据入口)
+                if ( pSecondEntry->DataIsDirectory == 1 )
+                {
+                    PIMAGE_RESOURCE_DIRECTORY pThirdDir = (PIMAGE_RESOURCE_DIRECTORY)( (LPBYTE)pRootRec + pSecondEntry->OffsetToDirectory );
+                    if ( pThirdDir->NumberOfIdEntries + pThirdDir->NumberOfNamedEntries >= 1 )
+                    {
+                        // 有一个Entry
+                        PIMAGE_RESOURCE_DIRECTORY_ENTRY pThirdEntry = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)( (LPDWORD)pThirdDir +
+                            sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(DWORD) );    
+                        if ( pThirdEntry->DataIsDirectory == 0 )
+                        {
+                            PIMAGE_RESOURCE_DATA_ENTRY pData = ( PIMAGE_RESOURCE_DATA_ENTRY )( (LPBYTE)pRootRec + pThirdEntry->OffsetToDirectory );
+                            if ( pData )
+                            {
+                                // 找到真实数据入口点
+                                return pData;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+
+#define LPBYTE unsigned char*
+
+void* PEOpenVersion(const char* pData, size_t stream_size)
+{
+  if (!IsValidPE(pData, stream_size)) {
+    return NULL;
+  }
+
+  PIMAGE_DOS_HEADER pDosHdr = (PIMAGE_DOS_HEADER)pData;
+  PIMAGE_NT_HEADERS pNtHdr = (PIMAGE_NT_HEADERS)(pData + pDosHdr->e_lfanew);
+
+  // 获取资源目录
+  PIMAGE_DATA_DIRECTORY pDataDir = &pNtHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_RESOURCE];
+  if ( pDataDir->VirtualAddress == 0 || pDataDir->Size == 0 ) {
+      return NULL;
+  }
+
+  // 读取资源在文件中的偏移位置
+  raw_t dwOffset = RvaToRaw( pData, stream_size, pDataDir->VirtualAddress );
+  if ( 0 == dwOffset )
+      return NULL;
+
+  // 找到版本号位置
+  PIMAGE_RESOURCE_DATA_ENTRY pVersionEntry = 
+    GetVersionInfoEntry( (PIMAGE_RESOURCE_DIRECTORY)(pData + dwOffset) );
+  if ( pVersionEntry == NULL ) {
+      return NULL;
+  }
+
+  // 得到文件中的偏移地址
+  dwOffset = RvaToRaw( pData, stream_size, pVersionEntry->OffsetToData );
+  if ( 0 == dwOffset )
+      return NULL;
+
+  const char* version = pData + dwOffset;
+  size_t versize = pVersionEntry->Size;
+
+  VS_VERSIONINFO* pVS = (VS_VERSIONINFO*)version;
+  if( 0 != wcscmp(pVS->szKey, L"VS_VERSION_INFO") ) {
+    return NULL;
+  }
+
+  slist_t *version_handle = (slist_t*)malloc(sizeof(slist_t));
+  if (version_handle == NULL) {
+    return NULL;
+  }
+  memset(version_handle, 0, sizeof(slist_t));
+
+  //printf(" (type:%d)\n", pVS->wType);
+  LPBYTE pVt = (LPBYTE)&pVS->szKey[wcslen(pVS->szKey) + 1];
+  VS_FIXEDFILEINFO* pValue = (VS_FIXEDFILEINFO*)ROUND_POS(pVt, pVS, 4);
+  if ( pVS->wValueLength ) {
+      ParseFixedFileInfo( pValue );
+  }
+
+  // 遍历 VS_VERSIONINFO 子节点元素
+  StringFileInfo* pSFI = 
+    (StringFileInfo*)ROUND_POS(((LPBYTE)pValue) + pVS->wValueLength, pValue, 4);
+  for ( ; ((LPBYTE) pSFI) < (((LPBYTE) pVS) + pVS->wLength);
+      pSFI = (StringFileInfo*)ROUND_POS((((LPBYTE) pSFI) + pSFI->wLength), pSFI, 4))
+  {
+    // StringFileInfo / VarFileInfo
+    if ( 0 == wcscmp(pSFI->szKey, L"StringFileInfo") ){
+      // 当前子节点元素是 StringFileInfo
+      //_ASSERT(1 == pSFI->wType);
+      //_ASSERT(!pSFI->wValueLength);
+
+          // 遍历字串信息 STRINGTABLE 元素
+      StringTable* pST = (StringTable*)ROUND_POS(&pSFI->szKey[wcslen(pSFI->szKey) + 1], pSFI, 4);
+      for ( ; ((LPBYTE) pST) < (((LPBYTE) pSFI) + pSFI->wLength);
+          pST = (StringTable*)ROUND_POS((((LPBYTE) pST) + pST->wLength), pST, 4))
+      {
+        //printf(" LangID: %S\n", pST->szKey);
+        //_ASSERT( !pST->wValueLength );
+
+        // 遍历字符串元素的 STRINGTABLE
+        String* pS = (String*)ROUND_POS(&pST->szKey[wcslen(pST->szKey) + 1], pST, 4);
+        for ( ; ((LPBYTE) pS) < (((LPBYTE) pST) + pST->wLength);
+          pS = (String*)ROUND_POS((((LPBYTE) pS) + pS->wLength), pS, 4))
+        {
+          PWCHAR psVal = (PWCHAR)ROUND_POS(&pS->szKey[wcslen(pS->szKey) + 1], pS, 4);
+          // 打印 <sKey> : <sValue>
+          //printf("  %-18S: %.*S\n", pS->szKey, pS->wValueLength, psVal);
+          ver_info_t verinfo = {0};
+          //_snwprintf(verinfo.name, (sizeof(verinfo.name) / 2) -1 , L"%S", pS->szKey);
+          memcpy(verinfo.name, pS->szKey, sizeof(verinfo.name) - sizeof(wchar_t));
+          //_snwprintf(verinfo.value, (sizeof(verinfo.value) / 2) - 1, L"%.*S", 
+          //    pS->wValueLength, psVal);
+          memcpy(verinfo.value, psVal, sizeof(verinfo.value) - sizeof(wchar_t));
+          SListAppend(version_handle, (unsigned char*)&verinfo, sizeof(ver_info_t));
+        }
+      }
+    } else {
+      // 当前子节点元素是 VarFileInfos
+      //_ASSERT( 1 == pSFI->wType );
+      VarFileInfo* pVFI = (VarFileInfo*) pSFI;
+      //_ASSERT( 0 == wcscmp(pVFI->szKey, L"VarFileInfo") );
+      //_ASSERT( !pVFI->wValueLength );
+
+      // var元素VarFileInfo遍历（应该只有一个，但以防万一...）
+      Var* pV = (Var*)ROUND_POS(&pVFI->szKey[wcslen(pVFI->szKey) + 1], pVFI, 4);
+      for ( ; ((LPBYTE) pV) < (((LPBYTE) pVFI) + pVFI->wLength);
+          pV = (Var*)ROUND_POS((((LPBYTE) pV) + pV->wLength), pV, 4)) {
+        //printf(" %S: ", pV->szKey);
+        
+        // 对16位的语言ID值，弥补标准的“翻译”VarFileInfo的元素的数组的遍历。
+        WORD* pwV = (WORD*) ROUND_POS(&pV->szKey[wcslen(pV->szKey) + 1], pV, 4);
+        for (WORD* wpos = pwV ; ((LPBYTE) wpos) < (((LPBYTE) pwV) + pV->wValueLength); wpos += 2)
+        {
+            //printf("%04x%04x ", (int)*wpos++, (int)(*(wpos + 1)));
+        }
+
+        //printf("\n");
+      }
+    }
+  }
+
+  //_ASSERT((LPBYTE)pSFI == ROUND_POS((((LPBYTE) pVS) + pVS->wLength), pVS, 4));
+
+  // 返回主版本号
+  //return pValue->dwFileVersionMS;  
+  return (void*)version_handle;
+}
+
+bool PENextVersion(void* ver_handle, ver_info_t* verinfo)
+{
+  slist_t* version_handle = (slist_t*)ver_handle;
+  if (version_handle == NULL) {
+    return false;
+  }
+
+  unsigned char*data = SListNext(version_handle);
+  if(data == NULL) {
+    return false;
+  }
+
+  memcpy(verinfo, data, sizeof(ver_info_t));
+  return true;
+}
+
+void PECloseVersion(void* ver_handle)
+{
+  slist_t* version_handle = (slist_t*)ver_handle;
+  SListClear(version_handle);
+  free(version_handle);
+}
+

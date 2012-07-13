@@ -380,64 +380,79 @@ int main(int argc, char* argv[])
 #endif
   } else if( strcmp( argv[1], "-version") == 0 ) {
     //dump版本信息
+    /*
     PE_VERSION verinfo;
     memset( &verinfo, 0, sizeof( verinfo ) );
     if ( GetVersionInfo( argv[2], &verinfo ) ) {
       //获取版本信息失败
       if( strlen( verinfo.FileVersion ) > 0 ) {
-        printf( "FileVersion==%s", verinfo.FileVersion );
+        printf( "FileVersion==%s\n", verinfo.FileVersion );
       }
 
       if( strlen( verinfo.CompanyName ) > 0 ) {
-        printf( "CompanyName==%s", verinfo.CompanyName );
+        printf( "CompanyName==%s\n", verinfo.CompanyName );
       }
 
       if( strlen( verinfo.FileDescription ) > 0 ) {
-        printf( "FileDescription==%s", verinfo.FileDescription );
+        printf( "FileDescription==%s\n", verinfo.FileDescription );
       }
 
       if( strlen( verinfo.ProductName ) > 0 ) {
-        printf( "ProductName==%s", verinfo.ProductName );
+        printf( "ProductName==%s\n", verinfo.ProductName );
       }
 
       if( strlen( verinfo.LegalCopyright ) > 0 ) {
-        printf( "LegalCopyright==%s", verinfo.LegalCopyright );
+        printf( "LegalCopyright==%s\n", verinfo.LegalCopyright );
       }
 
       if( strlen( verinfo.InternalName ) > 0 ) {
-        printf( "InternalName==%s", verinfo.InternalName );
+        printf( "InternalName==%s\n", verinfo.InternalName );
       }
 
       if( strlen( verinfo.Comments ) > 0 ) {
-        printf( "Comments==%s", verinfo.Comments );
+        printf( "Comments==%s\n", verinfo.Comments );
       }
 
       if( strlen( verinfo.SpecialBuild ) > 0 ) {
-        printf( "SpecialBuild==%s", verinfo.SpecialBuild );
+        printf( "SpecialBuild==%s\n", verinfo.SpecialBuild );
       }
 
       if( strlen( verinfo.LegalTrademarks ) > 0 ) {
-        printf( "LegalTrademarks==%s", verinfo.LegalTrademarks );
+        printf( "LegalTrademarks==%s\n", verinfo.LegalTrademarks );
       }
 
       if( strlen( verinfo.PrivateBuild ) > 0 ) {
-        printf( "PrivateBuild==%s", verinfo.PrivateBuild );
+        printf( "PrivateBuild==%s\n", verinfo.PrivateBuild );
       }
 
       if( strlen( verinfo.ProductVersion ) > 0 ) {
-        printf( "ProductVersion==%s", verinfo.ProductVersion );
+        printf( "ProductVersion==%s\n", verinfo.ProductVersion );
       }
 
       if( strlen( verinfo.OriginalFilename ) > 0 ) {
-        printf( "OriginalFilename==%s", verinfo.OriginalFilename );
+        printf( "OriginalFilename==%s\n", verinfo.OriginalFilename );
       }
     }
+    printf("====================================================\n");
+    */
+    void* ver_handle = PEOpenVersion((const char*)view.data, view.size);
+    if (ver_handle == NULL) {
+      printf("open version failed\n");
+    } else {
+      printf("====================================================\n");
+      ver_info_t verinfo = {0};
+      while(PENextVersion(ver_handle, &verinfo)) {
+        printf("%S: %S\n", verinfo.name, verinfo.value);
+      }
+      PECloseVersion(ver_handle);
+    }
+    
   } else {
     show_usage();
   }
 
   unmap_file( &view );
-
+ 
   return 0;
 }
 

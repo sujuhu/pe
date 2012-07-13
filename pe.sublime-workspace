@@ -47,7 +47,7 @@
 			"file": "petool/petool.cpp",
 			"settings":
 			{
-				"buffer_size": 12334,
+				"buffer_size": 0,
 				"line_ending": "Windows"
 			}
 		},
@@ -71,7 +71,7 @@
 			"file": "test/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 528,
+				"buffer_size": 573,
 				"line_ending": "Windows"
 			}
 		},
@@ -79,7 +79,7 @@
 			"file": "/D/src/autoit/autoit.cpp",
 			"settings":
 			{
-				"buffer_size": 11755,
+				"buffer_size": 0,
 				"line_ending": "Windows"
 			}
 		},
@@ -87,8 +87,8 @@
 			"file": "pe.sublime-project",
 			"settings":
 			{
-				"buffer_size": 570,
-				"line_ending": "Unix"
+				"buffer_size": 741,
+				"line_ending": "Windows"
 			}
 		},
 		{
@@ -103,7 +103,7 @@
 			"file": "CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 384,
+				"buffer_size": 404,
 				"line_ending": "Windows"
 			}
 		},
@@ -111,7 +111,7 @@
 			"file": "pywrap/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 2263,
+				"buffer_size": 2410,
 				"line_ending": "Windows"
 			}
 		},
@@ -132,11 +132,175 @@
 			}
 		},
 		{
+			"file": "src/petool.cpp",
+			"settings":
+			{
+				"buffer_size": 13011,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/pe.cpp",
+			"settings":
+			{
+				"buffer_size": 50046,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/slist.cpp",
+			"settings":
+			{
+				"buffer_size": 1174,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "pe.sublime-workspace",
+			"settings":
+			{
+				"buffer_size": 14816,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "src/pe.h",
 			"settings":
 			{
-				"buffer_size": 10627,
+				"buffer_size": 10900,
 				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "54-gdb-show interpreter\n=thread-group-added,id=\"i1\"\n~\"GNU gdb (GDB) 7.4\\n\"\n~\"Copyright (C) 2012 Free Software Foundation, Inc.\\n\"\n~\"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\\nThis is free software: you are free to change and redistribute it.\\nThere is NO WARRANTY, to the extent permitted by law.  Type \\\"show copying\\\"\\nand \\\"show warranty\\\" for details.\\n\"\n~\"This GDB was configured as \\\"i686-pc-mingw32\\\".\\nFor bug reporting instructions, please see:\\n\"\n~\"<http://www.gnu.org/software/gdb/bugs/>...\\n\"\n~\"Reading symbols from d:\\\\src\\\\bin\\\\petool.exe...\"\n~\"done.\\n\"\n(gdb)\n54^error,msg=\"Undefined show command: \\\"interpreter\\\".  Try \\\"help show\\\".\"\n(gdb)\n55-inferior-tty-set r:\\temp\\tmpsgbxfw\n56-gdb-set target-async 1\n57-gdb-set pagination off\n58-break-insert \"\\\"d:\\\\src\\\\pe\\\\src\\\\petool.cpp\\\":210\"\n55^done\n(gdb)\n56^done\n(gdb)\n57^done\n(gdb)\n58^done,bkpt={number=\"1\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\",addr=\"0x004015ac\",func=\"main(int, char**)\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"210\",times=\"0\",original-location=\"d:\\\\src\\\\pe\\\\src\\\\petool.cpp:210\"}\n(gdb)\n59-break-insert \"\\\"d:\\\\src\\\\pe\\\\src\\\\petool.cpp\\\":383\"\n59^done,bkpt={number=\"2\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\",addr=\"0x00401e2f\",func=\"main(int, char**)\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"383\",times=\"0\",original-location=\"d:\\\\src\\\\pe\\\\src\\\\petool.cpp:383\"}\n(gdb)\n60-exec-run\n&\"warning: Warning: Failed to open TTY r:\\\\temp\\\\tmpsgbxfw, error 0x20.\\n\"\n=thread-group-started,id=\"i1\",pid=\"2852\"\n=thread-created,id=\"1\",group-id=\"i1\"\n~\"[New Thread 2852.0x1cc]\\n\"\n60^running\n*running,thread-id=\"all\"\n(gdb)\n=library-loaded,id=\"C:\\\\Windows\\\\system32\\\\ntdll.dll\",target-name=\"C:\\\\Windows\\\\system32\\\\ntdll.dll\",host-name=\"C:\\\\Windows\\\\system32\\\\ntdll.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\syswow64\\\\kernel32.dll\",target-name=\"C:\\\\Windows\\\\syswow64\\\\kernel32.dll\",host-name=\"C:\\\\Windows\\\\syswow64\\\\kernel32.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\syswow64\\\\KernelBase.dll\",target-name=\"C:\\\\Windows\\\\syswow64\\\\KernelBase.dll\",host-name=\"C:\\\\Windows\\\\syswow64\\\\KernelBase.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\syswow64\\\\msvcrt.dll\",target-name=\"C:\\\\Windows\\\\syswow64\\\\msvcrt.dll\",host-name=\"C:\\\\Windows\\\\syswow64\\\\msvcrt.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\SysWOW64\\\\version.dll\",target-name=\"C:\\\\Windows\\\\SysWOW64\\\\version.dll\",host-name=\"C:\\\\Windows\\\\SysWOW64\\\\version.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"c:\\\\MinGW\\\\bin\\\\libgcc_s_dw2-1.dll\",target-name=\"c:\\\\MinGW\\\\bin\\\\libgcc_s_dw2-1.dll\",host-name=\"c:\\\\MinGW\\\\bin\\\\libgcc_s_dw2-1.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"c:\\\\MinGW\\\\bin\\\\libstdc++-6.dll\",target-name=\"c:\\\\MinGW\\\\bin\\\\libstdc++-6.dll\",host-name=\"c:\\\\MinGW\\\\bin\\\\libstdc++-6.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=breakpoint-modified,bkpt={number=\"1\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\",addr=\"0x004015ac\",func=\"main(int, char**)\",file=\"D:\\\\\\\\src\\\\\\\\pe\\\\\\\\src\\\\\\\\petool.cpp\",fullname=\"D:\\\\\\\\src\\\\\\\\pe\\\\\\\\src\\\\\\\\petool.cpp\",line=\"210\",times=\"1\",original-location=\"d:\\\\\\\\src\\\\\\\\pe\\\\\\\\src\\\\\\\\petool.cpp:210\"}\n*stopped,reason=\"breakpoint-hit\",disp=\"keep\",bkptno=\"1\",frame={addr=\"0x004015ac\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"210\"},thread-id=\"1\",stopped-threads=\"all\"\n61-thread-select 1\n(gdb)\n62-stack-info-frame\n61^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x004015ac\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"210\"}\n(gdb)\n62^done,frame={level=\"0\",addr=\"0x004015ac\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"210\"}\n(gdb)\n63-stack-list-frames\n63^done,stack=[frame={level=\"0\",addr=\"0x004015ac\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"210\"}]\n(gdb)\n64-stack-list-arguments 1\n64^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n65-thread-info\n65^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x004015ac\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"210\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n66-thread-list-ids\n66^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n67-stack-list-arguments 0 0 0\n67^done,stack-args=[frame={level=\"0\",args=[name=\"argc\",name=\"argv\"]}]\n(gdb)\n68-var-create - * argc\n68^done,name=\"var1\",numchild=\"0\",value=\"3\",type=\"int\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n69-var-create - * argv\n69^done,name=\"var2\",numchild=\"1\",value=\"0x932d98\",type=\"char **\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n70-stack-list-locals 0\n70^done,locals=[name=\"view\"]\n(gdb)\n71-var-create - * view\n71^done,name=\"var3\",numchild=\"1\",value=\"{...}\",type=\"MAPPED_FILE\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n72-exec-next\n72^running\n*running,thread-id=\"1\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x004015c5\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"215\"},thread-id=\"1\",stopped-threads=\"all\"\n73-thread-select 1\n(gdb)\n74-stack-info-frame\n73^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x004015c5\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"215\"}\n(gdb)\n74^done,frame={level=\"0\",addr=\"0x004015c5\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"215\"}\n(gdb)\n75-stack-list-frames\n75^done,stack=[frame={level=\"0\",addr=\"0x004015c5\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"215\"}]\n(gdb)\n76-stack-list-arguments 1\n76^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n77-thread-info\n77^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x004015c5\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"215\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n78-thread-list-ids\n78^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n79-var-update --all-values *\n79^done,changelist=[]\n(gdb)\n80-stack-list-locals 0\n80^done,locals=[name=\"view\"]\n(gdb)\n81-exec-next\n81^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x004015d5\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"216\"},thread-id=\"1\",stopped-threads=\"all\"\n82-thread-select 1\n(gdb)\n82^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x004015d5\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"216\"}\n(gdb)\n83-stack-info-frame\n83^done,frame={level=\"0\",addr=\"0x004015d5\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"216\"}\n(gdb)\n84-stack-list-frames\n84^done,stack=[frame={level=\"0\",addr=\"0x004015d5\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"216\"}]\n(gdb)\n85-stack-list-arguments 1\n85^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n86-thread-info\n86^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x004015d5\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"216\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n87-thread-list-ids\n87^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n88-var-update --all-values *\n88^done,changelist=[]\n(gdb)\n89-stack-list-locals 0\n89^done,locals=[name=\"view\"]\n(gdb)\n90-exec-next\n90^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401617\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"221\"},thread-id=\"1\",stopped-threads=\"all\"\n91-thread-select 1\n(gdb)\n91^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401617\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"221\"}\n(gdb)\n92-stack-info-frame\n92^done,frame={level=\"0\",addr=\"0x00401617\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"221\"}\n(gdb)\n93-stack-list-frames\n93^done,stack=[frame={level=\"0\",addr=\"0x00401617\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"221\"}]\n(gdb)\n94-stack-list-arguments 1\n94^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n95-thread-info\n95^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x00401617\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"221\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n96-thread-list-ids\n96^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n97-var-update --all-values *\n97^done,changelist=[]\n(gdb)\n98-stack-list-locals 0\n98^done,locals=[name=\"view\"]\n(gdb)\n99-exec-next\n99^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401648\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"226\"},thread-id=\"1\",stopped-threads=\"all\"\n100-thread-select 1\n(gdb)\n101-stack-info-frame\n100^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401648\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"226\"}\n(gdb)\n101^done,frame={level=\"0\",addr=\"0x00401648\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"226\"}\n(gdb)\n102-stack-list-frames\n102^done,stack=[frame={level=\"0\",addr=\"0x00401648\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"226\"}]\n(gdb)\n103-stack-list-arguments 1\n103^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n104-thread-info\n104^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x00401648\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"226\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n105-thread-list-ids\n105^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n106-var-update --all-values *\n106^done,changelist=[]\n(gdb)\n107-stack-list-locals 0\n107^done,locals=[name=\"view\"]\n(gdb)\n108-exec-next\n108^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x004016da\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"241\"},thread-id=\"1\",stopped-threads=\"all\"\n109-thread-select 1\n(gdb)\n110-stack-info-frame\n109^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x004016da\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"241\"}\n(gdb)\n110^done,frame={level=\"0\",addr=\"0x004016da\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"241\"}\n(gdb)\n111-stack-list-frames\n111^done,stack=[frame={level=\"0\",addr=\"0x004016da\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"241\"}]\n(gdb)\n112-stack-list-arguments 1\n112^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n113-thread-info\n113^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x004016da\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"241\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n114-thread-list-ids\n114^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n115-var-update --all-values *\n115^done,changelist=[]\n(gdb)\n116-stack-list-locals 0\n116^done,locals=[name=\"view\"]\n(gdb)\n117-exec-next\n117^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x004017b4\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"257\"},thread-id=\"1\",stopped-threads=\"all\"\n118-thread-select 1\n(gdb)\n118^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x004017b4\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"257\"}\n(gdb)\n119-stack-info-frame\n119^done,frame={level=\"0\",addr=\"0x004017b4\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"257\"}\n(gdb)\n120-stack-list-frames\n120^done,stack=[frame={level=\"0\",addr=\"0x004017b4\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"257\"}]\n(gdb)\n121-stack-list-arguments 1\n121^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n122-thread-info\n122^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x004017b4\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"257\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n123-thread-list-ids\n123^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n124-var-update --all-values *\n124^done,changelist=[]\n(gdb)\n125-stack-list-locals 0\n125^done,locals=[name=\"view\"]\n(gdb)\n126-exec-next\n126^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x0040193f\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"284\"},thread-id=\"1\",stopped-threads=\"all\"\n127-thread-select 1\n(gdb)\n128-stack-info-frame\n127^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x0040193f\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"284\"}\n(gdb)\n128^done,frame={level=\"0\",addr=\"0x0040193f\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"284\"}\n(gdb)\n129-stack-list-frames\n129^done,stack=[frame={level=\"0\",addr=\"0x0040193f\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"284\"}]\n(gdb)\n130-stack-list-arguments 1\n130^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n131-thread-info\n131^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x0040193f\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"284\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n132-thread-list-ids\n132^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n133-var-update --all-values *\n133^done,changelist=[]\n(gdb)\n134-stack-list-locals 0\n134^done,locals=[name=\"view\"]\n(gdb)\n135-exec-next\n135^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x004019ba\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"294\"},thread-id=\"1\",stopped-threads=\"all\"\n136-thread-select 1\n(gdb)\n137-stack-info-frame\n136^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x004019ba\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"294\"}\n(gdb)\n137^done,frame={level=\"0\",addr=\"0x004019ba\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"294\"}\n(gdb)\n138-stack-list-frames\n138^done,stack=[frame={level=\"0\",addr=\"0x004019ba\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"294\"}]\n(gdb)\n139-stack-list-arguments 1\n139^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}]}]\n(gdb)\n140-thread-info\n140^done,threads=[{id=\"1\",target-id=\"Thread 2852.0x1cc\",frame={level=\"0\",addr=\"0x004019ba\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x932d98\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"294\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n141-thread-list-ids\n141^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n142-var-update --all-values *\n142^done,changelist=[]\n(gdb)\n143-stack-list-locals 0\n143^done,locals=[name=\"view\"]\n(gdb)\n",
+			"settings":
+			{
+				"buffer_size": 18000,
+				"line_ending": "Windows",
+				"name": "GDB Session",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "GNU gdb (GDB) 7.4\nCopyright (C) 2012 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.  Type \"show copying\"\nand \"show warranty\" for details.\nThis GDB was configured as \"i686-pc-mingw32\".\nFor bug reporting instructions, please see:\n<http://www.gnu.org/software/gdb/bugs/>...\nReading symbols from d:\\\\src\\\\bin\\\\petool.exe...done.\n[New Thread 2852.0x1cc]\n",
+			"settings":
+			{
+				"buffer_size": 532,
+				"line_ending": "Windows",
+				"name": "GDB Console",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": " int argc = 3\n+char ** argv = 0x932d98\n+MAPPED_FILE view = {...}\n",
+			"settings":
+			{
+				"buffer_size": 65,
+				"line_ending": "Windows",
+				"name": "GDB Variables",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "1-gdb-show interpreter\n=thread-group-added,id=\"i1\"\n~\"GNU gdb (GDB) 7.4\\n\"\n~\"Copyright (C) 2012 Free Software Foundation, Inc.\\n\"\n~\"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\\nThis is free software: you are free to change and redistribute it.\\nThere is NO WARRANTY, to the extent permitted by law.  Type \\\"show copying\\\"\\nand \\\"show warranty\\\" for details.\\n\"\n~\"This GDB was configured as \\\"i686-pc-mingw32\\\".\\nFor bug reporting instructions, please see:\\n\"\n~\"<http://www.gnu.org/software/gdb/bugs/>...\\n\"\n~\"Reading symbols from d:\\\\src\\\\bin\\\\petool.exe...\"\n~\"done.\\n\"\n(gdb)\n1^error,msg=\"Undefined show command: \\\"interpreter\\\".  Try \\\"help show\\\".\"\n(gdb)\n2-inferior-tty-set r:\\temp\\tmp1reheh\n3-gdb-set target-async 1\n4-gdb-set pagination off\n5-break-insert \"\\\"d:\\\\src\\\\pe\\\\src\\\\petool.cpp\\\":383\"\n2^done\n(gdb)\n3^done\n(gdb)\n4^done\n(gdb)\n5^done,bkpt={number=\"1\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\",addr=\"0x00401e2f\",func=\"main(int, char**)\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"383\",times=\"0\",original-location=\"d:\\\\src\\\\pe\\\\src\\\\petool.cpp:383\"}\n(gdb)\n6-exec-run\n&\"warning: Warning: Failed to open TTY r:\\\\temp\\\\tmp1reheh, error 0x20.\\n\"\n=thread-group-started,id=\"i1\",pid=\"2616\"\n=thread-created,id=\"1\",group-id=\"i1\"\n~\"[New Thread 2616.0x9d4]\\n\"\n6^running\n*running,thread-id=\"all\"\n(gdb)\n=library-loaded,id=\"C:\\\\Windows\\\\system32\\\\ntdll.dll\",target-name=\"C:\\\\Windows\\\\system32\\\\ntdll.dll\",host-name=\"C:\\\\Windows\\\\system32\\\\ntdll.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\syswow64\\\\kernel32.dll\",target-name=\"C:\\\\Windows\\\\syswow64\\\\kernel32.dll\",host-name=\"C:\\\\Windows\\\\syswow64\\\\kernel32.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\syswow64\\\\KernelBase.dll\",target-name=\"C:\\\\Windows\\\\syswow64\\\\KernelBase.dll\",host-name=\"C:\\\\Windows\\\\syswow64\\\\KernelBase.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\syswow64\\\\msvcrt.dll\",target-name=\"C:\\\\Windows\\\\syswow64\\\\msvcrt.dll\",host-name=\"C:\\\\Windows\\\\syswow64\\\\msvcrt.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"C:\\\\Windows\\\\SysWOW64\\\\version.dll\",target-name=\"C:\\\\Windows\\\\SysWOW64\\\\version.dll\",host-name=\"C:\\\\Windows\\\\SysWOW64\\\\version.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"c:\\\\MinGW\\\\bin\\\\libgcc_s_dw2-1.dll\",target-name=\"c:\\\\MinGW\\\\bin\\\\libgcc_s_dw2-1.dll\",host-name=\"c:\\\\MinGW\\\\bin\\\\libgcc_s_dw2-1.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=library-loaded,id=\"c:\\\\MinGW\\\\bin\\\\libstdc++-6.dll\",target-name=\"c:\\\\MinGW\\\\bin\\\\libstdc++-6.dll\",host-name=\"c:\\\\MinGW\\\\bin\\\\libstdc++-6.dll\",symbols-loaded=\"0\",thread-group=\"i1\"\n=breakpoint-modified,bkpt={number=\"1\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\",addr=\"0x00401e2f\",func=\"main(int, char**)\",file=\"D:\\\\\\\\src\\\\\\\\pe\\\\\\\\src\\\\\\\\petool.cpp\",fullname=\"D:\\\\\\\\src\\\\\\\\pe\\\\\\\\src\\\\\\\\petool.cpp\",line=\"383\",times=\"1\",original-location=\"d:\\\\\\\\src\\\\\\\\pe\\\\\\\\src\\\\\\\\petool.cpp:383\"}\n*stopped,reason=\"breakpoint-hit\",disp=\"keep\",bkptno=\"1\",frame={addr=\"0x00401e2f\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"384\"},thread-id=\"1\",stopped-threads=\"all\"\n7-thread-select 1\n(gdb)\n7^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401e2f\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"384\"}\n(gdb)\n8-stack-info-frame\n8^done,frame={level=\"0\",addr=\"0x00401e2f\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"384\"}\n(gdb)\n9-stack-list-frames\n9^done,stack=[frame={level=\"0\",addr=\"0x00401e2f\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"384\"}]\n(gdb)\n10-stack-list-arguments 1\n10^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n11-thread-info\n11^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401e2f\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"384\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n12-thread-list-ids\n12^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n13-stack-list-arguments 0 0 0\n13^done,stack-args=[frame={level=\"0\",args=[name=\"argc\",name=\"argv\"]}]\n(gdb)\n14-var-create - * argc\n14^done,name=\"var1\",numchild=\"0\",value=\"3\",type=\"int\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n15-var-create - * argv\n15^done,name=\"var2\",numchild=\"1\",value=\"0x4a2d90\",type=\"char **\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n16-stack-list-locals 0\n16^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n17-var-create - * verinfo\n17^done,name=\"var3\",numchild=\"1\",value=\"{...}\",type=\"PE_VERSION\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n18-var-create - * ver_handle\n18^done,name=\"var4\",numchild=\"0\",value=\"0x8\",type=\"void *\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n19-var-create - * view\n19^done,name=\"var5\",numchild=\"1\",value=\"{...}\",type=\"MAPPED_FILE\",thread-id=\"1\",has_more=\"0\"\n(gdb)\n20-exec-next\n20^running\n*running,thread-id=\"1\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401e44\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"385\"},thread-id=\"1\",stopped-threads=\"all\"\n21-thread-select 1\n(gdb)\n22-stack-info-frame\n21^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401e44\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"385\"}\n(gdb)\n22^done,frame={level=\"0\",addr=\"0x00401e44\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"385\"}\n(gdb)\n23-stack-list-frames\n23^done,stack=[frame={level=\"0\",addr=\"0x00401e44\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"385\"}]\n(gdb)\n24-stack-list-arguments 1\n24^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n25-thread-info\n25^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401e44\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"385\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n26-thread-list-ids\n26^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n27-var-update --all-values *\n27^done,changelist=[]\n(gdb)\n28-stack-list-locals 0\n28^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n29-exec-next\n29^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401e66\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"387\"},thread-id=\"1\",stopped-threads=\"all\"\n30-thread-select 1\n(gdb)\n31-stack-info-frame\n30^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401e66\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"387\"}\n(gdb)\n31^done,frame={level=\"0\",addr=\"0x00401e66\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"387\"}\n(gdb)\n32-stack-list-frames\n32^done,stack=[frame={level=\"0\",addr=\"0x00401e66\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"387\"}]\n(gdb)\n33-stack-list-arguments 1\n33^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n34-thread-info\n34^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401e66\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"387\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n35-thread-list-ids\n35^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n36-var-update --all-values *\n36^done,changelist=[]\n(gdb)\n37-stack-list-locals 0\n37^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n38-exec-next\n38^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401e72\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"388\"},thread-id=\"1\",stopped-threads=\"all\"\n39-thread-select 1\n(gdb)\n39^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401e72\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"388\"}\n(gdb)\n40-stack-info-frame\n40^done,frame={level=\"0\",addr=\"0x00401e72\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"388\"}\n(gdb)\n41-stack-list-frames\n41^done,stack=[frame={level=\"0\",addr=\"0x00401e72\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"388\"}]\n(gdb)\n42-stack-list-arguments 1\n42^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n43-thread-info\n43^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401e72\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"388\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n44-thread-list-ids\n44^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n45-var-update --all-values *\n45^done,changelist=[]\n(gdb)\n46-stack-list-locals 0\n46^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n47-exec-next\n47^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401e88\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"391\"},thread-id=\"1\",stopped-threads=\"all\"\n48-thread-select 1\n(gdb)\n48^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401e88\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"391\"}\n(gdb)\n49-stack-info-frame\n49^done,frame={level=\"0\",addr=\"0x00401e88\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"391\"}\n(gdb)\n50-stack-list-frames\n50^done,stack=[frame={level=\"0\",addr=\"0x00401e88\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"391\"}]\n(gdb)\n51-stack-list-arguments 1\n51^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n52-thread-info\n52^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401e88\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"391\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n53-thread-list-ids\n53^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n54-var-update --all-values *\n54^done,changelist=[]\n(gdb)\n55-stack-list-locals 0\n55^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n56-exec-next\n56^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401e97\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"392\"},thread-id=\"1\",stopped-threads=\"all\"\n57-thread-select 1\n(gdb)\n57^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401e97\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"392\"}\n(gdb)\n58-stack-info-frame\n58^done,frame={level=\"0\",addr=\"0x00401e97\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"392\"}\n(gdb)\n59-stack-list-frames\n59^done,stack=[frame={level=\"0\",addr=\"0x00401e97\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"392\"}]\n(gdb)\n60-stack-list-arguments 1\n60^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n61-thread-info\n61^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401e97\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"392\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n62-thread-list-ids\n62^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n63-var-update --all-values *\n63^done,changelist=[]\n(gdb)\n64-stack-list-locals 0\n64^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n65-exec-next\n65^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401eb0\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"395\"},thread-id=\"1\",stopped-threads=\"all\"\n66-thread-select 1\n(gdb)\n66^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401eb0\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"395\"}\n67-stack-info-frame\n(gdb)\n67^done,frame={level=\"0\",addr=\"0x00401eb0\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"395\"}\n(gdb)\n68-stack-list-frames\n68^done,stack=[frame={level=\"0\",addr=\"0x00401eb0\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"395\"}]\n(gdb)\n69-stack-list-arguments 1\n69^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n70-thread-info\n70^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401eb0\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"395\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n71-thread-list-ids\n71^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n72-var-update --all-values *\n72^done,changelist=[]\n(gdb)\n73-stack-list-locals 0\n73^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n74-exec-next\n74^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401ec1\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"396\"},thread-id=\"1\",stopped-threads=\"all\"\n75-thread-select 1\n(gdb)\n75^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401ec1\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"396\"}\n(gdb)\n76-stack-info-frame\n76^done,frame={level=\"0\",addr=\"0x00401ec1\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"396\"}\n(gdb)\n77-stack-list-frames\n77^done,stack=[frame={level=\"0\",addr=\"0x00401ec1\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"396\"}]\n(gdb)\n78-stack-list-arguments 1\n78^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n79-thread-info\n79^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401ec1\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"396\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n80-thread-list-ids\n80^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n81-var-update --all-values *\n81^done,changelist=[]\n(gdb)\n82-stack-list-locals 0\n82^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n83-exec-next\n83^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401edc\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"399\"},thread-id=\"1\",stopped-threads=\"all\"\n84-thread-select 1\n(gdb)\n85-stack-info-frame\n84^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401edc\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"399\"}\n(gdb)\n85^done,frame={level=\"0\",addr=\"0x00401edc\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"399\"}\n(gdb)\n86-stack-list-frames\n86^done,stack=[frame={level=\"0\",addr=\"0x00401edc\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"399\"}]\n(gdb)\n87-stack-list-arguments 1\n87^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n88-thread-info\n88^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401edc\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"399\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n89-thread-list-ids\n89^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n90-var-update --all-values *\n90^done,changelist=[]\n(gdb)\n91-stack-list-locals 0\n91^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n92-exec-next\n92^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401eed\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"400\"},thread-id=\"1\",stopped-threads=\"all\"\n93-thread-select 1\n(gdb)\n93^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401eed\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"400\"}\n(gdb)\n94-stack-info-frame\n94^done,frame={level=\"0\",addr=\"0x00401eed\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"400\"}\n(gdb)\n95-stack-list-frames\n95^done,stack=[frame={level=\"0\",addr=\"0x00401eed\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"400\"}]\n(gdb)\n96-stack-list-arguments 1\n96^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n97-thread-info\n97^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401eed\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"400\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n98-thread-list-ids\n98^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n99-var-update --all-values *\n99^done,changelist=[]\n(gdb)\n100-stack-list-locals 0\n100^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n101-exec-next\n101^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401f08\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"403\"},thread-id=\"1\",stopped-threads=\"all\"\n102-thread-select 1\n(gdb)\n102^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401f08\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"403\"}\n(gdb)\n103-stack-info-frame\n103^done,frame={level=\"0\",addr=\"0x00401f08\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"403\"}\n(gdb)\n104-stack-list-frames\n104^done,stack=[frame={level=\"0\",addr=\"0x00401f08\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"403\"}]\n(gdb)\n105-stack-list-arguments 1\n105^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n106-thread-info\n106^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401f08\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"403\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n107-thread-list-ids\n107^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n108-var-update --all-values *\n108^done,changelist=[]\n(gdb)\n109-stack-list-locals 0\n109^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n110-exec-next\n110^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401f19\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"404\"},thread-id=\"1\",stopped-threads=\"all\"\n111-thread-select 1\n(gdb)\n111^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401f19\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"404\"}\n(gdb)\n112-stack-info-frame\n112^done,frame={level=\"0\",addr=\"0x00401f19\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"404\"}\n(gdb)\n113-stack-list-frames\n113^done,stack=[frame={level=\"0\",addr=\"0x00401f19\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"404\"}]\n(gdb)\n114-stack-list-arguments 1\n114^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n115-thread-info\n115^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401f19\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"404\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n116-thread-list-ids\n116^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n117-var-update --all-values *\n117^done,changelist=[]\n(gdb)\n118-stack-list-locals 0\n118^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n119-exec-next\n119^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401f34\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"407\"},thread-id=\"1\",stopped-threads=\"all\"\n120-thread-select 1\n(gdb)\n121-stack-info-frame\n120^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401f34\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"407\"}\n(gdb)\n121^done,frame={level=\"0\",addr=\"0x00401f34\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"407\"}\n(gdb)\n122-stack-list-frames\n122^done,stack=[frame={level=\"0\",addr=\"0x00401f34\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"407\"}]\n(gdb)\n123-stack-list-arguments 1\n123^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n124-thread-info\n124^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401f34\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"407\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n125-thread-list-ids\n125^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n126-var-update --all-values *\n126^done,changelist=[]\n(gdb)\n127-stack-list-locals 0\n127^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n128-exec-next\n128^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401f45\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"408\"},thread-id=\"1\",stopped-threads=\"all\"\n129-thread-select 1\n(gdb)\n129^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401f45\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"408\"}\n(gdb)\n130-stack-info-frame\n130^done,frame={level=\"0\",addr=\"0x00401f45\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"408\"}\n(gdb)\n131-stack-list-frames\n131^done,stack=[frame={level=\"0\",addr=\"0x00401f45\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"408\"}]\n(gdb)\n132-stack-list-arguments 1\n132^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n133-thread-info\n133^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401f45\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"408\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n134-thread-list-ids\n134^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n135-var-update --all-values *\n135^done,changelist=[]\n(gdb)\n136-stack-list-locals 0\n136^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n137-exec-next\n137^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401f60\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"411\"},thread-id=\"1\",stopped-threads=\"all\"\n138-thread-select 1\n(gdb)\n138^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401f60\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"411\"}\n(gdb)\n139-stack-info-frame\n139^done,frame={level=\"0\",addr=\"0x00401f60\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"411\"}\n(gdb)\n140-stack-list-frames\n140^done,stack=[frame={level=\"0\",addr=\"0x00401f60\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"411\"}]\n(gdb)\n141-stack-list-arguments 1\n141^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n142-thread-info\n142^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401f60\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"411\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n143-thread-list-ids\n143^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n144-var-update --all-values *\n144^done,changelist=[]\n(gdb)\n145-stack-list-locals 0\n145^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n146-exec-next\n146^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401f8c\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"415\"},thread-id=\"1\",stopped-threads=\"all\"\n147-thread-select 1\n(gdb)\n147^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401f8c\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"415\"}\n148-stack-info-frame\n(gdb)\n148^done,frame={level=\"0\",addr=\"0x00401f8c\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"415\"}\n(gdb)\n149-stack-list-frames\n149^done,stack=[frame={level=\"0\",addr=\"0x00401f8c\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"415\"}]\n(gdb)\n150-stack-list-arguments 1\n150^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n151-thread-info\n151^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401f8c\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"415\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n152-thread-list-ids\n152^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n153-var-update --all-values *\n153^done,changelist=[]\n(gdb)\n154-stack-list-locals 0\n154^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n155-exec-next\n155^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401fb8\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"419\"},thread-id=\"1\",stopped-threads=\"all\"\n156-thread-select 1\n(gdb)\n156^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401fb8\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"419\"}\n(gdb)\n157-stack-info-frame\n157^done,frame={level=\"0\",addr=\"0x00401fb8\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"419\"}\n(gdb)\n158-stack-list-frames\n158^done,stack=[frame={level=\"0\",addr=\"0x00401fb8\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"419\"}]\n(gdb)\n159-stack-list-arguments 1\n159^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n160-thread-info\n160^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401fb8\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"419\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n161-thread-list-ids\n161^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n162-var-update --all-values *\n162^done,changelist=[]\n(gdb)\n163-stack-list-locals 0\n163^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n164-exec-next\n164^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00401fe4\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"423\"},thread-id=\"1\",stopped-threads=\"all\"\n165-thread-select 1\n(gdb)\n165^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00401fe4\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"423\"}\n(gdb)\n166-stack-info-frame\n166^done,frame={level=\"0\",addr=\"0x00401fe4\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"423\"}\n(gdb)\n167-stack-list-frames\n167^done,stack=[frame={level=\"0\",addr=\"0x00401fe4\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"423\"}]\n(gdb)\n168-stack-list-arguments 1\n168^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n169-thread-info\n169^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00401fe4\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"423\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n170-thread-list-ids\n170^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n171-var-update --all-values *\n171^done,changelist=[]\n(gdb)\n172-stack-list-locals 0\n172^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n173-exec-next\n173^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00402010\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"427\"},thread-id=\"1\",stopped-threads=\"all\"\n174-thread-select 1\n(gdb)\n175-stack-info-frame\n174^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00402010\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"427\"}\n(gdb)\n175^done,frame={level=\"0\",addr=\"0x00402010\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"427\"}\n(gdb)\n176-stack-list-frames\n176^done,stack=[frame={level=\"0\",addr=\"0x00402010\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"427\"}]\n(gdb)\n177-stack-list-arguments 1\n177^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n178-thread-info\n178^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00402010\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"427\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n179-thread-list-ids\n179^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n180-var-update --all-values *\n180^done,changelist=[]\n(gdb)\n181-stack-list-locals 0\n181^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n182-exec-next\n182^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00402021\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"428\"},thread-id=\"1\",stopped-threads=\"all\"\n183-thread-select 1\n(gdb)\n183^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00402021\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"428\"}\n(gdb)\n184-stack-info-frame\n184^done,frame={level=\"0\",addr=\"0x00402021\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"428\"}\n(gdb)\n185-stack-list-frames\n185^done,stack=[frame={level=\"0\",addr=\"0x00402021\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"428\"}]\n(gdb)\n186-stack-list-arguments 1\n186^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n187-thread-info\n187^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00402021\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"428\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n188-thread-list-ids\n188^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n189-var-update --all-values *\n189^done,changelist=[]\n(gdb)\n190-stack-list-locals 0\n190^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n191-exec-next\n191^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x0040203c\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"431\"},thread-id=\"1\",stopped-threads=\"all\"\n192-thread-select 1\n(gdb)\n192^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x0040203c\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"431\"}\n(gdb)\n193-stack-info-frame\n193^done,frame={level=\"0\",addr=\"0x0040203c\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"431\"}\n(gdb)\n194-stack-list-frames\n194^done,stack=[frame={level=\"0\",addr=\"0x0040203c\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"431\"}]\n(gdb)\n195-stack-list-arguments 1\n195^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n196-thread-info\n196^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x0040203c\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"431\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n197-thread-list-ids\n197^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n198-var-update --all-values *\n198^done,changelist=[]\n(gdb)\n199-stack-list-locals 0\n199^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n200-exec-next\n200^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x0040204d\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"432\"},thread-id=\"1\",stopped-threads=\"all\"\n201-thread-select 1\n(gdb)\n201^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x0040204d\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"432\"}\n(gdb)\n202-stack-info-frame\n202^done,frame={level=\"0\",addr=\"0x0040204d\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"432\"}\n(gdb)\n203-stack-list-frames\n203^done,stack=[frame={level=\"0\",addr=\"0x0040204d\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"432\"}]\n(gdb)\n204-stack-list-arguments 1\n204^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n205-thread-info\n205^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x0040204d\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"432\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n206-thread-list-ids\n206^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n207-var-update --all-values *\n207^done,changelist=[]\n(gdb)\n208-stack-list-locals 0\n208^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n209-exec-next\n209^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00402068\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"435\"},thread-id=\"1\",stopped-threads=\"all\"\n210-thread-select 1\n(gdb)\n210^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00402068\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"435\"}\n211-stack-info-frame\n(gdb)\n211^done,frame={level=\"0\",addr=\"0x00402068\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"435\"}\n(gdb)\n212-stack-list-frames\n212^done,stack=[frame={level=\"0\",addr=\"0x00402068\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"435\"}]\n(gdb)\n213-stack-list-arguments 1\n213^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n214-thread-info\n214^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00402068\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"435\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n215-thread-list-ids\n215^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n216-var-update --all-values *\n216^done,changelist=[]\n(gdb)\n217-stack-list-locals 0\n217^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n218-exec-next\n218^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00402074\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"437\"},thread-id=\"1\",stopped-threads=\"all\"\n219-thread-select 1\n(gdb)\n219^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00402074\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"437\"}\n(gdb)\n220-stack-info-frame\n220^done,frame={level=\"0\",addr=\"0x00402074\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"437\"}\n(gdb)\n221-stack-list-frames\n221^done,stack=[frame={level=\"0\",addr=\"0x00402074\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"437\"}]\n(gdb)\n222-stack-list-arguments 1\n222^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n223-thread-info\n223^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00402074\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"437\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n224-thread-list-ids\n224^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n225-var-update --all-values *\n225^done,changelist=[]\n(gdb)\n226-stack-list-locals 0\n226^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n227-exec-next\n227^running\n*running,thread-id=\"all\"\n(gdb)\n*stopped,reason=\"end-stepping-range\",frame={addr=\"0x00402089\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"438\"},thread-id=\"1\",stopped-threads=\"all\"\n228-thread-select 1\n(gdb)\n228^done,new-thread-id=\"1\",frame={level=\"0\",addr=\"0x00402089\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"438\"}\n(gdb)\n229-stack-info-frame\n229^done,frame={level=\"0\",addr=\"0x00402089\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"438\"}\n(gdb)\n230-stack-list-frames\n230^done,stack=[frame={level=\"0\",addr=\"0x00402089\",func=\"main\",file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"438\"}]\n(gdb)\n231-stack-list-arguments 1\n231^done,stack-args=[frame={level=\"0\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}]}]\n(gdb)\n232-thread-info\n232^done,threads=[{id=\"1\",target-id=\"Thread 2616.0x9d4\",frame={level=\"0\",addr=\"0x00402089\",func=\"main\",args=[{name=\"argc\",value=\"3\"},{name=\"argv\",value=\"0x4a2d90\"}],file=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",fullname=\"D:\\\\src\\\\pe\\\\src\\\\petool.cpp\",line=\"438\"},state=\"stopped\"}],current-thread-id=\"1\"\n(gdb)\n233-thread-list-ids\n233^done,thread-ids={thread-id=\"1\"},current-thread-id=\"1\",number-of-threads=\"1\"\n(gdb)\n234-var-update --all-values *\n234^done,changelist=[{name=\"var4\",value=\"0x0\",in_scope=\"true\",type_changed=\"false\",has_more=\"0\"}]\n(gdb)\n235-stack-list-locals 0\n235^done,locals=[name=\"verinfo\",name=\"ver_handle\",name=\"view\"]\n(gdb)\n",
+			"settings":
+			{
+				"buffer_size": 44285,
+				"line_ending": "Windows",
+				"name": "GDB Session",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "GNU gdb (GDB) 7.4\nCopyright (C) 2012 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.  Type \"show copying\"\nand \"show warranty\" for details.\nThis GDB was configured as \"i686-pc-mingw32\".\nFor bug reporting instructions, please see:\n<http://www.gnu.org/software/gdb/bugs/>...\nReading symbols from d:\\\\src\\\\bin\\\\petool.exe...done.\n[New Thread 2616.0x9d4]\n",
+			"settings":
+			{
+				"buffer_size": 532,
+				"line_ending": "Windows",
+				"name": "GDB Console",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": " int argc = 3\n+char ** argv = 0x4a2d90\n+PE_VERSION verinfo = {...}\n void * ver_handle = 0x0\n+MAPPED_FILE view = {...}\n",
+			"settings":
+			{
+				"buffer_size": 118,
+				"line_ending": "Windows",
+				"name": "GDB Variables",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "main(argc = 3,argv = 0x932d98,);\n",
+			"settings":
+			{
+				"buffer_size": 33,
+				"line_ending": "Windows",
+				"name": "GDB Callstack",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "main(argc = 3,argv = 0x4a2d90,);\n",
+			"settings":
+			{
+				"buffer_size": 33,
+				"line_ending": "Windows",
+				"name": "GDB Callstack",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "001 -    stopped - main(argc = 3, argv = 0x932d98);\n",
+			"settings":
+			{
+				"buffer_size": 52,
+				"line_ending": "Windows",
+				"name": "GDB Threads",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "1 - d:\\src\\pe\\src\\petool.cpp:210\n2 - d:\\src\\pe\\src\\petool.cpp:383\n",
+			"settings":
+			{
+				"buffer_size": 66,
+				"line_ending": "Windows",
+				"name": "GDB Breakpoints",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "001 -    stopped - main(argc = 3, argv = 0x4a2d90);\n",
+			"settings":
+			{
+				"buffer_size": 52,
+				"line_ending": "Windows",
+				"name": "GDB Threads",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "1 - d:\\src\\pe\\src\\petool.cpp:383\n",
+			"settings":
+			{
+				"buffer_size": 33,
+				"line_ending": "Windows",
+				"name": "GDB Breakpoints",
+				"read_only": true,
+				"scratch": true
 			}
 		}
 	],
@@ -327,6 +491,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"PEClose",
 			"        \"",
 			"sourcedir",
 			"workingdir",
@@ -390,7 +555,7 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 12,
 			"sheets":
 			[
 				{
@@ -398,15 +563,15 @@
 					"file": "petool/petool.cpp",
 					"settings":
 					{
-						"buffer_size": 12334,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12314,
-								12314
+								0,
+								0
 							]
 						],
 						"settings":
@@ -478,15 +643,15 @@
 					"file": "test/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 528,
+						"buffer_size": 573,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								341,
-								373
+								0,
+								0
 							]
 						],
 						"settings":
@@ -505,15 +670,15 @@
 					"file": "/D/src/autoit/autoit.cpp",
 					"settings":
 					{
-						"buffer_size": 11755,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								340,
-								340
+								0,
+								0
 							]
 						],
 						"settings":
@@ -532,15 +697,15 @@
 					"file": "pe.sublime-project",
 					"settings":
 					{
-						"buffer_size": 570,
+						"buffer_size": 741,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								567,
-								567
+								194,
+								194
 							]
 						],
 						"settings":
@@ -586,15 +751,15 @@
 					"file": "CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 384,
+						"buffer_size": 404,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								384,
-								384
+								0,
+								0
 							]
 						],
 						"settings":
@@ -612,15 +777,15 @@
 					"file": "pywrap/CMakeLists.txt",
 					"settings":
 					{
-						"buffer_size": 2263,
+						"buffer_size": 2410,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2077,
-								1917
+								0,
+								0
 							]
 						],
 						"settings":
@@ -689,6 +854,118 @@
 						"zoom_level": 1.0
 					},
 					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "src/petool.cpp",
+					"settings":
+					{
+						"buffer_size": 13011,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12508,
+								12508
+							]
+						],
+						"settings":
+						{
+							"spell_check": false,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7682.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "src/pe.cpp",
+					"settings":
+					{
+						"buffer_size": 50046,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								50046,
+								50046
+							]
+						],
+						"settings":
+						{
+							"spell_check": true,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 32072.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "src/slist.cpp",
+					"settings":
+					{
+						"buffer_size": 1174,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								956,
+								956
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 592.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "pe.sublime-workspace",
+					"settings":
+					{
+						"buffer_size": 14816,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
 				}
 			]
 		},
@@ -697,19 +974,19 @@
 			"sheets":
 			[
 				{
-					"buffer": 11,
+					"buffer": 15,
 					"file": "src/pe.h",
 					"settings":
 					{
-						"buffer_size": 10627,
+						"buffer_size": 10900,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								523,
-								523
+								0,
+								0
 							]
 						],
 						"settings":
@@ -719,7 +996,321 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1944.0,
+						"translation.y": 2268.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"settings":
+					{
+						"buffer_size": 18000,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18000,
+								18000
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/SublimeGDB/gdb_session.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3618.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"settings":
+					{
+						"buffer_size": 532,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								532,
+								532
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 252.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"settings":
+					{
+						"buffer_size": 65,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								65,
+								65
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"settings":
+					{
+						"buffer_size": 44285,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								44285,
+								44285
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/SublimeGDB/gdb_session.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"settings":
+					{
+						"buffer_size": 532,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								532,
+								532
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 252.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"settings":
+					{
+						"buffer_size": 118,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								118,
+								118
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 22,
+					"settings":
+					{
+						"buffer_size": 33,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								33,
+								33
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 23,
+					"settings":
+					{
+						"buffer_size": 33,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								33,
+								33
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 24,
+					"settings":
+					{
+						"buffer_size": 52,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								52,
+								52
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 25,
+					"settings":
+					{
+						"buffer_size": 66,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								66,
+								66
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"word_wrap": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 26,
+					"settings":
+					{
+						"buffer_size": 52,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								52,
+								52
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 27,
+					"settings":
+					{
+						"buffer_size": 33,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								33,
+								33
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"word_wrap": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -742,25 +1333,39 @@
 			[
 				0,
 				0,
-				1,
+				3,
 				1
 			],
 			[
-				1,
 				0,
+				1,
+				1,
+				2
+			],
+			[
+				1,
+				1,
 				2,
-				1
+				2
+			],
+			[
+				2,
+				1,
+				3,
+				2
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.5,
+			0.33,
+			0.66,
 			1.0
 		],
 		"rows":
 		[
 			0.0,
+			0.75,
 			1.0
 		]
 	},

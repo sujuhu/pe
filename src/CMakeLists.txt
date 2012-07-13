@@ -1,7 +1,8 @@
 
 SET(SRC_LIST
 pe.cpp
-strconv.cpp)
+strconv.cpp
+slist.cpp)
 
 #static library
 ADD_LIBRARY(pe_static STATIC ${SRC_LIST})
