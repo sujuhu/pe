@@ -119,15 +119,23 @@
 			"file": "pywrap/pype.cpp",
 			"settings":
 			{
-				"buffer_size": 16156,
+				"buffer_size": 14764,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "build/pype.cpp",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Windows"
 			}
 		},
 		{
 			"file": "pywrap/example.py",
 			"settings":
 			{
-				"buffer_size": 1939,
+				"buffer_size": 1945,
 				"line_ending": "Windows"
 			}
 		},
@@ -135,7 +143,7 @@
 			"file": "src/petool.cpp",
 			"settings":
 			{
-				"buffer_size": 13011,
+				"buffer_size": 12997,
 				"line_ending": "Windows"
 			}
 		},
@@ -143,7 +151,7 @@
 			"file": "src/pe.cpp",
 			"settings":
 			{
-				"buffer_size": 50046,
+				"buffer_size": 50117,
 				"line_ending": "Windows"
 			}
 		},
@@ -159,7 +167,7 @@
 			"file": "pe.sublime-workspace",
 			"settings":
 			{
-				"buffer_size": 14816,
+				"buffer_size": 97122,
 				"line_ending": "Unix"
 			}
 		},
@@ -555,7 +563,7 @@
 	"groups":
 	[
 		{
-			"selected": 12,
+			"selected": 11,
 			"sheets":
 			[
 				{
@@ -804,15 +812,15 @@
 					"file": "pywrap/pype.cpp",
 					"settings":
 					{
-						"buffer_size": 16156,
+						"buffer_size": 14764,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								13589,
+								13589
 							]
 						],
 						"settings":
@@ -822,17 +830,17 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 8476.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 10,
-					"file": "pywrap/example.py",
+					"file": "build/pype.cpp",
 					"settings":
 					{
-						"buffer_size": 1939,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
@@ -845,9 +853,7 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -857,18 +863,46 @@
 				},
 				{
 					"buffer": 11,
-					"file": "src/petool.cpp",
+					"file": "pywrap/example.py",
 					"settings":
 					{
-						"buffer_size": 13011,
+						"buffer_size": 1945,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12508,
-								12508
+								1785,
+								1785
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 486.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "src/petool.cpp",
+					"settings":
+					{
+						"buffer_size": 12997,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12827,
+								12827
 							]
 						],
 						"settings":
@@ -885,19 +919,19 @@
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 13,
 					"file": "src/pe.cpp",
 					"settings":
 					{
-						"buffer_size": 50046,
+						"buffer_size": 50117,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								50046,
-								50046
+								48470,
+								48470
 							]
 						],
 						"settings":
@@ -908,13 +942,13 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 32072.0,
+						"translation.y": 31154.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 14,
 					"file": "src/slist.cpp",
 					"settings":
 					{
@@ -941,11 +975,11 @@
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 15,
 					"file": "pe.sublime-workspace",
 					"settings":
 					{
-						"buffer_size": 14816,
+						"buffer_size": 97122,
 						"regions":
 						{
 						},
@@ -974,7 +1008,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 15,
+					"buffer": 16,
 					"file": "src/pe.h",
 					"settings":
 					{
@@ -1002,7 +1036,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 16,
+					"buffer": 17,
 					"settings":
 					{
 						"buffer_size": 18000,
@@ -1027,7 +1061,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 17,
+					"buffer": 18,
 					"settings":
 					{
 						"buffer_size": 532,
@@ -1052,7 +1086,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 18,
+					"buffer": 19,
 					"settings":
 					{
 						"buffer_size": 65,
@@ -1077,7 +1111,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 19,
+					"buffer": 20,
 					"settings":
 					{
 						"buffer_size": 44285,
@@ -1102,7 +1136,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 20,
+					"buffer": 21,
 					"settings":
 					{
 						"buffer_size": 532,
@@ -1127,7 +1161,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 21,
+					"buffer": 22,
 					"settings":
 					{
 						"buffer_size": 118,
@@ -1158,7 +1192,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 22,
+					"buffer": 23,
 					"settings":
 					{
 						"buffer_size": 33,
@@ -1183,7 +1217,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 23,
+					"buffer": 24,
 					"settings":
 					{
 						"buffer_size": 33,
@@ -1214,7 +1248,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 24,
+					"buffer": 25,
 					"settings":
 					{
 						"buffer_size": 52,
@@ -1239,7 +1273,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 25,
+					"buffer": 26,
 					"settings":
 					{
 						"buffer_size": 66,
@@ -1265,7 +1299,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 26,
+					"buffer": 27,
 					"settings":
 					{
 						"buffer_size": 52,
@@ -1290,7 +1324,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 27,
+					"buffer": 28,
 					"settings":
 					{
 						"buffer_size": 33,

@@ -19,4 +19,7 @@ EXPORTS
     GetVersionInfo
     GetIcon
     LoadPEImage
+    PEOpenVersion
+    PENextVersion
+    PECloseVersion
 

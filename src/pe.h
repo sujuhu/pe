@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(c) 2011. Kim Zhang [analyst004 at gmail.com].
 
 This program is free software; you can redistribute it and/or modify
@@ -32,9 +32,9 @@ extern "C" {
 #define ECANCELED   401
 #endif
 
-typedef unsigned int rva_t;
-typedef unsigned int raw_t;
-typedef unsigned int va_t;
+typedef uint32_t rva_t;
+typedef uint32_t raw_t;
+typedef uint32_t va_t;
 
 #define GET_DOS_HEADER( s )  ((IMAGE_DOS_HEADER*)s)
 
@@ -55,9 +55,9 @@ typedef unsigned int va_t;
 //导出函数
 typedef struct _EXPORT_FUNCTION
 {
-  int   Ordinal;                //函数序号
-  char  FunctionName[256];      //函数名称
-  va_t  FunctionVirtualAddress; //函数内存地址
+  int32_t   Ordinal;                //函数序号
+  char      FunctionName[256];      //函数名称
+  va_t      FunctionVirtualAddress; //函数内存地址
 }EXPORT_FUNCTION, *PEXPORT_FUNCTION;
 
 //导入函数
@@ -66,15 +66,15 @@ typedef struct _IMPORT_FUNCTION
   //int IndexOfModule;
   //uint32_t IndexInModule;   //在该导入模块中第几个导入函数
   union {
-    unsigned short FunctionOrdinal; //以序号的方式导入函数时有效
-    unsigned short FunctionHint;    //以名称的方式导入函数时有效
+    uint16_t FunctionOrdinal; //以序号的方式导入函数时有效
+    uint16_t FunctionHint;    //以名称的方式导入函数时有效
   };
-  char FunctionName[256];     //以名称的方式导入函数
-  raw_t ThunkOffset;
-  rva_t ThunkRVA;
-  unsigned int ThunkValue;    //最高位1， 表示序号方式导入， 无函数名称
-  raw_t OffsetName;
-  rva_t iat;                  //导入函数地址实际填入的位置
+  char      FunctionName[256];     //以名称的方式导入函数
+  raw_t     ThunkOffset;
+  rva_t     ThunkRVA;
+  uint32_t  ThunkValue;    //最高位1， 表示序号方式导入， 无函数名称
+  raw_t     OffsetName;
+  rva_t     iat;                  //导入函数地址实际填入的位置
 }IMPORT_FUNCTION, *PIMPORT_FUNCTION;
 
 //导入模块
@@ -82,7 +82,7 @@ typedef struct _IMPORT_MODULE
 {
   char  ModuleName[260];      //模块名称
   rva_t OriginalFirstThunk;
-  unsigned int TimeDataStamp;
+  uint32_t TimeDataStamp;
   rva_t ForwarderChain;
   rva_t FirstThunk;
   raw_t OffsetName;           //模块名称的位置
@@ -93,9 +93,9 @@ typedef struct _PE_RESOURCE_ID
 {
   wchar_t ResourceName[64];   //资源名称
   unsigned short  ResourceID; //资源ID
-  int   OffsetToData;         //数据偏移
-  int   Size;                 //数据大小
-  unsigned int  CodePage;     //代码页
+  int32_t   OffsetToData;         //数据偏移
+  int32_t   Size;                 //数据大小
+  uint32_t  CodePage;     //代码页
   _PE_RESOURCE_ID*    Next;
 }PE_RESOURCE_ID, *PPE_RESOURCE_ID;
 
@@ -103,7 +103,7 @@ typedef struct _PE_RESOURCE_ID
 typedef struct _PE_RESOURCE_TYPE
 {
   wchar_t ResourceTypeName[64];   //资源类型名称
-  unsigned int ResourceTypeID;      //资源类型ID/资源名称Offset
+  uint32_t ResourceTypeID;      //资源类型ID/资源名称Offset
   PPE_RESOURCE_ID ResourceList;   //资源列表
 }PE_RESOURCE_TYPE, *PPE_RESOURCE_TYPE;
 
@@ -246,7 +246,7 @@ int  GetSectionIndexByRaw(
 typedef
 bool (*RESOURCE_CALLBACK)(
     wchar_t* wName,
-    unsigned short NameLen,
+    uint16_t NameLen,
     IMAGE_RESOURCE_DATA_ENTRY* DataEntry,
     void* lpParam );
 
@@ -268,7 +268,7 @@ bool EnumResource(
 typedef struct _PE_RELOCATION_ITEM
 {
   rva_t rva;
-  int   Type;
+  int32_t   Type;
 }PE_RELOCATION_ITEM, *PPE_RELOCATION_ITEM;
 
 typedef
@@ -280,7 +280,7 @@ bool (*RELOC_ITEM_CALLBACK)(
 typedef struct _PE_RELOCATION_BLOCK
 {
     rva_t rva;  //重定位块的相对偏移地址
-    int cItem;  //重定位项的数量
+    int32_t cItem;  //重定位项的数量
 }PE_RELOCATION_BLOCK, *PPE_RELOCATION_BLOCK;
 
 typedef
@@ -309,9 +309,9 @@ bool EnumRelocation(
 
 typedef struct _PE_BOUND
 {
-    int   TimeDateStamp;
-    char  ModuleName[128];
-    unsigned short    NumberOfModuleForwarderRefs;
+    int32_t   TimeDateStamp;
+    char      ModuleName[128];
+    uint16_t  NumberOfModuleForwarderRefs;
 }PE_BOUND, *PPE_BOUND;
 
 /*
@@ -374,8 +374,8 @@ bool GetIcon(
 //PE间隙描述符
 typedef struct _SECTION_GAP
 {
-  raw_t offset;   //间隙在文件中的偏移
-  int length;   //间隙的长度
+  raw_t   offset;   //间隙在文件中的偏移
+  int32_t length;   //间隙的长度
 }SECTION_GAP, *PSECTION_GAP;
 
 /*
@@ -391,9 +391,6 @@ int EnumSectionGap(
     size_t stream_size,
     SECTION_GAP* pSectionGaps,
     size_t cbSize);
-
-
-
 
 
 //Notice: Not Support MultiThread
@@ -453,6 +450,12 @@ typedef struct _ver_info
 
 #define version_t   void*
 
+/*
+ * Description: 打开PE的版本信息块
+ * Parameter: version   版本信息块
+ *            versize   版本信息块长度
+ * Return:    句柄
+ */
 void* PEOpenVersion(const char* version, size_t versize);
 
 bool PENextVersion(void* ver_handle, ver_info_t* verinfo);
