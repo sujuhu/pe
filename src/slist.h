@@ -1,6 +1,10 @@
 #ifndef LIB_SLIST_H_
 #define LIB_SLIST_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef ANYSIZE
 #define ANYSIZE 	1
 #endif
@@ -22,4 +26,9 @@ bool SListAppend(slist_t * slist, unsigned char* data, size_t data_size);
 unsigned char* SListNext(slist_t* slist);
 
 void SListClear(slist_t* slist);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

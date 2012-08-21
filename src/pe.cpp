@@ -14,6 +14,7 @@ GNU General Public License for more details.
 
 */
 #pragma warning(disable:4996)
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
