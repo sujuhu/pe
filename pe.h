@@ -16,6 +16,7 @@ GNU General Public License for more details.
 #define LIB_PE_H_
 
 #include "imgfmt.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -391,40 +392,6 @@ int EnumSectionGap(
     size_t stream_size,
     SECTION_GAP* pSectionGaps,
     size_t cbSize);
-
-
-//Notice: Not Support MultiThread
-//Notice: Not Support Unicode
-
-typedef struct _PE_VERSION
-{
-  char FileVersion[128];            //文件版本
-  char CompanyName[256];            //公司名称
-  char FileDescription[256];          //文件描述
-  char ProductName[256];            //产品名称
-  char LegalCopyright[256];         //版权信息
-  char InternalName[128];           //内部名称
-  char Comments[256];             //备注信息
-  char SpecialBuild[128];           //特殊内部版本
-  char LegalTrademarks[128];          //合法商标
-  char PrivateBuild[128];           //个人用内部版本
-  char ProductVersion[128];         //产品版本
-  char OriginalFilename[128];         //原始文件名
-  wchar_t wLanguage;
-  wchar_t wCodePage;
-}PE_VERSION;
-
-/*
- * Description: 获取PE文件版本信息
- * Parameter: stream    文件数据
- *            stream_size   文件数据长度
- *            verinfo       PE版本信息
- * Return:    间隙描述符的长度
- */
-bool GetVersionInfo(
-    const char* filename,
-    PE_VERSION *verinfo);
-
 
 /*
  * Description: 将PE文件加载到内存中
