@@ -36,6 +36,7 @@ extern "C" {
 typedef uint32_t rva_t;
 typedef uint32_t raw_t;
 typedef uint32_t va_t;
+typedef int      pehandle_t;
 
 #define GET_DOS_HEADER( s )  ((IMAGE_DOS_HEADER*)s)
 
@@ -49,100 +50,40 @@ typedef uint32_t va_t;
 #define GET_IMAGE_BASE( s ) \
  (unsigned int)(/*1*/(/*2*/(IMAGE_NT_HEADERS*)((const char*)s + ((IMAGE_DOS_HEADER*)s)->e_lfanew) /*2*/ )->OptionalHeader.ImageBase/*1*/)
 
-#define INVALID_FILE_OFFSET -1
+#define INVALID_PE              -1
+
+#define INVALID_FILE_OFFSET     -1
 
 #define INVALID_VIRTUAL_ADDRESS -1
 
 //导出函数
-typedef struct _EXPORT_FUNCTION
-{
-  int32_t   Ordinal;                //函数序号
-  char      FunctionName[256];      //函数名称
-  va_t      FunctionVirtualAddress; //函数内存地址
-}EXPORT_FUNCTION, *PEXPORT_FUNCTION;
 
-//导入函数
-typedef struct _IMPORT_FUNCTION
+typedef struct _pe_resource_t
 {
-  //int IndexOfModule;
-  //uint32_t IndexInModule;   //在该导入模块中第几个导入函数
-  union {
-    uint16_t FunctionOrdinal; //以序号的方式导入函数时有效
-    uint16_t FunctionHint;    //以名称的方式导入函数时有效
-  };
-  char      FunctionName[256];     //以名称的方式导入函数
-  raw_t     ThunkOffset;
-  rva_t     ThunkRVA;
-  uint32_t  ThunkValue;    //最高位1， 表示序号方式导入， 无函数名称
-  raw_t     OffsetName;
-  rva_t     iat;                  //导入函数地址实际填入的位置
-}IMPORT_FUNCTION, *PIMPORT_FUNCTION;
-
-//导入模块
-typedef struct _IMPORT_MODULE
-{
-  char  ModuleName[260];      //模块名称
-  rva_t OriginalFirstThunk;
-  uint32_t TimeDataStamp;
-  rva_t ForwarderChain;
-  rva_t FirstThunk;
-  raw_t OffsetName;           //模块名称的位置
-}IMPORT_MODULE, *PIMPORT_MODULE;
-
-//资源ID
-typedef struct _PE_RESOURCE_ID
-{
-  wchar_t ResourceName[64];   //资源名称
-  unsigned short  ResourceID; //资源ID
+  bool      is_directory;
+  wchar_t   ResourceName[64];   //资源名称
+  uint16_t  ResourceID; //资源ID
   int32_t   OffsetToData;         //数据偏移
   int32_t   Size;                 //数据大小
   uint32_t  CodePage;     //代码页
-  _PE_RESOURCE_ID*    Next;
-}PE_RESOURCE_ID, *PPE_RESOURCE_ID;
+}pe_resource_t;
 
-//资源类型
-typedef struct _PE_RESOURCE_TYPE
-{
-  wchar_t ResourceTypeName[64];   //资源类型名称
-  uint32_t ResourceTypeID;      //资源类型ID/资源名称Offset
-  PPE_RESOURCE_ID ResourceList;   //资源列表
-}PE_RESOURCE_TYPE, *PPE_RESOURCE_TYPE;
-
-/*
- * Description: 枚举导入模块回调函数
- * Parameter:   pImportModule    导入模块相关信息
- *              lpParam          回调参数
- * Return:      true    继续枚举
- *              false   停止枚举
+/**
+ * Description: parse pe format
+ * Parameter:   stream      
+ *              size           
+ * Return:      INVALID_PE     parse pe fail, errno
+ *              
  */
-typedef
-bool (*fnEnumImportModuleCallback)(
-    IMPORT_MODULE* pImportModule,
-    void* lpParam );
+int   pe_open(const char* stream, size_t size);
 
-/*
- * Description: 枚举导入函数回调函数
- * Parameter:   pImportFunction  导入函数相关信息
- *              pImportModule    导入模块相关信息
- *              lpParam          回调参数
- * Return:      true    继续枚举
- *              false   停止枚举
+/**
+ * Description: clean and close pe format
+ * Parameter:   fd        pe descriptor, return by pe_open()          
+ * Return:      void
+ *              
  */
-typedef bool (*fnEnumImportFunctionCallback)(
-    PIMPORT_FUNCTION pImportFunction,
-    PIMPORT_MODULE pImportModule,
-    void* lpParam );
-
-/*
- * Description: 判断是否PE文件
- * Parameter:   lpszFile  文件全路径
- * Return:      TRUE    是PE文件
- *              FALSE   不是PE文件
- */
-int IsValidPE(
-    const char* stream,
-    size_t stream_size);
-
+void  pe_close(int  fd);
 
 /*
  * Description: 根据虚拟地址计算文件偏移地址
@@ -150,10 +91,7 @@ int IsValidPE(
  * Return:      INVALID_FILE_OFFSET   计算失败
  *            否则， 返回文件偏移地址的值
  */
-raw_t RvaToRaw(
-    const char *stream,
-    size_t stream_size,
-    rva_t rva);
+raw_t rva_to_raw(int fd, rva_t rva);
 
 /*
  * Description: 根据文件偏移地址计算虚拟地址
@@ -162,201 +100,12 @@ raw_t RvaToRaw(
  * Return:    INVALID_VIRTUAL_ADDRESS 计算失败
  *          否则， 返回虚拟地址的值
  */
-rva_t RawToRva(
-    const char* stream,
-    raw_t raw);
+rva_t raw_to_rva(int fd, rva_t raw);
 
 /*
- * Description: 枚举导出函数
- * Parameter: lpFileData  文件数据
- *            cbFileSize  文件长度
- * pFunctions 导出函数数据
- *  pcbSize   数据缓冲区长度
- * Return:    true    枚举成功
- *            false   枚举失败
+ * 获取PE格式附加数据相关的信息
  */
-bool EnumExportFunction(
-    const char* stream,
-    size_t stream_size,
-    EXPORT_FUNCTION *exports,
-    size_t* bufsize);
-
-/*
- * Description: 枚举导入模块和函数
- * Parameter: lpFileData    文件数据
- *            cbFileSize    文件数据大小
- *            pfnModule   导入模块枚举函数
- *            lpParamModule 导入模块枚举回调函数参数
- *            pfnFunction   导入函数枚举回调函数
- *            lpParamFunction 导入函数枚举回调函数参数
- * Return:    true      枚举成功
- *            false     枚举失败， GetLastError()
-  */
-bool EnumImportModuleAndFunction(
-    const char* stream,
-    size_t stream_size,
-    fnEnumImportModuleCallback module_routine,
-    void* module_param,
-    fnEnumImportFunctionCallback api_routine,
-    void* api_param);
-
-/*
- * Description: 获取导入模块数量
- * Parameter:   lpFileData      文件数据
- *      cbFileSize      文件数据大小
- * Return:      导入模块数量
- */
-int  GetImportModuleCount(
-    const char* stream,
-    size_t stream_size);
-
-/*
- * Description: 计算虚拟地址所在的节
- * Parameter:   lpFileData      文件数据
- *        dwVirtualAddress  虚拟地址
- * Return:      节段索引值
- */
-int GetSectionIndexByRva(
-    const char* stream,
-    rva_t rva);
-
-/*
- * Description: 获取导出DLL名称
- * Parameter:   lpFileData    文件数据
- *        cbFileSize    文件大小
- *        DllName     输出缓冲区
- *        BufSize     缓冲区大小
- * Return:      TRUE      成功
- */
-bool GetExportDllName(
-    const char *stream,
-    size_t stream_size,
-    char *dll_name,
-    size_t bufsize);
-
-/*
- * Description: 计算文件偏移所在的节
- * Parameter: lpFileData      文件数据
- * dwFileOffset   文件偏移值
- * Return:    节段索引值
- */
-int  GetSectionIndexByRaw(
-    const char* stream,
-    raw_t raw);
-
-typedef
-bool (*RESOURCE_CALLBACK)(
-    wchar_t* wName,
-    uint16_t NameLen,
-    IMAGE_RESOURCE_DATA_ENTRY* DataEntry,
-    void* lpParam );
-
-/*
- * Description: 枚举资源
- * Parameter: lpFileData    文件数据
- *            cbFileSize    文件数据大小
- *            pResources    资源类型数组
- *            pcbSize     资源类型数组长度
- * Return:    true  枚举成功
- *            false 枚举失败， errno
- */
-bool EnumResource(
-    const char* stream,
-    size_t stream_size,
-    RESOURCE_CALLBACK pfnRoutine,
-    void* lpParam);
-
-typedef struct _PE_RELOCATION_ITEM
-{
-  rva_t rva;
-  int32_t   Type;
-}PE_RELOCATION_ITEM, *PPE_RELOCATION_ITEM;
-
-typedef
-bool (*RELOC_ITEM_CALLBACK)(
-    rva_t rvaOwnerBlock,
-    PPE_RELOCATION_ITEM pItem,
-    void* lpParam );
-
-typedef struct _PE_RELOCATION_BLOCK
-{
-    rva_t rva;  //重定位块的相对偏移地址
-    int32_t cItem;  //重定位项的数量
-}PE_RELOCATION_BLOCK, *PPE_RELOCATION_BLOCK;
-
-typedef
-bool (*RELOC_BLOCK_CALLBACK)(
-    PPE_RELOCATION_BLOCK pBlock,
-    void* lpParam );
-
-/*
- * Description: 枚举重定位数据
- * Parameter: lpFileData    文件数据
- *            cbFileSize    文件数据大小
- *            pfnBlock    重定位块枚举回调函数
- *            lpBlockParam  重定位块枚举回调函数参数
- *            pfnItem     重定位项回调函数
- *            lpItemParam   重定位项回调函数参数
- * Return:    true      枚举成功
- *            false     枚举失败, GetLastError()
- */
-bool EnumRelocation(
-    const char* stream,
-    size_t stream_size,
-    RELOC_BLOCK_CALLBACK block_routine,
-    void* lpBlockParam,
-    RELOC_ITEM_CALLBACK item_routine,
-    void* lpItemParam );
-
-typedef struct _PE_BOUND
-{
-    int32_t   TimeDateStamp;
-    char      ModuleName[128];
-    uint16_t  NumberOfModuleForwarderRefs;
-}PE_BOUND, *PPE_BOUND;
-
-/*
- * Description: 枚举Bound
- * Parameter: stream        文件数据
- *            stream_size   文件数据大小
- *            pBounds       Bound数组
- *            pcbSize       Boudn数组长度
- * Return:    true  枚举成功
- *            false 枚举失败， GetLastError()
- */
-bool EnumBound(
-    const char* stream,
-    size_t stream_size,
-    PPE_BOUND pBounds,
-    size_t* pcbSize);
-
-/*
- * Description: 获取节段头部信息
- * Parameter: lpFileData  文件数据
- *            nIndexOfSection   节段索引号
- *            pSection      节段信息内容
- * Return:    true    获取成功
- *            false   获取失败， GetLastError()
- */
-bool GetSectionHeader(
-    const char* stream,
-    int section_index,
-    IMAGE_SECTION_HEADER *section_header);
-
-/*
- * Description: 获取附加数据的开始位置和长度
- * Parameter: stream    文件数据
- *            stream_size   文件数据长度
- *            overlay_raw     附加数据开始位置
- *            overlay_len     附加数据长度
- * Return:    true      获取成功
- *            false     获取失败， GetLastError()
- */
-bool GetOverlay(
-    const char* stream,
-    size_t stream_size,
-    raw_t* overlay_raw,
-    size_t* overlay_len);
+IMAGE_OVERLAY* pe_overlay(int fd);
 
 
 /*
@@ -406,28 +155,6 @@ bool LoadPEImage(
     size_t stream_size, 
     char* image, 
     size_t image_size);
-
-
-typedef struct _ver_info
-{ 
-  wchar_t name[128];
-  wchar_t value[512];
-}ver_info_t;
-
-
-#define version_t   void*
-
-/*
- * Description: 打开PE的版本信息块
- * Parameter: version   版本信息块
- *            versize   版本信息块长度
- * Return:    句柄
- */
-void* PEOpenVersion(const char* version, size_t versize);
-
-bool PENextVersion(void* ver_handle, ver_info_t* verinfo);
-
-void PECloseVersion(void* ver_handle);
 
 
 #ifdef __cplusplus
