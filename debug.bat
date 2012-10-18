@@ -1,0 +1,1 @@
+d:\src\pe\build\x86\nmake\release\bin\petool.exe -entry c:\windows\system32\notepad.exe

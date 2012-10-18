@@ -4,7 +4,8 @@ osname = platform.system()
 shared_libs = []
 
 module1 = Extension('pype',
-                    sources = ['pype.cpp'],
+                    sources = ['pype.cpp', 'pe.cpp', 'util/strconv.cpp'],
+                    include_dirs = ['./util', './struct'],
                     #define_macros = [('WIN32',None),
                     #                 ("_CRT_SECURE_NO_DEPRECATE",None),
                     #                 ("_CRT_NONSTDC_NO_DEPRECATE",None)],
@@ -12,7 +13,7 @@ module1 = Extension('pype',
                     #              "../build"],
                     #library_dirs = ["../build"],
                     libraries = shared_libs,
-                    extra_objects = ["../build/lib/libpe.a"],
+                    extra_objects = [],
                     #extra_compile_args=["/MT", "/W3", "/Od", "/Oy", "/Zi"],
                     #extra_link_args=["/nologo",
                     #                 "/debug",
@@ -21,6 +22,6 @@ module1 = Extension('pype',
                     #                ]
 )
 setup ( name = 'pype',
-        version = '0.3.2',
+        version = '0.4',
         description = 'Python module wrapping libpe',
         ext_modules = [module1])

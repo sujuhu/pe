@@ -1,0 +1,6 @@
+[submodule "struct"]
+	path = struct
+	url = d:/git/struct.git
+[submodule "util"]
+	path = util
+	url = d:/git/util.git

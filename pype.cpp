@@ -1,51 +1,12 @@
 ﻿// pefile.cpp : Defines the entry point for the console application.
 //
 //#pragma  warning( disable:4996 )
+#pragma warning(disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <Python.h>
-#include "../src/pe.h"
-#include <vector>
-using namespace std;
-
-typedef struct _RESITEM
-{
-  string name;
-  DWORD  offset;
-  DWORD  size;
-  DWORD  codepage;
-}RESITEM;
-
-bool ResourceRoutine(
-    wchar_t* wName,
-    unsigned short NameLen,
-    IMAGE_RESOURCE_DATA_ENTRY* DataEntry,
-    void* lpParam )
-{
-  vector<RESITEM>* ctItem = (vector<RESITEM>*)lpParam;
-  RESITEM item;
-  char* name = (char*)malloc( (NameLen >> 1) + 1 );
-  memset( name, 0, (NameLen >> 1) + 1  );
-  wcstombs( name, wName, (NameLen >> 1) );
-  item.name = name;
-  item.offset = DataEntry->OffsetToData;
-  item.size = DataEntry->Size;
-  item.codepage = DataEntry->CodePage;
-  ctItem->push_back( item );
-  free( name );
-  name = NULL;
-  return true;
-}
-
-bool WalkRes(char *data, size_t data_len, vector<RESITEM>* ctItem )
-{
-  if (!EnumResource(data, data_len, ResourceRoutine, (LPVOID)ctItem)) {
-    return false;
-  }
-
-  return true;
-}
+#include "pe.h"
 
 /*
   Check whether we got a Python Object
@@ -68,128 +29,146 @@ PyObject *check_object(PyObject *pObject)
 extern "C"
 PyObject* sections(PyObject* self, PyObject* args)
 {
-  IMAGE_NT_HEADERS* nt = NULL;
   PyObject* pTuple = NULL;
-  WORD i = 0;
 
   if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 1 expected:(int fd)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+  PyObject *py_fd = PyTuple_GetItem(args, 0);
+  if (!check_object(py_fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
     return NULL;
   }
 
-  PyObject *stream_size = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_size)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
-    return NULL;
-  }
+  int pe = PyLong_AsLong(py_fd);
 
-
-  char* data = NULL;
-  data = PyString_AsString(stream);
-  size_t data_size = PyLong_AsLong(stream_size);
-
-  if (!IsValidPE(data, data_size)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
-    return NULL;
-  }
-
-  nt = GET_NT_HEADER( data );
+  IMAGE_NT_HEADERS*nt = pe_nt_header(pe);
   pTuple = PyTuple_New( nt->FileHeader.NumberOfSections );
   assert(PyTuple_Size(pTuple) == nt->FileHeader.NumberOfSections );
-  for( ; i < nt->FileHeader.NumberOfSections; i++ ) {
-
-    IMAGE_SECTION_HEADER header;
-    memset(&header, 0, sizeof(IMAGE_SECTION_HEADER));
-    if( GetSectionHeader( data, i, &header ) ) {
-      PyObject* item = NULL;
-      item = PyDict_New();
-      PyDict_SetItem( item, Py_BuildValue( "s", "name"),
-                  Py_BuildValue( "s", header.Name ) );
-      PyDict_SetItem( item, Py_BuildValue( "s", "vaddr" ),
-                  Py_BuildValue( "I", header.VirtualAddress ));
-      PyDict_SetItem( item, Py_BuildValue( "s", "vsize" ),
-                  Py_BuildValue( "I", header.Misc.VirtualSize ));
-      PyDict_SetItem( item, Py_BuildValue( "s", "raw" ),
-                  Py_BuildValue( "I", header.PointerToRawData ));
-      PyDict_SetItem( item, Py_BuildValue( "s", "rawsize" ),
-                  Py_BuildValue( "I", header.SizeOfRawData ));
-      PyDict_SetItem( item, Py_BuildValue( "s", "characteristics" ),
-                  Py_BuildValue( "I", header.Characteristics ));
-      PyTuple_SetItem(pTuple, i, item );
-    }
+  for( int i = 0; i < nt->FileHeader.NumberOfSections; i++ ) {
+    IMAGE_SECTION_HEADER* header = pe_section_header(pe, i);
+    PyObject* item = PyDict_New();
+    PyDict_SetItem( item, Py_BuildValue( "s", "name"),
+                Py_BuildValue( "s", header->Name ) );
+    PyDict_SetItem( item, Py_BuildValue( "s", "vaddr" ),
+                Py_BuildValue( "I", header->VirtualAddress ));
+    PyDict_SetItem( item, Py_BuildValue( "s", "vsize" ),
+                Py_BuildValue( "I", header->Misc.VirtualSize ));
+    PyDict_SetItem( item, Py_BuildValue( "s", "raw" ),
+                Py_BuildValue( "I", header->PointerToRawData ));
+    PyDict_SetItem( item, Py_BuildValue( "s", "rawsize" ),
+                Py_BuildValue( "I", header->SizeOfRawData ));
+    PyDict_SetItem( item, Py_BuildValue( "s", "characteristics" ),
+                Py_BuildValue( "I", header->Characteristics ));
+    PyTuple_SetItem(pTuple, i, item );
   }
 
   return pTuple;
 }
 
-//枚举导入函数回调函数
-bool ImportFunctionRoutine( PIMPORT_FUNCTION pImportFunction,
-               PIMPORT_MODULE pImportModule, LPVOID lpParam )
-{
-  PyObject* pList = (PyObject*)lpParam;
-
-  PyObject* pDict = PyDict_New();
-  PyDict_SetItem( pDict, Py_BuildValue( "s", "module" ),
-          Py_BuildValue( "s", pImportModule->ModuleName ) );
-
-  PyDict_SetItem( pDict, Py_BuildValue( "s", "function" ),
-    Py_BuildValue( "s", pImportFunction->FunctionName ) );
-
-  PyDict_SetItem( pDict, Py_BuildValue( "s", "mname_offset" ),
-    Py_BuildValue( "I", pImportModule->OffsetName ) );
-
-  PyDict_SetItem( pDict, Py_BuildValue( "s", "fname_offset" ),
-    Py_BuildValue( "I", pImportFunction->OffsetName ) );
-
-  PyList_Append( pList, pDict );
-
-  return true;
-}
-
-
 extern "C"
-PyObject* imports(PyObject* self, PyObject* args)
+PyObject* Open(PyObject* self, PyObject* args)
 {
   if (!args || PyObject_Length(args)!=2) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 2 expected:(stream, size)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
+  PyObject *py_stream = PyTuple_GetItem(args, 0);
+  if (!check_object(py_stream)){
     PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
     return NULL;
   }
 
-  PyObject *stream_len = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_len)){
+  PyObject *py_size = PyTuple_GetItem(args, 0);
+  if (!check_object(py_size)){
+    PyErr_SetString(PyExc_ValueError, "Can't get size from arguments");
+    return NULL;
+  }
+
+  char* stream = PyString_AsString(py_stream);
+  size_t size = PyLong_AsLong(py_size);
+
+  int pe = pe_open(stream, size);
+  if (pe == INVALID_PE) {
+    PyErr_SetString(PyExc_TypeError, "Invalid PE");
+    return NULL;
+  }
+
+  return PyLong_FromLong(pe);
+}
+
+extern "C"
+PyObject* Close(PyObject* self, PyObject* args)
+{
+  if (!args || PyObject_Length(args)!=1) {
+    PyErr_SetString(PyExc_TypeError,
+      "Invalid number of arguments, 1 expected:(int fd)" );
+    return NULL;
+  }
+
+  PyObject *fd = PyTuple_GetItem(args, 0);
+  if (!check_object(fd)){
     PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
     return NULL;
   }
 
-  char* data = NULL;
-  size_t data_len = 0;
-  data=PyString_AsString(stream);
-  data_len = PyLong_AsLong(stream_len);
+  int pe = PyLong_AsLong(fd);
 
-  if (!IsValidPE(data, data_len)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
+  pe_close(pe);
+  Py_RETURN_NONE;
+}
+
+//枚举导入函数回调函数
+extern "C"
+PyObject* imports(PyObject* self, PyObject* args)
+{
+  if (!args || PyObject_Length(args)!=1) {
+    PyErr_SetString(PyExc_TypeError,
+      "Invalid number of arguments, 1 expected:(int fd)" );
     return NULL;
   }
+
+  PyObject *fd = PyTuple_GetItem(args, 0);
+  if (!check_object(fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
+    return NULL;
+  }
+
+  int pe = PyLong_AsLong(fd);
 
   PyObject* pList = PyList_New( 0 );
-  if( !EnumImportModuleAndFunction( data, data_len,
-                  NULL, NULL,
-                  ImportFunctionRoutine, (LPVOID)pList ) ) {
-    Py_RETURN_NONE;
+
+  IMAGE_IMPORT_DESCRIPTOR* dll = pe_import_dll_first(pe);
+  for (; dll != NULL; dll = pe_import_dll_next(dll)) {
+    
+
+    char dllname[256] = {0};
+    if (!pe_import_dllname(pe, dll, dllname, sizeof(dllname) - 1)) {
+      continue;
+    }
+
+    IMAGE_IMPORT_FUNCTION* api = pe_import_api_first(dll);
+    for (; api != NULL; api = pe_import_api_next(api)) {
+      PyObject* pDict = PyDict_New();
+      PyDict_SetItem( pDict, Py_BuildValue( "s", "module" ),
+              Py_BuildValue( "s", dllname ) );
+
+      PyDict_SetItem( pDict, Py_BuildValue( "s", "function" ),
+        Py_BuildValue( "s", api->FunctionName ) );
+
+      PyDict_SetItem( pDict, Py_BuildValue( "s", "mname_offset" ),
+        Py_BuildValue( "I", dll->Name ) );
+
+      PyDict_SetItem( pDict, Py_BuildValue( "s", "fname_offset" ),
+        Py_BuildValue( "I", api->OffsetName ) );
+
+      PyList_Append( pList, pDict );
+    }
   }
   return pList;
 }
@@ -197,167 +176,108 @@ PyObject* imports(PyObject* self, PyObject* args)
 extern "C"
 PyObject* exports( PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args)!=2) {
+  if (!args || PyObject_Length(args)!=1) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 1 expected:(int fd)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+  PyObject *py_fd = PyTuple_GetItem(args, 0);
+  if (!check_object(py_fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
     return NULL;
   }
 
-  PyObject *stream_len = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_len)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
-    return NULL;
+  int pe = PyLong_AsLong(py_fd);
+
+  PyObject* pDict = PyDict_New();
+  const char* dllname = pe_export_dllname(pe);
+  if (dllname != NULL) {
+    PyDict_SetItem(pDict,  Py_BuildValue("s", "dllname"), 
+      Py_BuildValue("s", dllname));  
+  }
+  
+  IMAGE_EXPORT_FUNCTION* api = pe_export_first(pe);
+  PyObject* pList = PyList_New(0);
+  for (; api != NULL; api = pe_export_next(api)) {
+    PyObject* item = PyDict_New();
+    PyDict_SetItem( item,
+      Py_BuildValue( "s", "ordinal" ),
+      Py_BuildValue( "I", api->Ordinal) );
+    PyDict_SetItem( item,
+      Py_BuildValue( "s", "name" ),
+      Py_BuildValue( "s", api->FunctionName ) );
+    PyDict_SetItem( item,
+      Py_BuildValue( "s", "va" ),
+      Py_BuildValue( "I", api->FunctionVirtualAddress ) );
+    PyList_Append( pList, item );
   }
 
-  char* data = NULL;
-  size_t data_len = 0;
-  data = PyString_AsString(stream);
-  data_len = PyLong_AsLong(stream_len);
+  PyDict_SetItem( pDict, Py_BuildValue( "s", "symbols"), pList );
 
-  if (!IsValidPE(data, data_len)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
-    return NULL;
-  }
-
-  PyObject* pDict = NULL;
-  CHAR DllName[256] = {0};
-  if (GetExportDllName(data, data_len, DllName, sizeof( DllName )) ) {
-    if( pDict == NULL )
-      pDict = PyDict_New();
-    PyDict_SetItem( pDict,  Py_BuildValue( "s", "dllname"),
-                Py_BuildValue( "s", DllName ));
-  }
-
-  size_t size = 0;
-  EnumExportFunction(data, data_len, NULL, &size);
-  if( errno == EINVAL ) {
-    if( size != 0 ) {
-      EXPORT_FUNCTION* exports = (EXPORT_FUNCTION*)malloc( size );
-      memset( exports, 0, size );
-      if( EnumExportFunction(data, data_len, exports, &size ) ) {
-        if( pDict == NULL )
-          pDict = PyDict_New();
-        DWORD i = 0;
-        PyObject* pList = PyList_New(0);
-        for( ; i < size / sizeof( EXPORT_FUNCTION ); i++ ) {
-          PyObject* item = PyDict_New();
-          PyDict_SetItem( item,
-            Py_BuildValue( "s", "ordinal" ),
-            Py_BuildValue( "I", exports[i].Ordinal) );
-          PyDict_SetItem( item,
-            Py_BuildValue( "s", "name" ),
-            Py_BuildValue( "s", exports[i].FunctionName ) );
-          PyDict_SetItem( item,
-            Py_BuildValue( "s", "va" ),
-            Py_BuildValue( "I", exports[i].FunctionVirtualAddress ) );
-          PyList_Append( pList, item );
-        }
-
-        PyDict_SetItem( pDict, Py_BuildValue( "s", "symbols"), pList );
-      }
-      free( exports );
-      exports = NULL;
-    }
-  }
-
-  if( pDict )
-    return pDict;
-  else
-    Py_RETURN_NONE;
+  return pDict;
 }
 
 extern "C"
 PyObject* overlay( PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args)!=2) {
+  if (!args || PyObject_Length(args)!=1) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 1 expected:(int fd)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+  PyObject *py_fd = PyTuple_GetItem(args, 0);
+  if (!check_object(py_fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
     return NULL;
   }
 
-  PyObject *stream_len = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_len)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
-    return NULL;
+  int pe = PyLong_AsLong(py_fd);
+
+  IMAGE_OVERLAY* overlay = pe_overlay(pe);
+  if (overlay == NULL) {
+    Py_RETURN_NONE; 
   }
 
-  char* data = NULL;
-  size_t data_len = 0;
-  data = PyString_AsString(stream);
-  data_len = PyLong_AsLong(stream_len);
-
-  if (!IsValidPE(data, data_len)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
-    return NULL;
-  }
-
-  raw_t overlay_offset = 0;
-  size_t overlay_size = 0;
-  if( !GetOverlay(data, data_len,
-              &overlay_offset, &overlay_size ) ) {
+  if (overlay->size == 0) {
     Py_RETURN_NONE;
-  } else {
-    if( overlay_size != 0 ) {
-      PyObject* pDict = PyDict_New();
-      PyDict_SetItem( pDict, Py_BuildValue( "s", "offset" ),
-        Py_BuildValue( "I", overlay_offset ) );
-      PyDict_SetItem( pDict, Py_BuildValue( "s", "size"),
-        Py_BuildValue( "I", overlay_size ) );
-      return pDict;
-    } else {
-      Py_RETURN_NONE;
-    }
   }
+
+  PyObject* pDict = PyDict_New();
+  PyDict_SetItem( pDict, Py_BuildValue( "s", "offset" ),
+    Py_BuildValue( "I", overlay->offset_in_file ) );
+  PyDict_SetItem( pDict, Py_BuildValue( "s", "size"),
+    Py_BuildValue( "I", overlay->size ) );
+  return pDict;
 }
 
 extern "C"
 PyObject* entrypoint( PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args)!=2) {
+  if (!args || PyObject_Length(args)!=1) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 1 expected:(int fd)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+  PyObject *py_fd = PyTuple_GetItem(args, 0);
+  if (!check_object(py_fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
     return NULL;
   }
 
-  PyObject *stream_len = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_len)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
-    return NULL;
-  }
-
-  char* data = NULL;
-  size_t data_len = 0;
-  data = PyString_AsString(stream);
-  data_len = PyLong_AsLong(stream_len);
-
-  if (!IsValidPE(data, data_len)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
-    return NULL;
-  }
+  int pe = PyLong_AsLong(py_fd);
 
   //dump入口点
-  IMAGE_NT_HEADERS* nt = GET_NT_HEADER( data );
-  DWORD rva = nt->OptionalHeader.AddressOfEntryPoint;
+  IMAGE_NT_HEADERS* nt = pe_nt_header(pe);
+  if (nt == NULL) {
+    PyErr_SetString(PyExc_ValueError, "can not found nt_header in pe");
+    return NULL;    
+  }
+  uint32_t rva = nt->OptionalHeader.AddressOfEntryPoint;
   //计算入口点在第几个节中
-  int iSection = GetSectionIndexByRva(data, rva );
+  int iSection = pe_section_by_rva(pe, rva );
 
   PyObject* pTuple = PyTuple_New( 2 );
   PyTuple_SetItem( pTuple, 0, Py_BuildValue( "I", rva ) );
@@ -368,150 +288,112 @@ PyObject* entrypoint( PyObject* self, PyObject* args )
 extern "C"
 PyObject* icon( PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args)!=3) {
+  if (!args || PyObject_Length(args) != 2) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 2 expected:(int fd, char* ico_file)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+  PyObject *py_fd = PyTuple_GetItem(args, 0);
+  if (!check_object(py_fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
     return NULL;
   }
 
-  PyObject *stream_len = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_len)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
-    return NULL;
-  }
-
-  PyObject *py_ico_file = PyTuple_GetItem(args, 2);
+  PyObject *py_ico_file = PyTuple_GetItem(args, 1);
   if (!check_object(py_ico_file)){
     PyErr_SetString(PyExc_ValueError, "Can't get ico_file from arguments");
     return NULL;
   }
 
-  char* data = NULL;
-  size_t data_len = 0;
-  data = PyString_AsString(stream);
-  data_len = PyLong_AsLong(stream_len);
+  int pe = PyLong_AsLong(py_fd);
   char* ico_file = PyString_AsString(py_ico_file);
 
-  if (!IsValidPE(data, data_len)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
-    return NULL;
-  }
-
-  //raw_t icon_raw = 0;
-  //size_t icon_len = 0;
-  if (!GetIcon(data, data_len, ico_file)) {
-    //get icon fail
+  if (!pe_icon_file(pe, ico_file)){
     Py_RETURN_FALSE;
+  } else {
+    Py_RETURN_TRUE;
   }
+}
 
-  Py_RETURN_TRUE;
+void WalkResource(
+    int pe, 
+    IMAGE_RESOURCE_DIRECTORY_ENTRY* parent, 
+    PyObject* PyList)
+{
+  IMAGE_RESOURCE_DIRECTORY_ENTRY* res = pe_resource_first(pe, parent);
+  for (; res != NULL; res = pe_resource_next(res)) {
+    char name[256] = {0};
+    if (res->NameIsString) {
+      pe_resource_name(pe, res, name, sizeof(name) - 1);
+    } else {
+      snprintf(name,sizeof(name)-1, "%d", res->Id);
+    }
+
+    if (IS_RESOURCE_DIRECTORY(res)) {
+      WalkResource(pe, res, PyList);
+    } else{
+      IMAGE_RESOURCE_DATA_ENTRY* data = pe_resource_data(pe, res);
+      if (data == NULL) {
+        continue;
+      }
+
+      PyObject* PyDict = PyDict_New();
+      PyDict_SetItem(PyDict, Py_BuildValue("s", "name"), Py_BuildValue("s", name));
+      PyDict_SetItem(PyDict, Py_BuildValue("s", "offset"),
+          Py_BuildValue( "l", data->OffsetToData ) );
+      PyDict_SetItem( PyDict, Py_BuildValue( "s", "size"),
+        Py_BuildValue( "l", data->Size ) );
+      PyList_Append( PyList, PyDict );
+    }
+  }
 }
 
 extern "C"
 PyObject* resource( PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args)!=2) {
+  if (!args || PyObject_Length(args)!=1) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 1 expected:(int fd)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+  PyObject *py_fd = PyTuple_GetItem(args, 0);
+  if (!check_object(py_fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
     return NULL;
   }
 
-  PyObject *stream_len = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_len)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
-    return NULL;
-  }
-
-  char* data = NULL;
-  size_t data_len = 0;
-  data = PyString_AsString(stream);
-  data_len = PyLong_AsLong(stream_len);
-
-  if (!IsValidPE(data, data_len)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
-    return NULL;
-  }
+  int pe = PyLong_AsLong(py_fd);
 
   PyObject* PyList = PyList_New(0);
-  vector<RESITEM> ctItem;
-  if (!WalkRes(data, data_len, &ctItem)) {
-    Py_RETURN_NONE;
-  }
-
-  std::vector<RESITEM>::iterator it = ctItem.begin();
-  for( ; it != ctItem.end(); it++ ) {
-    PyObject* PyDict = PyDict_New();
-    PyDict_SetItem( PyDict, Py_BuildValue( "s", "name" ),
-        Py_BuildValue( "s", it->name.c_str() ) );
-    PyDict_SetItem( PyDict, Py_BuildValue( "s", "offset"),
-        Py_BuildValue( "l", it->offset ) );
-    PyDict_SetItem( PyDict, Py_BuildValue( "s", "size"),
-      Py_BuildValue( "l", it->size ) );
-    PyList_Append( PyList, PyDict );
-  }
+  WalkResource(pe, NULL, PyList);
   return PyList;
 }
 
 extern "C"
 PyObject* verinfo( PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args)!=2) {
+  if (!args || PyObject_Length(args)!=1) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 2 expected:(stream, stream_size)" );
+      "Invalid number of arguments, 1 expected:(int fd)" );
     return NULL;
   }
 
-  PyObject *stream = PyTuple_GetItem(args, 0);
-  if (!check_object(stream)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
+  PyObject *py_fd = PyTuple_GetItem(args, 0);
+  if (!check_object(py_fd)){
+    PyErr_SetString(PyExc_ValueError, "Can't get fd from arguments");
     return NULL;
   }
 
-  PyObject *stream_len = PyTuple_GetItem(args, 1);
-  if (!check_object(stream_len)){
-    PyErr_SetString(PyExc_ValueError, "Can't get stream from arguments");
-    return NULL;
-  }
-
-  char* data = NULL;
-  size_t data_len = 0;
-  data = PyString_AsString(stream);
-  data_len = PyLong_AsLong(stream_len);
-
-  if (!IsValidPE(data, data_len)) {
-    PyErr_SetString(PyExc_ValueError, "file is not pe");
-    return NULL;
-  }
+  int pe = PyLong_AsLong(py_fd);
 
   //dump版本信息
   PyObject* pDict = PyDict_New();
-  void* ver_handle = PEOpenVersion((const char*)data, data_len);
-  if (ver_handle == NULL) {
-    //没有版本信息或者解析版本信息的时候出错
-    /*
-    PyErr_SetString(PyExc_ValueError, "open version faile");
-    return NULL;
-    */
-  } else {
-    ver_info_t verinfo = {0};
-    while(PENextVersion(ver_handle, &verinfo)) {
-    PyDict_SetItem( pDict,
-      Py_BuildValue("u", verinfo.name),
-      Py_BuildValue( "u",verinfo.value));
-    }
-    PECloseVersion(ver_handle);
+  IMAGE_VERSION* version = pe_version_first(pe);
+  for (; version != NULL; version = pe_version_next(version)) {
+    PyDict_SetItem(pDict, Py_BuildValue("u", version->name), 
+      Py_BuildValue( "u",version->value));
   }
 
   return pDict;
@@ -519,14 +401,16 @@ PyObject* verinfo( PyObject* self, PyObject* args )
 
 static PyMethodDef peMethods[] =
 {
-  {"sections",  sections, METH_VARARGS, "sections( file_path )"},
-  {"imports",   imports,  METH_VARARGS, "imports( file_path )"},
-  {"exports",   exports,  METH_VARARGS, "exports( file_path )"},
-  {"overlay",   overlay,  METH_VARARGS, "overlay( file_path )"},
-  {"verinfo",   verinfo,  METH_VARARGS, "verinfo( file_path )"},
-  {"entrypoint",  entrypoint,   METH_VARARGS, "entrypoint( file_path )"},
-  {"resource",  resource, METH_VARARGS, "resource( file_path )"},
-  {"icon", icon, METH_VARARGS, "icon( file_path )" },
+  {"Open",  Open, METH_VARARGS, "Open(stream, size)"},
+  {"Close",  Close, METH_VARARGS, "Close(fd)"},
+  {"sections",  sections, METH_VARARGS, "sections(fd)"},
+  {"imports",   imports,  METH_VARARGS, "imports(fd)"},
+  {"exports",   exports,  METH_VARARGS, "exports(fd)"},
+  {"overlay",   overlay,  METH_VARARGS, "overlay(fd)"},
+  {"verinfo",   verinfo,  METH_VARARGS, "verinfo(fd)"},
+  {"entrypoint",  entrypoint,   METH_VARARGS, "entrypoint(fd)"},
+  {"resource",  resource, METH_VARARGS, "resource(fd)"},
+  {"icon", icon, METH_VARARGS, "icon(fd)" },
   {NULL, NULL, 0, NULL}
 };
 

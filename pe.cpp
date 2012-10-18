@@ -12,15 +12,21 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 #pragma warning(disable:4996)
-#include <stdint.h>
+#undef __STRICT_ANSI__ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
 #include <errno.h>
 #include <assert.h>
-#include <llist.h>
+#include <strconv.h>
+#include "petype.h"
+
+
+#include <slist.h>
+#include "petype.h"
 #include "peformat.h"
+#include "verfmt.h"
 #include "pe.h"
 
 #ifdef __GNUC__
@@ -51,10 +57,24 @@ GNU General Public License for more details.
   && sb >= bb && sb + sb_size <= bb + bb_size)
 
 #define DIRECTORY_ENTRY(s, i) \
-(&(GET_NT_HEADER(s)->OptionalHeader.DataDirectory[i]))
+  (&(GET_NT_HEADER(s)->OptionalHeader.DataDirectory[i]))
+
+
+#define GET_DOS_HEADER( s )  ((IMAGE_DOS_HEADER*)s)
+
+#define GET_NT_HEADER( s )   \
+  ((IMAGE_NT_HEADERS*)((const char*)(s)+GET_DOS_HEADER(s)->e_lfanew ))
+
+#define GET_SECTION_HEADER(nt, i) \
+  ((IMAGE_SECTION_HEADER*)((char*)nt + sizeof(int) + sizeof(IMAGE_FILE_HEADER) + nt->FileHeader.SizeOfOptionalHeader+(i)*sizeof(IMAGE_SECTION_HEADER)))
+
+//获取基地址
+#define GET_IMAGE_BASE( s ) \
+ (unsigned int)(/*1*/(/*2*/(IMAGE_NT_HEADERS*)((const char*)s + ((IMAGE_DOS_HEADER*)s)->e_lfanew) /*2*/ )->OptionalHeader.ImageBase/*1*/)
+
 
 typedef struct _pe_t{
-  IMAGE_DOS_HEADERS* dos;   //dos header
+  IMAGE_DOS_HEADER* dos;   //dos header
   IMAGE_NT_HEADERS*  nt;    //nt header
   const char* stream;
   size_t      size;
@@ -62,7 +82,7 @@ typedef struct _pe_t{
   slist_t     export_apis;
   slist_t import_dlls;
   slist_t version;
-  slist_t reloc;
+  slist_t reloc_list;
   slist_t resource;
   slist_t bound_list;
   IMAGE_OVERLAY   overlay;
@@ -81,29 +101,49 @@ typedef struct _import_api_t {
 
 //导入模块
 typedef struct _import_dll_t{
-  pe_import_dll_t   data;
+  IMAGE_IMPORT_DESCRIPTOR   data;
   slist_t api_list;
   snode_t node;
 }import_dll_t;
 
 typedef struct _version_t{
-  pe_version_t data;
+  IMAGE_VERSION data;
   snode_t node;
 }version_t;
 
 typedef struct _reloc_t{
   snode_t node;
-  IMAGE_RELOCATION   data;
+  IMAGE_RELOCATION_ITEM   data;
 }reloc_t;
 
 typedef struct _resource_t{
-  pe_resource_t data;
+  IMAGE_RESOURCE_DIRECTORY_ENTRY data;
   snode_t node;
   slist_t child;
 }resource_t;
 
-int   pe_open(const char* stream, size_t size)
-{
+typedef struct _bound_t{
+  snode_t node;
+  IMAGE_BOUND_IMPORT_DESCRIPTOR data;
+}bound_t;
+
+
+bool parse_export(int fd);
+
+bool parse_import(int fd);
+
+bool parse_reloc(int fd);
+
+bool parse_version(int fd);
+
+bool parse_overlay(int fd);
+
+bool parse_resource(int fd);
+
+bool parse_bound(int fd);
+
+int  pe_open(const char* stream, size_t size)
+{      
   if (stream==NULL || size == 0){
     errno = EINVAL;
     return INVALID_PE;
@@ -121,21 +161,21 @@ int   pe_open(const char* stream, size_t size)
   pe->nt  = GET_NT_HEADER(stream);
 
   //读取PE头部数据
-  if (pe->dos.e_magic != IMAGE_DOS_SIGNATURE) {
+  if (pe->dos->e_magic != IMAGE_DOS_SIGNATURE) {
     free(pe);
     pe = NULL;
     return INVALID_PE;
   }
 
-  if ((size_t)pe->dos.e_lfanew >= (size_t)stream_size)  {
+  if ((size_t)pe->dos->e_lfanew >= (size_t)size)  {
     free(pe);
     pe = NULL;
     return INVALID_PE;
   }
 
-  if (pe->nt.Signature != IMAGE_NT_SIGNATURE
-   || pe->nt.FileHeader.Machine != IMAGE_FILE_MACHINE_I386
-   || pe->nt.OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ) {
+  if (pe->nt->Signature != IMAGE_NT_SIGNATURE
+   || pe->nt->FileHeader.Machine != IMAGE_FILE_MACHINE_I386
+   || pe->nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ) {
     free(pe);
     pe = NULL;
     return INVALID_PE;
@@ -156,13 +196,66 @@ int   pe_open(const char* stream, size_t size)
 
   parse_bound((int)pe);
 
-  return pe;
+  return (int)pe;
+}
+
+void clean_resource(slist_t* list)
+{
+  resource_t* res = NULL;
+  slist_for_each_safe(list, resource_t, node, res) {
+    if (!slist_empty(&res->child))
+      clean_resource(&res->child);
+    free(res);
+    res = NULL;
+  }
 }
 
 void  pe_close(int  fd)
-{
+{  
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return;
+  }
 
-}
+  pe_t* pe = (pe_t*)fd;
+  export_api_t* item = NULL;
+  slist_for_each_safe(&pe->export_apis, export_api_t, node, item) {
+    free(item);
+    item = NULL;
+  }
+
+  version_t* ver = NULL;
+  slist_for_each_safe(&pe->version, version_t, node, ver) {
+    free(ver);
+    ver = NULL;
+  }
+
+  bound_t* bound = NULL;
+  slist_for_each_safe(&pe->bound_list, bound_t, node, bound) {
+    free(bound);
+    bound = NULL;
+  }
+
+  reloc_t* reloc = NULL;
+  slist_for_each_safe(&pe->reloc_list, reloc_t, node, reloc) {
+    free(reloc);
+    reloc = NULL;
+  }
+
+  import_dll_t* dll = NULL;
+  slist_for_each_safe(&pe->import_dlls, import_dll_t, node, dll) {
+    import_api_t* api = NULL;
+    slist_for_each_safe(&dll->api_list, import_api_t, node, api) {
+      free(api);
+      api = NULL;
+    }
+
+    free(dll);
+    dll = NULL;
+  }
+
+  clean_resource(&pe->resource);
+} 
 
 IMAGE_NT_HEADERS*  pe_nt_header(int fd)
 {
@@ -174,7 +267,7 @@ IMAGE_NT_HEADERS*  pe_nt_header(int fd)
   return ((pe_t*)fd)->nt;
 }
 
-IMAGE_DOS_HEADERS* pe_dos_header(int fd)
+IMAGE_DOS_HEADER* pe_dos_header(int fd)
 {
   if (fd == INVALID_PE) {
     errno = EINVAL;
@@ -194,13 +287,13 @@ raw_t rva_to_raw(int fd, rva_t rva)
   pe_t* pe = (pe_t*)fd;
   //枚举所有Section
   IMAGE_SECTION_HEADER *section = NULL;
-  uint32_t sectin_align_mask = pe->nt.OptionalHeader.SectionAlignment - 1;
-  uint32_t file_align = pe->nt.OptionalHeader.FileAlignment;
+  uint32_t sectin_align_mask = pe->nt->OptionalHeader.SectionAlignment - 1;
+  uint32_t file_align = pe->nt->OptionalHeader.FileAlignment;
   uint32_t file_align_mask = file_align - 1;
 
   //计算rva在哪个节中
   raw_t raw = 0;
-  for (size_t i=0; i < pe->nt.FileHeader.NumberOfSections; i++) {
+  for (size_t i=0; i < pe->nt->FileHeader.NumberOfSections; i++) {
     section = GET_SECTION_HEADER(pe->nt, i);
     if (rva >= section->VirtualAddress
      && rva <= (section->VirtualAddress + section->Misc.VirtualSize - 1)){
@@ -212,7 +305,7 @@ raw_t rva_to_raw(int fd, rva_t rva)
   raw = rva;
 
 ret:
-  if (raw >= stream_size) {
+  if (raw >= pe->size) {
     errno = ERANGE;
     return INVALID_RAW;
   }
@@ -227,7 +320,7 @@ rva_t raw_to_rva(int fd, raw_t raw)
   }
 
   pe_t* pe = (pe_t*)fd;
-  for (size_t i=0; i < pe->nt.FileHeader.NumberOfSections; i++) {
+  for (size_t i=0; i < pe->nt->FileHeader.NumberOfSections; i++) {
     //判断FileOffset是否在该Section地址范围内
     IMAGE_SECTION_HEADER *section = GET_SECTION_HEADER(pe->nt, i);
     if (raw >= section->PointerToRawData
@@ -261,11 +354,10 @@ bool parse_export(int fd)
 
   //无导出函数
   if (block_rva == 0 ){
-    *bufsize = 0;
     return true;
   }
 
-  raw_t block_raw = rva_to_raw(pe->stream, pe->size, block_rva);
+  raw_t block_raw = rva_to_raw(fd, block_rva);
   if (block_raw == INVALID_RAW) {
     errno = EINVAL;
     return false;
@@ -315,8 +407,8 @@ bool parse_export(int fd)
     }
     memset(api, 0, sizeof(export_api_t));
 
-    api->FunctionVirtualAddress = ((rva_t*)(pe->stream + raw_functions))[i];
-    api->Ordinal = export_header->Base + i;
+    api->data.FunctionVirtualAddress = ((rva_t*)(pe->stream + raw_functions))[i];
+    api->data.Ordinal = export_header->Base + i;
     //api name
     for(size_t j = 0; i < export_header->NumberOfNames; j++) {
       int oridinal = (int)(((uint16_t*)(pe->stream + raw_name_ordinals))[j]);
@@ -329,7 +421,8 @@ bool parse_export(int fd)
       if (raw == INVALID_RAW)
         continue;
 
-      strncpy(api.FunctionName, pe->stream + raw, sizeof(api.FunctionName) - 1);
+      strncpy(api->data.FunctionName, pe->stream + raw, 
+        sizeof(api->data.FunctionName) - 1);
       break;
     }
 
@@ -347,7 +440,7 @@ IMAGE_EXPORT_FUNCTION *pe_export_first(int fd)
   }
 
   pe_t* pe = (pe_t*)fd;
-  return slist_entry(&pe->export_apis, export_api_t, data, node);
+  return slist_first_entry(&pe->export_apis, export_api_t, data, node);
 }
 
 IMAGE_EXPORT_FUNCTION *pe_export_next(IMAGE_EXPORT_FUNCTION* iter)
@@ -379,16 +472,16 @@ const char* pe_export_dllname(int fd)
 
 bool parse_import(int fd)
 {
-  if (fd == NULL) {
+  if (fd == INVALID_PE) {
     errno = EINVAL;
     return false;
   }
 
   pe_t* pe = (pe_t*)fd;
   rva_t block_rva
-    = DIRECTORY_ENTRY(stream, IMAGE_DIRECTORY_ENTRY_IMPORT)->VirtualAddress;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_IMPORT)->VirtualAddress;
   size_t block_size
-    = DIRECTORY_ENTRY(stream, IMAGE_DIRECTORY_ENTRY_IMPORT)->Size;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_IMPORT)->Size;
 
   if (block_rva == 0 || block_size == 0) {
     //表示没有导入表， 这种情况极少， 但还是存在
@@ -424,7 +517,7 @@ bool parse_import(int fd)
       return false;
     }
     memset(dll, 0, sizeof(import_dll_t));
-    memcpy(&dll->data, import_descriptor, sizoef(IMAGE_IMPORT_DESCRIPTOR));
+    memcpy(&dll->data, import_descriptor, sizeof(IMAGE_IMPORT_DESCRIPTOR));
     slist_add(&pe->import_dlls, &dll->node);
 
     //枚举该模块的导入函数列表
@@ -485,7 +578,7 @@ bool parse_import(int fd)
       }
 
       api->data.iat = rva_iat + num_api * sizeof(rva_t);
-      slist_add(&dll->api_list, &api->node)
+      slist_add(&dll->api_list, &api->node);
     } while(++num_api);
   }while(++num_module);
 
@@ -543,7 +636,7 @@ IMAGE_IMPORT_FUNCTION* pe_import_api_first(IMAGE_IMPORT_DESCRIPTOR* import_dll)
     return NULL;
   }
 
-  import_dll_t* dll = contained_of(import_dll, import_dll_t, data);
+  import_dll_t* dll = container_of(import_dll, import_dll_t, data);
   if (dll->api_list.first == NULL) {
     return NULL;
   }
@@ -646,9 +739,87 @@ char* get_restype_name(int res_type)
   }
 }
 
+bool pe_resource_name(int fd,  IMAGE_RESOURCE_DIRECTORY_ENTRY* res,
+    char* name, int max_len)
+{
+  if (fd == INVALID_PE || res == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)fd;
+
+  rva_t block_rva
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->VirtualAddress;
+  size_t block_size
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->Size;
+
+  if (block_rva == 0) {
+    errno = ENOENT;
+    return NULL;
+  }
+
+  raw_t raw = rva_to_raw(fd, block_rva);
+  if (raw == INVALID_RAW) {
+    errno = ERANGE;
+    return NULL;
+  }
+
+  if (res->NameOffset + raw >= pe->size) {
+    errno = ERANGE;
+    return NULL;
+  }
+
+  IMAGE_RESOURCE_DIR_STRING_U* pString =
+    (IMAGE_RESOURCE_DIR_STRING_U*)(pe->stream + raw + res->NameOffset);
+  int cch = 0;
+  if (pString->Length <= (max_len<<1)) {
+    cch = pString->Length >> 1;
+  } else {
+    cch = max_len;
+  }
+  _wcstombs(name, pString->NameString, cch);
+  return true; 
+}
+
+IMAGE_RESOURCE_DATA_ENTRY* pe_resource_data(
+    int fd, 
+    IMAGE_RESOURCE_DIRECTORY_ENTRY* entry)
+{
+  if (fd == INVALID_PE || entry == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)fd;
+
+  rva_t block_rva
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->VirtualAddress;
+  size_t block_size
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->Size;
+
+  if (block_rva == 0) {
+    errno = ENOENT;
+    return NULL;
+  }
+
+  raw_t raw = rva_to_raw(fd, block_rva);
+  if (raw == INVALID_RAW) {
+    errno = ERANGE;
+    return NULL;
+  }
+
+  if (entry->OffsetToData + raw >= pe->size) {
+    errno = ERANGE;
+    return NULL;
+  }
+
+  return (IMAGE_RESOURCE_DATA_ENTRY*)(pe->stream + raw + entry->OffsetToData); 
+}
+
 bool parse_resource_dir(
     pe_t* pe, 
-    raw_t raw_root;
+    raw_t raw_root,
     IMAGE_RESOURCE_DIRECTORY* ResDir, 
     slist_t* res_list)
 {
@@ -661,42 +832,6 @@ bool parse_resource_dir(
 
   //枚举子资源
   for (int i = 0; i < cRes; i++) {
-    //生成新的名称
-    wchar_t* NewName = NULL;
-    unsigned short NewSize = 0;
-
-    //根据资源的名称计算出一个hash值
-    wchar_t res_name[128] = {0};
-    if (Entry[i].NameIsString) {
-      if ((raw_root + Entry[i].NameOffset) >= pe->size) {
-        continue;
-      }
-
-      //有资源名称
-      IMAGE_RESOURCE_DIR_STRING_U* pString =
-        (IMAGE_RESOURCE_DIR_STRING_U*)(pe->stream
-                                     + raw_root
-                                     + Entry[i].NameOffset);
-      if (pString->Length <= (sizeof(res_name) - sizeof(wchar_t)) {
-        cch = pString->Length >> 1;
-      } else {
-        cch = (sizeof(res_name) >> 1) - 1 ;
-      }
-      wcsncpy(res_name, pString->NameString, cch);
-    } else {
-      if (wName==NULL && NameLen == 0) {
-        //资源目录顶层
-        char* name = get_restype_name(Entry[i].Id);
-        if (name == NULL)
-          swprintf(res_name, "%d", Entry[i].Id);
-        else
-          mbstowcs(res_name, name, sizeof(res_name) >> 1);
-      } else {
-        //非资源目录顶层
-        swprintf(res_name, "%s", Entry[i].Id);
-      }
-    }
-
     if (Entry[i].DataIsDirectory) {
       //资源目录
       //递归
@@ -712,24 +847,20 @@ bool parse_resource_dir(
             return false;
           }
           memset(res, 0, sizeof(resource_t));
-          res->is_directory = true;
+          memcpy(&res->data, &Entry[i], sizeof(IMAGE_RESOURCE_DIRECTORY_ENTRY));
           slist_add(res_list, &res->node);
           parse_resource_dir(pe, raw_root, subdir, &res->child);
         }
       }
     } else {
       //资源数据
-      if (Entry[i].OffsetToData + raw_root < root->cbFileSize) {
-        IMAGE_RESOURCE_DATA_ENTRY* data_entry =
-          (IMAGE_RESOURCE_DATA_ENTRY*)(pe->stream
-                                       + raw_root
-                                       + Entry[i].OffsetToData);
+      if (Entry[i].OffsetToData + raw_root < pe->size) {
         resource_t* res = (resource_t*)malloc(sizeof(resource_t));
         if (res == NULL) {
           return false;
         }
         memset(res, 0, sizeof(resource_t));
-        res->is_directory = false;
+        memcpy(&res->data, &Entry[i], sizeof(IMAGE_RESOURCE_DIRECTORY_ENTRY));
         slist_add(res_list, &res->node);
       }
     }
@@ -748,9 +879,9 @@ bool parse_resource(int fd)
   pe_t* pe = (pe_t*)fd;
 
   rva_t block_rva
-    = DIRECTORY_ENTRY(stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->VirtualAddress;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->VirtualAddress;
   size_t block_size
-    = DIRECTORY_ENTRY(stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->Size;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_RESOURCE)->Size;
 
   if (block_rva == 0) {
     return true;
@@ -767,7 +898,47 @@ bool parse_resource(int fd)
   return parse_resource_dir(pe, raw, pRootDirectory, &pe->resource);
 }
 
-bool parse_reloc(fd)
+IMAGE_RESOURCE_DIRECTORY_ENTRY* pe_resource_first(
+    int fd,
+    IMAGE_RESOURCE_DIRECTORY_ENTRY* parent)
+{
+  if (fd == INVALID_PE ) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)fd;
+
+  slist_t* list = NULL;
+  if (parent == NULL) {
+    list = &pe->resource;
+  } else {
+    resource_t *node = container_of(parent, resource_t, data);
+    list = &node->child;
+  }
+
+  return slist_first_entry(list, resource_t, data, node);
+}
+
+IMAGE_RESOURCE_DIRECTORY_ENTRY* pe_resource_next(
+  IMAGE_RESOURCE_DIRECTORY_ENTRY* prev)
+{
+  if (prev == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  return slist_next_entry(prev, resource_t, data, node);
+}
+
+
+/**********************************************************************
+ *
+ * pe relocation
+ *
+ **********************************************************************/
+
+bool parse_reloc(int fd)
 {
   if (fd == INVALID_PE) {
     errno = EINVAL;
@@ -776,9 +947,9 @@ bool parse_reloc(fd)
 
   pe_t* pe = (pe_t*)fd;
   rva_t block_rva
-    = DIRECTORY_ENTRY(stream, IMAGE_DIRECTORY_ENTRY_BASERELOC)->VirtualAddress;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BASERELOC)->VirtualAddress;
   size_t blook_size
-    = DIRECTORY_ENTRY(stream, IMAGE_DIRECTORY_ENTRY_BASERELOC)->Size;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BASERELOC)->Size;
 
   if (block_rva == 0)
     return true;
@@ -790,27 +961,26 @@ bool parse_reloc(fd)
   }
 
   IMAGE_BASE_RELOCATION *base_relocation
-    = (IMAGE_BASE_RELOCATION*)((char*)stream + raw);
+    = (IMAGE_BASE_RELOCATION*)(pe->stream + raw);
 
   //获取重定位项的总数
   while(base_relocation->SizeOfBlock != 0) {
-    PE_RELOCATION_BLOCK block = {0};
-    block.rva = base_relocation->VirtualAddress;
-    block.cItem = (base_relocation->SizeOfBlock
+    rva_t block_rva = base_relocation->VirtualAddress;
+    int block_cItem = (base_relocation->SizeOfBlock
                  - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(uint16_t);
 
     uint16_t* items = (uint16_t*)(base_relocation + 1);
-    for (int i=0; i < block.cItem ; i++) {
-      reloc_t*  = (reloc_t*)malloc(sizeof(reloc_t));
+    for (int i=0; i < block_cItem ; i++) {
+      reloc_t* item = (reloc_t*)malloc(sizeof(reloc_t));
       if (item == NULL) {
         return false;
       }
       memset(item, 0, sizeof(reloc_t));
 
-      item->data.rva = (items[i] & 0x0FFF) + base_relocation->VirtualAddress;;
-      item->data.Type = ((items[i] & 0x0000F000) >> 12);
+      item->data.rva = (items[i] & 0x0FFF) + base_relocation->VirtualAddress;
+      item->data.type = ((items[i] & 0x0000F000) >> 12);
 
-      if (item.Type == IMAGE_REL_BASED_ABSOLUTE) {
+      if (item->data.type == IMAGE_REL_BASED_ABSOLUTE) {
         //对齐用， 没实际作用
         item->data.rva = 0;
       }
@@ -827,7 +997,7 @@ bool parse_reloc(fd)
   return true;
 }
 
-IMAGE_RELOCATION* pe_reloc_first(int fd)
+IMAGE_RELOCATION_ITEM* pe_reloc_first(int fd)
 {
   if (fd == INVALID_PE) {
     errno = EINVAL;
@@ -835,10 +1005,10 @@ IMAGE_RELOCATION* pe_reloc_first(int fd)
   }
 
   pe_t* pe = (pe_t*)fd;
-  return slist_first_entry(&pe->reloc, reloc_t, data, node);
+  return slist_first_entry(&pe->reloc_list, reloc_t, data, node);
 }
 
-IMAGE_RELOCATION* pe_reloc_next(IMAGE_RELOCATION* iter)
+IMAGE_RELOCATION_ITEM* pe_reloc_next(IMAGE_RELOCATION_ITEM* iter)
 {
   if (iter == NULL) {
     errno = EINVAL;
@@ -853,6 +1023,7 @@ IMAGE_RELOCATION* pe_reloc_next(IMAGE_RELOCATION* iter)
  * pe bound
  *
  **********************************************************************/
+
 bool parse_bound(int fd)
 {
   if (fd == INVALID_PE) {
@@ -862,9 +1033,9 @@ bool parse_bound(int fd)
 
   pe_t* pe = (pe_t*)fd;
   rva_t block_rva
-    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT].VirtualAddress;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT)->VirtualAddress;
   rva_t block_size
-    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT].Size;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT)->Size;
   if (block_rva >= pe->size) {
     //SetLastError(ERROR_BAD_EXE_FORMAT);
     return false;
@@ -878,15 +1049,14 @@ bool parse_bound(int fd)
     = (IMAGE_BOUND_IMPORT_DESCRIPTOR*)(pe->stream + block_rva);
   descriptor = (IMAGE_BOUND_IMPORT_DESCRIPTOR*)(pe->stream  + block_rva);
 
-  cBound = 0;
   while(descriptor->OffsetModuleName != 0) {
     bound_t* bound_dll = (bound_t*)malloc(sizeof(bound_t));
     if (bound_dll == NULL) {
       return false;
     }
     memset(bound_dll, 0, sizeof(bound_t));
-    memcpy(&bound_dll->data, 0, sizeof(bound_t));
-    slist_add(pe->bound_list, &bound_dll->node);
+    memcpy(&bound_dll->data, descriptor, sizeof(IMAGE_BOUND_IMPORT_DESCRIPTOR));
+    slist_add(&pe->bound_list, &bound_dll->node);
 
     descriptor = (IMAGE_BOUND_IMPORT_DESCRIPTOR*)((char*)descriptor
                           + sizeof(IMAGE_BOUND_IMPORT_DESCRIPTOR)
@@ -897,7 +1067,7 @@ bool parse_bound(int fd)
   return true;
 }
 
-const char* pe_bound_import_dllname(int fd, IMAGE_BOUND_IMPORT_DESCRIPTOR dll)
+const char* pe_bound_import_dllname(int fd, IMAGE_BOUND_IMPORT_DESCRIPTOR* dll)
 {
   if (fd == INVALID_PE) {
     errno = EINVAL;
@@ -906,9 +1076,9 @@ const char* pe_bound_import_dllname(int fd, IMAGE_BOUND_IMPORT_DESCRIPTOR dll)
 
   pe_t* pe = (pe_t*)fd;
   rva_t block_rva
-    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT].VirtualAddress;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT)->VirtualAddress;
   rva_t block_size
-    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT].Size;
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT)->Size;
   if (block_rva >= pe->size) {
     errno = ERANGE;
     return NULL;
@@ -926,6 +1096,7 @@ const char* pe_bound_import_dllname(int fd, IMAGE_BOUND_IMPORT_DESCRIPTOR dll)
   return pe->stream + block_rva + dll->OffsetModuleName;
 }
 
+
 IMAGE_BOUND_IMPORT_DESCRIPTOR* pe_bound_import_first(int fd)
 {
   if (fd == INVALID_PE) {
@@ -933,6 +1104,7 @@ IMAGE_BOUND_IMPORT_DESCRIPTOR* pe_bound_import_first(int fd)
     return NULL;
   }
 
+  pe_t* pe = (pe_t*)fd;
   return slist_first_entry(&pe->bound_list, bound_t, data, node);
 }
 
@@ -952,32 +1124,66 @@ IMAGE_BOUND_IMPORT_DESCRIPTOR* pe_bound_import_next(
  * pe section
  *
  **********************************************************************/
+//由于脱壳的需要， 有的时候是不知道文件数据大小的
+bool copy_section_header(int fd,int sect_id, IMAGE_SECTION_HEADER *sect_header)
+{
+  if (fd == INVALID_PE || sect_header == NULL) {
+    errno = EINVAL;
+    return false;
+  }
+
+  pe_t* pe = (pe_t*)fd;
+  if (sect_id >= pe->nt->FileHeader.NumberOfSections) {
+    errno = EINVAL;
+    return false;
+  }
+
+  memcpy(sect_header, GET_SECTION_HEADER(pe->nt, sect_id), 
+    sizeof(IMAGE_SECTION_HEADER));
+  return true;
+}
+
+IMAGE_SECTION_HEADER* pe_section_header(int fd, int sect_id)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)fd;
+  if (sect_id < 0 || sect_id > pe->nt->FileHeader.NumberOfSections) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  return GET_SECTION_HEADER(pe->nt, sect_id);
+}
 
 //计算虚拟地址所在的节
 int pe_section_by_rva(int fd, rva_t rva)
 {
-  if (fd == NULL || rva == INVALID_RVA) {
+  if (fd == INVALID_PE || rva == INVALID_RVA) {
     errno = EINVAL;
-    return INVALID_SECTION_NO;
+    return INVALID_SECTION_ID;
   }
 
   pe_t* pe = (pe_t*)fd;
   //枚举所有Section
-  uint32_t section_align_mask = pe->nt.OptionalHeader.SectionAlignment - 1;
-  uint32_t file_align = pe->nt.OptionalHeader.FileAlignment;
+  uint32_t section_align_mask = pe->nt->OptionalHeader.SectionAlignment - 1;
+  uint32_t file_align = pe->nt->OptionalHeader.FileAlignment;
   uint32_t file_align_mask = file_align - 1;
 
   int i=0;
-  for(; i < pe->nt.FileHeader.NumberOfSections; i++)  {
+  for(; i < pe->nt->FileHeader.NumberOfSections; i++)  {
     //判断RVA是否在该Section地址范围内
     IMAGE_SECTION_HEADER section = {0};
-    GetSectionHeader(stream, i, &section);
+    copy_section_header(fd, i, &section);
     if ((rva >= section.VirtualAddress)
      && (rva <= (section.VirtualAddress + section.Misc.VirtualSize - 1)))
       break;
   }
 
-  if (i >= pe->nt.FileHeader.NumberOfSections)
+  if (i >= pe->nt->FileHeader.NumberOfSections)
     return -1;
   else
     return i;
@@ -996,30 +1202,7 @@ int  pe_section_by_raw(int fd, raw_t raw)
   return pe_section_by_rva(fd, rva);
 }
 
-bool copy_section_header(int fd,int sect_id, IMAGE_SECTION_HEADER *sect_header)
-{
-  //由于脱壳的需要， 有的时候是不知道文件数据大小的
-  /*
-  if (lpFileData == NULL || IsBadReadPtr(lpFileData, cbFileSize)) {
-    SetLastError(ERROR_INVALID_PARAMETER);
-    return FALSE;
-  }
-  */
 
-  if (fd == INVALID_PE || sect_header == NULL) {
-    errno = EINVAL;
-    return false;
-  }
-
-  if (section_index >= pe->nt.FileHeader.NumberOfSections) {
-    errno = EINVAL;
-    return false;
-  }
-
-  memcpy(sect_header, GET_SECTION_HEADER(pe->nt, sect_id), 
-    sizeof(IMAGE_SECTION_HEADER));
-  return true;
-}
 
 /**********************************************************************
  *
@@ -1037,21 +1220,21 @@ bool parse_overlay(int fd)
   pe_t* pe = (pe_t*)fd;
   //将所有的节的长度进行累加
   size_t image_size = 0;
-  for(int i = 0; i < pe->nt.FileHeader.NumberOfSections; i++) {
+  for(int i = 0; i < pe->nt->FileHeader.NumberOfSections; i++) {
     IMAGE_SECTION_HEADER section = {0};
     copy_section_header(fd, i, &section);
     image_size += ALIGN(section.SizeOfRawData,
-                        pe->nt.OptionalHeader.FileAlignment);
+                        pe->nt->OptionalHeader.FileAlignment);
   }
-  image_size += pe->nt.OptionalHeader.SizeOfHeaders;
+  image_size += pe->nt->OptionalHeader.SizeOfHeaders;
 
-  if (image_size > stream_size) {  //损坏的PE
+  if (image_size > pe->size) {  //损坏的PE
     pe->overlay.offset_in_file = 0;
     pe->overlay.size = 0;
     return true;
   }
 
-  if (image_size == stream_size) { //没有附加数据
+  if (image_size == pe->size) { //没有附加数据
     pe->overlay.offset_in_file = 0;
     pe->overlay.size = 0;
   } else {
@@ -1088,32 +1271,71 @@ bool pe_icon_file(int fd, const char* ico_file)
   pe_t* pe = (pe_t*)fd;
   bool is_success = false;
 
-  //遍历资源, 找到ICON GROUPS资源
-  IMAGE_RESOURCE_DIRECTORY* icon_group = NULL;
-  name = get_restype_name(14);
-  slist_for_each_entry(pos, node, name) {
-    if ( 0 == strncmp(name, pos->name)) {
-      icon_group  = ;
+  //遍历资源, 找到ICON GROUPS资源 
+  IMAGE_RESOURCE_DIRECTORY_ENTRY *res = NULL;
+  IMAGE_RESOURCE_DATA_ENTRY* icon_group = NULL;
+  slist_for_each_entry(res, &pe->resource, resource_t, data, node) {
+    if (res->Id == 14 && IS_RESOURCE_DIRECTORY(res)) {
+      resource_t* node = container_of(res, resource_t, data);
+      slist_t* res_list = &node->child;
+      IMAGE_RESOURCE_DIRECTORY_ENTRY* res_2 = NULL;
+      slist_for_each_entry(res_2, res_list, resource_t, data, node) {
+        if (IS_RESOURCE_DIRECTORY(res_2)) {
+          resource_t* node = container_of(res_2, resource_t, data);
+          slist_t* res_3_list = &node->child;
+          IMAGE_RESOURCE_DIRECTORY_ENTRY* res_3 = NULL;
+          slist_for_each_entry(res_3, res_3_list, resource_t, data, node) {
+            if (!IS_RESOURCE_DIRECTORY(res_3)) {
+              icon_group = pe_resource_data(fd, res_3);
+              if (icon_group != NULL){
+                break;
+              }
+            }
+          }
+        }
+
+        if (icon_group != NULL) {
+          break;
+        }
+      }
+    }
+
+    if (icon_group != NULL) {
       break;
     }
   }
-  if (icon_group.rva == 0 && icon_group.size == 0 ) {
-    //printf("ico group not found");
+
+  if (icon_group == NULL || icon_group->OffsetToData == 0 || icon_group->Size == 0 ) {
+    errno = ENOENT;
     return false;
   }
 
-  raw_t raw = rva_to_raw(fd, icon_group.rva);
+  raw_t raw = rva_to_raw(fd, icon_group->OffsetToData);
   if (raw == INVALID_RAW) {
     //printf("invalid icon group raw");
     return false;
   }
 
   GRPICONDIR* icon_dir = (GRPICONDIR*)(pe->stream + raw);
-  if (icon_group.size != sizeof(GRPICONDIR)
+  if (icon_group->Size != sizeof(GRPICONDIR)
                          + (icon_dir->idCount-1)*sizeof(GRPICON_DIR_ENTRY)) {
     //printf("invalid icon group size");
     return false;
   }
+
+  //获取资源的位置和长度
+  IMAGE_RESOURCE_DIRECTORY_ENTRY* res_icon = NULL;
+  slist_for_each_entry(res_icon, &pe->resource, resource_t, data, node) {
+    if (res_icon->Id == 3) {
+      break;
+    }
+  }
+
+  if (res_icon == NULL) {
+    errno = ENOENT;
+    return false;
+  }
+
 
   FILE* fp = fopen(ico_file, "wb");
   if (fp==NULL) {
@@ -1121,13 +1343,15 @@ bool pe_icon_file(int fd, const char* ico_file)
     return false;
   }
 
-  size_t ico_header_size = sizeof(GRPICONDIR)
+
+  size_t ico_header_size = sizeof(ICON_DIR)
                            + (icon_dir->idCount-1)*sizeof(ICON_ENTRY);
   ICON_DIR* ico_header = (ICON_DIR*)malloc(ico_header_size);
   if (ico_header == NULL) {
-    //printf("malloc memory failed");
     is_success = false;
-    goto ret_door;
+    fclose(fp);
+    fp = NULL;
+    return false;
   }
 
   fseek(fp, ico_header_size, SEEK_SET);
@@ -1139,22 +1363,44 @@ bool pe_icon_file(int fd, const char* ico_file)
     ico_header->idEntries[i].wPlanes = icon_dir->idEntries[i].wPlanes;
     ico_header->idEntries[i].wBitCount = icon_dir->idEntries[i].wBitCount;
 
-    //获取资源的位置和长度
-    char res_name[32] = {0};
-    snprintf(res_name, sizeof(res_name), "%d", icon_dir->idEntries[i].nID);
-    uint32_t key = crc32(res_name, strlen(res_name));
-    IMAGE_RESOURCE_DATA_ENTRY *icon = btree_lookup(&pe->resource, "ICON", key);
-    if (icon.Size != 0) {
-      raw_t icon_raw = rva_to_raw(fd, icon.OffsetToData);
+    resource_t* res = container_of(res_icon, resource_t, data);
+    IMAGE_RESOURCE_DIRECTORY_ENTRY* entry = NULL;
+    slist_for_each_entry(entry, &res->child, resource_t, data, node) {
+      if (entry->Id == icon_dir->idEntries[i].nID 
+        && IS_RESOURCE_DIRECTORY(entry)) {
+        break;
+      }
+    }
+
+    if(entry == NULL) {
+      //在ICON资源目录下没有找到目标图标资源
+      continue;
+    }
+
+    resource_t* node = container_of(entry, resource_t, data);
+    entry = NULL;
+    slist_for_each_entry(entry, &node->child, resource_t, data, node) {
+      if (!IS_RESOURCE_DIRECTORY(entry)) {
+        break;
+      }
+    }
+
+    if (entry == NULL) {
+      continue;
+    }
+
+    IMAGE_RESOURCE_DATA_ENTRY* icon = pe_resource_data(fd, entry);
+    if (icon->Size != 0) {
+      raw_t icon_raw = rva_to_raw(fd, icon->OffsetToData);
       if (icon_raw != INVALID_RAW) {
         //write ico data
-        if (icon.size != fwrite(pe->stream + icon_raw, 1, icon.Size, fp)){
+        if (icon->Size != fwrite(pe->stream + icon_raw, 1, icon->Size, fp)){
           //printf("write ico data failed");
           is_success = false;
           goto ret_door;
         }
-        ico_header->idEntries[i].dwBytesInRes = icon.Size;
-        ico_header->idEntries[i].dwImageOffset = ftell(fp) - icon.Size;
+        ico_header->idEntries[i].dwBytesInRes = icon->Size;
+        ico_header->idEntries[i].dwImageOffset = ftell(fp) - icon->Size;
       } else {
         //ico data overrun
         //printf("ico data overrun");
@@ -1199,7 +1445,6 @@ ret_door:
  * pe version
  *
  **********************************************************************/
-
 typedef struct _VS_VERSIONINFO
 {
     uint16_t  wLength;
@@ -1262,6 +1507,7 @@ typedef struct _VarFileInfo
     Var   Children[1];
 }VarFileInfo; 
 
+
 bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
 {
     if(VS_FFI_SIGNATURE != pValue->dwSignature ) {
@@ -1273,106 +1519,107 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
     }
     
     // 输出 VS_FIXEDFILEINFO 结构体信息
-    version_t* version = malloc(sizeof(version_t));
+    version_t* version = (version_t*)malloc(sizeof(version_t));
     if( version == NULL) {
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version.data.name, L"Signature", MAX_VER_NAME_LEN - 1);
-    swprintf(version.data.value, "%d.%d", 
+    wcsncpy(version->data.name, L"Signature", MAX_VER_NAME_LEN - 1);
+    swprintf(version->data.value, L"%d.%d", 
       pValue->dwStrucVersion >> 16,
       pValue->dwStrucVersion & 0xFFFF);
-    slist_add(&pe->ver_list, &version->node);
+    slist_add(&pe->version, &version->node);
 
-    version = malloc(sizeof(version_t));
+    version = (version_t*)malloc(sizeof(version_t));
     if (version == NULL) {
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->name, L"FileVersion", MAX_VER_NAME_LEN - 1);
-    swprintf(version->value, "%d.%d.%d.%d",
+    wcsncpy(version->data.name, L"FileVersion", MAX_VER_NAME_LEN - 1);
+    swprintf(version->data.value, L"%d.%d.%d.%d",
         pValue->dwFileVersionMS >> 16,
         pValue->dwFileVersionMS & 0xFFFF,
         pValue->dwFileVersionLS >> 16,
         pValue->dwFileVersionLS & 0xFFFF);
-    slist_add(&pe->ver_list, &version->node);
+    slist_add(&pe->version, &version->node);
 
-    version = malloc(sizeof(version_t));
+    version = (version_t*)malloc(sizeof(version_t));
     if (version == NULL) {
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->name, L"ProductVersion", MAX_VER_NAME_LEN - 1);
-    swprintf(version->value, "%d.%d.%d.%d",
+    wcsncpy(version->data.name, L"ProductVersion", MAX_VER_NAME_LEN - 1);
+    swprintf(version->data.value, L"%d.%d.%d.%d",
         pValue->dwProductVersionMS >> 16,
         pValue->dwProductVersionMS & 0xFFFF,
         pValue->dwProductVersionLS >> 16,
         pValue->dwProductVersionLS & 0xFFFF);
-    slist_add(&pe->ver_list, &version->node);
+    slist_add(&pe->version, &version->node);
 
-    version = malloc(sizeof(version_t));
+    version = (version_t*)malloc(sizeof(version_t));
     if (version == NULL) {
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->name, L"FileFlagsMask", MAX_VER_NAME_LEN -1);
-    swprintf(version->value, "%s%x", pValue->dwFileFlagsMask ? "0x" : "",
+    wcsncpy(version->data.name, L"FileFlagsMask", MAX_VER_NAME_LEN -1);
+    swprintf(version->data.value, L"%s%x", 
+        pValue->dwFileFlagsMask ? "0x" : "",
         pValue->dwFileFlagsMask);
-    slist_add(&pe->ver_list, &version->node);
+    slist_add(&pe->version, &version->node);
 
-    version = malloc(sizeof(version_t));
+    version = (version_t*)malloc(sizeof(version_t));
     if (version == NULL) {
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->name, L"FileDate", MAX_VER_NAME_LEN - 1);
-    swprintf(version->value, "%x.%x", pValue->dwFileDateMS, pValue->dwFileDateLS);
-    slist_add(&pe->ver_list, &version->node);
+    wcsncpy(version->data.name, L"FileDate", MAX_VER_NAME_LEN - 1);
+    swprintf(version->data.value, L"%x.%x", pValue->dwFileDateMS, pValue->dwFileDateLS);
+    slist_add(&pe->version, &version->node);
     return true;
 }
 
-
-#define ROUND_OFFSET(a,b,r)    (((LPBYTE)(b) - (LPBYTE)(a) + ((r) - 1)) & ~((r) - 1))
-#define ROUND_POS(b, a, r)    (((LPBYTE)(a)) + ROUND_OFFSET(a, b, r))
+#define ROUND_OFFSET(a,b,r)    (((uint8_t*)(b) - (uint8_t*)(a) + ((r) - 1)) & ~((r) - 1))
+#define ROUND_POS(b, a, r)    (((uint8_t*)(a)) + ROUND_OFFSET(a, b, r))
 
 // 获取版本号信息入口点
 IMAGE_RESOURCE_DATA_ENTRY* get_version_block(
     PIMAGE_RESOURCE_DIRECTORY pRootRec )
 {
-    WORD nCount = pRootRec->NumberOfIdEntries + pRootRec->NumberOfNamedEntries;
-    for ( WORD i = 0; i < nCount; ++i )
+    uint16_t nCount = pRootRec->NumberOfIdEntries + pRootRec->NumberOfNamedEntries;
+    for ( uint16_t i = 0; i < nCount; ++i )
     {
-        PIMAGE_RESOURCE_DIRECTORY_ENTRY pFirstEntry = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)( (LPDWORD)pRootRec +
-            sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(DWORD) ) + i;
+        IMAGE_RESOURCE_DIRECTORY_ENTRY* pFirstEntry 
+          = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)((uint32_t*)pRootRec +
+            sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(uint32_t) ) + i;
         
-        WORD id_ver = pFirstEntry->Id;
+        uint16_t id_ver = pFirstEntry->Id;
         if (  id_ver != 16 )
             continue;
 
         // 进入目录
         if ( pFirstEntry->DataIsDirectory == 0x01 )
         {
-            PIMAGE_RESOURCE_DIRECTORY pFirstDir = (PIMAGE_RESOURCE_DIRECTORY) ( (LPBYTE)pRootRec + pFirstEntry->OffsetToDirectory );
-            WORD nDirCount = pFirstDir->NumberOfNamedEntries + pFirstDir->NumberOfIdEntries;
+            IMAGE_RESOURCE_DIRECTORY* pFirstDir = (IMAGE_RESOURCE_DIRECTORY*) ( (uint8_t*)pRootRec + pFirstEntry->OffsetToDirectory );
+            uint16_t nDirCount = pFirstDir->NumberOfNamedEntries + pFirstDir->NumberOfIdEntries;
 
             // 第二层目录(资源代码页)
-            for ( WORD nIndex = 0; nIndex < nDirCount; ++nIndex )
+            for ( uint16_t nIndex = 0; nIndex < nDirCount; ++nIndex )
             {
-                PIMAGE_RESOURCE_DIRECTORY_ENTRY pSecondEntry = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)( (LPDWORD)pFirstDir +
-                    sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(DWORD) ) + nIndex;
+                IMAGE_RESOURCE_DIRECTORY_ENTRY* pSecondEntry = (IMAGE_RESOURCE_DIRECTORY_ENTRY*)( (uint32_t)pFirstDir +
+                    sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(uint32_t) ) + nIndex;
 
                 // 取第三层目录(资源数据入口)
                 if ( pSecondEntry->DataIsDirectory == 1 )
                 {
-                    PIMAGE_RESOURCE_DIRECTORY pThirdDir = (PIMAGE_RESOURCE_DIRECTORY)( (LPBYTE)pRootRec + pSecondEntry->OffsetToDirectory );
+                    IMAGE_RESOURCE_DIRECTORY* pThirdDir = (IMAGE_RESOURCE_DIRECTORY*)( (uint8_t*)pRootRec + pSecondEntry->OffsetToDirectory );
                     if ( pThirdDir->NumberOfIdEntries + pThirdDir->NumberOfNamedEntries >= 1 )
                     {
                         // 有一个Entry
-                        PIMAGE_RESOURCE_DIRECTORY_ENTRY pThirdEntry = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)( (LPDWORD)pThirdDir +
-                            sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(DWORD) );    
+                        IMAGE_RESOURCE_DIRECTORY_ENTRY* pThirdEntry = (IMAGE_RESOURCE_DIRECTORY_ENTRY*)( (uint32_t*)pThirdDir +
+                            sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(uint32_t) );    
                         if ( pThirdEntry->DataIsDirectory == 0 )
                         {
-                            PIMAGE_RESOURCE_DATA_ENTRY pData = ( PIMAGE_RESOURCE_DATA_ENTRY )( (LPBYTE)pRootRec + pThirdEntry->OffsetToDirectory );
+                            IMAGE_RESOURCE_DATA_ENTRY* pData = (IMAGE_RESOURCE_DATA_ENTRY* )( (uint8_t*)pRootRec + pThirdEntry->OffsetToDirectory );
                             if ( pData )
                             {
                                 // 找到真实数据入口点
@@ -1399,7 +1646,7 @@ bool parse_version(int fd)
 
   // 获取资源目录
   IMAGE_DATA_DIRECTORY* pDataDir 
-    = &pe->nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_RESOURCE];
+    = &pe->nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_RESOURCE];
   if ( pDataDir->VirtualAddress == 0 || pDataDir->Size == 0 ) {
       return false;
   }
@@ -1410,7 +1657,7 @@ bool parse_version(int fd)
       return false;
 
   // 找到版本号位置
-  IMAGE_RESOURCE_DATA_ENTRY pVersionEntry = 
+  IMAGE_RESOURCE_DATA_ENTRY* pVersionEntry = 
     get_version_block((IMAGE_RESOURCE_DIRECTORY*)(pe->stream + dwOffset));
   if ( pVersionEntry == NULL ) {
       return false;
@@ -1472,12 +1719,12 @@ bool parse_version(int fd)
 
           //_snwprintf(verinfo.name, (sizeof(verinfo.name) / 2) -1 , L"%S", pS->szKey);
           //memcpy(item->name, pS->szKey, sizeof(item->name) - sizeof(wchar_t));
-          wcsncpy(item->name, pS->szKey, MAX_VER_NAME_LEN - 1);
+          wcsncpy(item->data.name, pS->szKey, MAX_VER_NAME_LEN - 1);
           //_snwprintf(verinfo.value, (sizeof(verinfo.value) / 2) - 1, L"%.*S", 
           //    pS->wValueLength, psVal);
           //memcpy(item->value, psVal, sizeof(item->value) - sizeof(wchar_t));
-          wcsncpy(item->value, psVal, MAX_VER_NAME_LEN - 1);
-          llist_add(&item->node, &pe->version);
+          wcsncpy(item->data.value, psVal, MAX_VER_NAME_LEN - 1);
+          slist_add(&pe->version, &item->node);
         }
       }
     } else {
@@ -1519,7 +1766,8 @@ IMAGE_VERSION* pe_version_first(int fd)
     return NULL;
   }
 
-  return (IMAGE_VERSION*)&pe->ver_list->first.data;
+  pe_t* pe = (pe_t*)fd;
+  return slist_first_entry(&pe->version, version_t, data, node);
 }
 
 IMAGE_VERSION* pe_version_next(IMAGE_VERSION* iter)
@@ -1529,14 +1777,21 @@ IMAGE_VERSION* pe_version_next(IMAGE_VERSION* iter)
     return NULL;
   }
 
-  return llist_next((version_t*)iter);
+  return slist_next_entry(iter, version_t, data, node);
 }
 
+/*
 int parse_gap(int fd)
 {
-  int cMaxGap = cbSize / sizeof(SECTION_GAP);
-  IMAGE_DOS_HEADER *dos_header = GET_DOS_HEADER(stream);
-  IMAGE_NT_HEADERS *nt_header = GET_NT_HEADER(stream);
+  if (fd == INVALID_PE) {
+    errno = INVALID_PE;
+    return EINVAL;
+  }
+
+  pe_t* pe = (pe_t*)fd;
+  int cMaxGap = pe->size / sizeof(SECTION_GAP);
+  IMAGE_DOS_HEADER *dos_header = GET_DOS_HEADER(pe->stream);
+  IMAGE_NT_HEADERS *nt_header = GET_NT_HEADER(pe->stream);
   size_t dwActualHeaderSize = dos_header->e_lfanew
                 + sizeof(int)
                 + sizeof(IMAGE_FILE_HEADER)
@@ -1569,6 +1824,7 @@ int parse_gap(int fd)
 
   return cGap * sizeof(SECTION_GAP);
 }
+*/
 
 bool pe_remove_last_section(int fd)
 {
@@ -1577,34 +1833,36 @@ bool pe_remove_last_section(int fd)
     return false;
   }
 
+  pe_t* pe = (pe_t*)fd;
   IMAGE_SECTION_HEADER Header = {0};
-  if (!get_section_header(fd, pe->nt.FileHeader.NumberOfSections -1,
+  if (!copy_section_header(fd, pe->nt->FileHeader.NumberOfSections -1,
                &Header))
     return false;
 
   //删除节数据
-  memset(pe->stream + Header.PointerToRawData, 0, Header.SizeOfRawData);
+  memset((char*)pe->stream + (uint32_t)Header.PointerToRawData, 0, Header.SizeOfRawData);
 
   //删除节描述符
   IMAGE_SECTION_HEADER* pSectionHeader =
     (IMAGE_SECTION_HEADER*)((char*)pe->nt
                  + sizeof(int)
                  + sizeof(IMAGE_FILE_HEADER)
-                 + pe->nt.FileHeader.SizeOfOptionalHeader);
+                 + pe->nt->FileHeader.SizeOfOptionalHeader);
   memset(pSectionHeader, 0, sizeof(IMAGE_SECTION_HEADER));
 
   //修改节数量
-  pe->nt.FileHeader.NumberOfSections --;
+  pe->nt->FileHeader.NumberOfSections --;
 
   //修改SizeOfImage字段
-  pe->nt.OptionalHeader.SizeOfImage
-    -= ALIGN(Header.Misc.VirtualSize, pe->nt.OptionalHeader.SectionAlignment);
+  pe->nt->OptionalHeader.SizeOfImage
+    -= ALIGN(Header.Misc.VirtualSize, pe->nt->OptionalHeader.SectionAlignment);
   return true;
 }
 
+/*
 bool LoadPERelocRoutine(
     rva_t rvaOwnerBlock,
-    PPE_RELOCATION_ITEM pItem,
+    IMAGE_RELOCATION_ITEM* pItem,
     void* lpParam )
 {
   char* image = (char*)lpParam;
@@ -1692,7 +1950,7 @@ bool pe_load(int fd, char* image, size_t image_size)
   }
 
   //modify imagebase
-  //image_nt->OptionalHeader.ImageBase = (DWORD)image;
+  //image_nt->OptionalHeader.ImageBase = (uint32_t)image;
 
   //modify FileAlignment
   image_nt->OptionalHeader.FileAlignment = nt->OptionalHeader.SectionAlignment;
@@ -1700,3 +1958,4 @@ bool pe_load(int fd, char* image, size_t image_size)
   return true;
 #endif
 }
+*/
