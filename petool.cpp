@@ -164,13 +164,13 @@ void dump_version(int pe)
 
 int main(int argc, char* argv[])
 {
-  if (argc!=3) {
+  if (argc!=2) {
     show_usage();
     return 0;
   }
 
   MAPPED_FILE view = {0};
-  if( 0 != map_file( argv[2], &view ) ) {
+  if( 0 != map_file( argv[1], &view ) ) {
     printf( "open file failed: %s\n", argv[2]);
     return -1;
   }
@@ -199,6 +199,7 @@ int main(int argc, char* argv[])
 
   unmap_file(&view);
  
+  system("pause");
   return 0;
 }
 
