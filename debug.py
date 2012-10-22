@@ -6,7 +6,7 @@ import subprocess
 
 debug = r'd:\src\pe\build\nmake.win32\debug'
 bin = "bin\\petool.exe"
-parm = r'c:\windows\system32\notepad.exe'
+parm = r'c:\windows\system32\kernel32.dll'
 
 #启动虚拟机
 vm_path = r"d:\ace\debugger_wxpsp3cn\debugger_wxpsp3cn.vmx"
@@ -45,7 +45,8 @@ print os.path.join(remote_dir, bin)
 cmdline = ["d:\\app\\windbg\\x86\\windbg.exe",
 	"-premote", 
 	"tcp:port=6422, server=192.168.184.11", 
-	"%s" % os.path.join(remote_dir, bin)]
+	"%s" % os.path.join(remote_dir, bin),
+    parm]
 subprocess.call(cmdline)
 
 

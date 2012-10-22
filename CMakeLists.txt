@@ -4,8 +4,6 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 PROJECT(pe) 
 
-#CONFIGURE_FILE(peConfig.cmake.in "${CMAKE_SOURCE_DIR}/peConfig.cmake")
-
 #util
 IF (NOT TARGET util)
 	ADD_SUBDIRECTORY(util)
@@ -42,7 +40,6 @@ ADD_DEPENDENCIES(petool pe struct)
 #install
 INSTALL(TARGETS pe
 	ARCHIVE DESTINATION lib)
-#install(EXPORT pelib DESTINATION "pelib")
 INSTALL(FILES pe.h DESTINATION include)
 INSTALL(FILES peformat.h DESTINATION include)	
 INSTALL(TARGETS petool RUNTIME DESTINATION bin)

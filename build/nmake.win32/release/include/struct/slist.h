@@ -183,13 +183,13 @@ static inline bool slist_add(slist_t *head, snode_t *new_node)
  */
 static inline snode_t *slist_del_all(slist_t *head)
 {
-	return (snode_t*)xchg(&head->first, NULL);
+	return (snode_t*)xchg(&head->first, 0);
 }
 
 
 #define slist_for_each_safe(list, type, member, var)   \
      for(snode_t *i =(list)->first, *t = NULL; \
-    i != NULL && (t = i->next) && ((var) = container_of(i, type, member)) != NULL; \
+    i != NULL && ((t = i->next) == NULL || t != NULL) && ((var) = container_of(i, type, member)) != NULL; \
     i = t, slist_del_all(list))
 
 extern bool slist_add_batch(slist_t *head, 

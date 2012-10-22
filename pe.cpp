@@ -181,7 +181,6 @@ int  pe_open(const char* stream, size_t size)
     return INVALID_PE;
   }
 
-  //parse export function
   parse_export((int)pe);
 
   parse_import((int)pe);
@@ -224,6 +223,20 @@ void  pe_close(int  fd)
     item = NULL;
   }
 
+  import_dll_t* dll = NULL;
+  slist_for_each_safe(&pe->import_dlls, import_dll_t, node, dll) {
+    import_api_t* api = NULL;
+    //printf("free dll");
+    slist_for_each_safe(&dll->api_list, import_api_t, node, api) {
+      //printf("free api");
+      free(api);
+      api = NULL;
+    }
+
+    free(dll);
+    dll = NULL;
+  }
+
   version_t* ver = NULL;
   slist_for_each_safe(&pe->version, version_t, node, ver) {
     free(ver);
@@ -242,19 +255,12 @@ void  pe_close(int  fd)
     reloc = NULL;
   }
 
-  import_dll_t* dll = NULL;
-  slist_for_each_safe(&pe->import_dlls, import_dll_t, node, dll) {
-    import_api_t* api = NULL;
-    slist_for_each_safe(&dll->api_list, import_api_t, node, api) {
-      free(api);
-      api = NULL;
-    }
 
-    free(dll);
-    dll = NULL;
-  }
 
   clean_resource(&pe->resource);
+
+  free(pe);
+  pe = NULL;
 } 
 
 IMAGE_NT_HEADERS*  pe_nt_header(int fd)

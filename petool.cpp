@@ -169,6 +169,7 @@ int main(int argc, char* argv[])
     return 0;
   }
 
+  while(true) {
   MAPPED_FILE view = {0};
   if( 0 != map_file( argv[1], &view ) ) {
     printf( "open file failed: %s\n", argv[2]);
@@ -198,6 +199,7 @@ int main(int argc, char* argv[])
   pe_close(pe);
 
   unmap_file(&view);
+  }
  
   system("pause");
   return 0;
