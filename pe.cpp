@@ -1531,7 +1531,7 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
     }
     memset(version, 0, sizeof(version_t));
     wcsncpy(version->data.name, L"Signature", MAX_VER_NAME_LEN - 1);
-    swprintf(version->data.value, L"%d.%d", 
+    swprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%d.%d", 
       pValue->dwStrucVersion >> 16,
       pValue->dwStrucVersion & 0xFFFF);
     slist_add(&pe->version, &version->node);
@@ -1542,7 +1542,7 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
     }
     memset(version, 0, sizeof(version_t));
     wcsncpy(version->data.name, L"FileVersion", MAX_VER_NAME_LEN - 1);
-    swprintf(version->data.value, L"%d.%d.%d.%d",
+    swprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%d.%d.%d.%d",
         pValue->dwFileVersionMS >> 16,
         pValue->dwFileVersionMS & 0xFFFF,
         pValue->dwFileVersionLS >> 16,
@@ -1555,7 +1555,7 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
     }
     memset(version, 0, sizeof(version_t));
     wcsncpy(version->data.name, L"ProductVersion", MAX_VER_NAME_LEN - 1);
-    swprintf(version->data.value, L"%d.%d.%d.%d",
+    swprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%d.%d.%d.%d",
         pValue->dwProductVersionMS >> 16,
         pValue->dwProductVersionMS & 0xFFFF,
         pValue->dwProductVersionLS >> 16,
@@ -1568,7 +1568,7 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
     }
     memset(version, 0, sizeof(version_t));
     wcsncpy(version->data.name, L"FileFlagsMask", MAX_VER_NAME_LEN -1);
-    swprintf(version->data.value, L"%s%x", 
+    swprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%s%x", 
         pValue->dwFileFlagsMask ? "0x" : "",
         pValue->dwFileFlagsMask);
     slist_add(&pe->version, &version->node);
@@ -1579,7 +1579,9 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
     }
     memset(version, 0, sizeof(version_t));
     wcsncpy(version->data.name, L"FileDate", MAX_VER_NAME_LEN - 1);
-    swprintf(version->data.value, L"%x.%x", pValue->dwFileDateMS, pValue->dwFileDateLS);
+    swprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%x.%x", 
+        pValue->dwFileDateMS, 
+        pValue->dwFileDateLS);
     slist_add(&pe->version, &version->node);
     return true;
 }
