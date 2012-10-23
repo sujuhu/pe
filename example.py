@@ -1,5 +1,9 @@
 import os, sys
-sys.path.append("./build/python/lib.win32-2.7")
+import platform
+if platform.system() == "Window":
+    sys.path.append("./build/python/lib.win32-2.7")
+else:
+    sys.path.append("./build/python/lib.linux-i686-2.7")
 import pype
 
 #test_file = r'../examples/0c94b325dca948dcdf81036a5306901b.sample'
@@ -10,7 +14,7 @@ test_file = os.path.abspath(test_file)
 
 def dump_pe(filename):
     pe = pype.PE(test_file)
-    
+
     sections = pe.sections()
 
     if sections is not None:
@@ -58,10 +62,9 @@ def dump_pe(filename):
         print "extract ico file fail"
     else:
         print ico_file
- 
-    pe.close()
-    del pe
 
-#while True:
-dump_pe(test_file)
+    pe.close()
+
+while True:
+    dump_pe(test_file)
 print "test passed"

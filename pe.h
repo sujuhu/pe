@@ -30,13 +30,13 @@ typedef uint32_t rva_t;
 typedef uint32_t raw_t;
 typedef uint32_t va_t;
 
-#define INVALID_PE       0
+#define INVALID_PE       (int)0
 
-#define INVALID_RAW     -1
+#define INVALID_RAW     (raw_t)-1
 
-#define INVALID_RVA     -1
+#define INVALID_RVA     (raw_t)-1
 
-#define INVALID_SECTION_ID  -1
+#define INVALID_SECTION_ID  (raw_t)-1
 
 #define IS_RESOURCE_DIRECTORY(entry)  entry->DataIsDirectory
 

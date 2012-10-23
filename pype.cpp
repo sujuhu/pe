@@ -1,7 +1,9 @@
-﻿#pragma warning(disable:4996)
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
+﻿#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string>
 #include <Python.h>
 #include <structmember.h>  
 #include "util/filemap.h"
@@ -76,24 +78,26 @@ static void PE_destruct(PE* self)                   //析构方法.
   self->ob_type->tp_free(self);
   //Py_TYPE(self)->tp_free((PyObject*)self);      //释放对象/实例.  
 }  
-  
+    /*
 static PyObject* PE_Str(PE* self)             //调用str/print时自动调用此函数.  
 {  
-  /*
+
        ostringstream OStr;  
        OStr<<"Name    : "<<Self->m_szName<<endl  
            <<"Math    : "<<Self->m_dMath<<endl  
            <<"English : "<<Self->m_dEnglish<<endl  
        string Str = OStr.str();  
        return Py_BuildValue("s", Str.c_str());  
-  */
+
   Py_RETURN_NONE;
 }  
-  
+   */ 
+/*
 static PyObject* PE_Repr(PE* self)            //调用repr内置函数时自动调用.  
 {  
   return PE_Str(self);  
-}  
+} 
+*/ 
 
 //dump节表
 extern "C"
@@ -154,8 +158,15 @@ PyObject* PE_open(PE* self, PyObject* args)
 extern "C"
 PyObject* PE_close(PE* self, PyObject* args)
 {
-  int pe = self->m_fd;
-  pe_close(pe);
+  if (self->m_fd != INVALID_PE) {
+    pe_close(self->m_fd);
+    self->m_fd = INVALID_PE;  
+  }
+
+  if (self->m_view.data != NULL) {
+    unmap_file(&self->m_view);
+    self->m_view.data = NULL;
+  }
   Py_RETURN_NONE;
 }
 
@@ -377,14 +388,14 @@ static PyMethodDef PE_methods[] =
 };
 
 static PyMemberDef PE_members[] =         //类/结构的数据成员的说明.  
-  
+{  
       //{"m_fd",   T_INT, offsetof(pe, m_fd),   0, "The Name of instance"},  
       //{"m_dMath",    T_FLOAT,  offsetof(CScore, m_dMath),    0, "The Math score of instance."},  
       //{"m_dEnglish", T_FLOAT,  offsetof(CScore, m_dEnglish), 0, "The English score of instance."},  
       //{"m_dTotal",   T_FLOAT,  offsetof(CScore, m_dTotal),   0, "The Total score of instance.align"},  
   
       {NULL, NULL, NULL, 0, NULL}  
-; 
+}; 
 
 static PyTypeObject pyep_PEType =  
 {  
