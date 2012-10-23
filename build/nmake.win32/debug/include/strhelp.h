@@ -1,4 +1,4 @@
-#ifndef __STRING_H_ZXK_20100410
+ï»¿#ifndef __STRING_H_ZXK_20100410
 #define __STRING_H_ZXK_20100410
 
 #ifdef __cplusplus
@@ -13,46 +13,48 @@ typedef struct
 }UNICODE_STRING, *PUNICODE_STRING;
 
 /*
-Description:		·Ö¸î×Ö·û´®
-Parameter:			lpszSrc	 ËùÒª·Ö¸îµÄ×Ö·û´®
-chSplit  ·Ö¸ô×Ö·û
-aString	 ·Ö¸î½á¹û£¬×Ö·û´®Êı×éµÄÖ¸Õë
-cbMaxInRow	Ã¿Ò»¸ö×Ö·û´®Ò»ĞĞÖĞ×î´ó×Ö·ûÊı
-pnMaxRow	·Ö¸îÁË¶àÉÙĞĞ
-Return:				TRUE	 ·Ö¸î³É¹¦
-FALSE	 ·Ö¸îÊ§°Ü
+Description:		åˆ†å‰²å­—ç¬¦ä¸²
+Parameter:			lpszSrc	 æ‰€è¦åˆ†å‰²çš„å­—ç¬¦ä¸²
+chSplit  åˆ†éš”å­—ç¬¦
+aString	 åˆ†å‰²ç»“æœï¼Œå­—ç¬¦ä¸²æ•°ç»„çš„æŒ‡é’ˆ
+cbMaxInRow	æ¯ä¸€ä¸ªå­—ç¬¦ä¸²ä¸€è¡Œä¸­æœ€å¤§å­—ç¬¦æ•°
+pnMaxRow	åˆ†å‰²äº†å¤šå°‘è¡Œ
+Return:				TRUE	 åˆ†å‰²æˆåŠŸ
+FALSE	 åˆ†å‰²å¤±è´¥
 */
 bool	SplitString(
 		const char* lpszSrc, 
 		char chSplit, 
-		OUT char* aString, 
+		char* aString, 
 		int cbMaxInRow, 
 		int* pnMaxRow );
 
-//É¾³ı×Ö·û´®×ó²àµÄ¿Õ¸ñ
+//åˆ é™¤å­—ç¬¦ä¸²å·¦ä¾§çš„ç©ºæ ¼
 void	TrimLeftString(char* lpsz);
 
-//É¾³ı×Ö·û´®ÓÒ²àµÄ¿Õ¸ñ
+//åˆ é™¤å­—ç¬¦ä¸²å³ä¾§çš„ç©ºæ ¼
 void	TrimRightString(char* lpsz);
 
 int	CombinString(
 	char chSplit, 
-	OUT char* aString, 
+	char* aString, 
 	int cbMaxInRow, 
 	int nRow, 
-	OUT char* lpszDst, 
+	char* lpszDst, 
 	int nLenDst);
 
 char* MakeMacString(uint8_t mac[6], char* str, int max_cch);
 
 char* MakeIPString(uint8_t ip[4], char* str, int max_cch);
 
+#ifdef _MSC_VER
 char* MakeTimeString(
 	SYSTEMTIME* tmSystem, 
-	OUT LPSTR lpszDatatime, 
-	DWORD cbBufferSize);
+	char* lpszDatatime, 
+	int cbBufferSize);
+#endif
 
-bool MakeHexString(uint8_t* buffer, DWORD size, OUT char* hex, DWORD max_cch);
+bool MakeHexString(uint8_t* buffer, int size, char* hex, int max_cch);
 
 int	MakeHexBinary(const char* hex_str, IN uint8_t* buffer, int max_cch);
 
