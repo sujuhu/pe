@@ -3,7 +3,12 @@
 #pragma  warning(disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
+#include <memory.h>
+#ifdef _MSC_VER
 #include <direct.h>
+#else
+#include <unistd.h>
+#endif
 #include <filemap.h>
 #include "petype.h"
 #include "pe.h"
@@ -76,7 +81,7 @@ void dump_section(int pe)
 {
   //dump节表
   IMAGE_NT_HEADERS* nt = pe_nt_header(pe);
-  WORD i = 0;
+  short i = 0;
   for( ; i < nt->FileHeader.NumberOfSections; i++ ) {
     IMAGE_SECTION_HEADER header;
     memset(&header, 0, sizeof(IMAGE_SECTION_HEADER));
@@ -192,8 +197,7 @@ int main(int argc, char* argv[])
   dump_resource(pe);
 
   char path[256] = {0};
-  getcwd(path, sizeof(path) - 1);
-  strcat(path, "\\sample.ico");
+  strcat(getcwd(path, sizeof(path) - 1), "\\sample.ico");
   dump_icon(pe, path);
 
   pe_close(pe);
