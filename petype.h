@@ -29,24 +29,6 @@ typedef unsigned char uint_fast8_t;
 typedef unsigned int uint_fast16_t;
 typedef unsigned int uint_fast32_t;
 
-#ifndef _INTPTR_T_DEFINED
- #define _INTPTR_T_DEFINED
- #ifdef _WIN64
-typedef __int64 intptr_t;
- #else /* _WIN64 */
-typedef _W64 int intptr_t;
- #endif /* _WIN64 */
-#endif /* _INTPTR_T_DEFINED */
-
-#ifndef _UINTPTR_T_DEFINED
- #define _UINTPTR_T_DEFINED
- #ifdef _WIN64
-typedef unsigned __int64 uintptr_t;
- #else /* _WIN64 */
-typedef _W64 unsigned int uintptr_t;
- #endif /* _WIN64 */
-#endif /* _UINTPTR_T_DEFINED */
-
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
 

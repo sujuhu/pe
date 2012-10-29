@@ -336,6 +336,36 @@ rva_t raw_to_rva(int fd, raw_t raw)
   return INVALID_RVA;
 }
 
+uint8_t* pe_stream_by_raw(int fd, raw_t raw)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)fd;
+  if (raw >= pe->size) {
+    errno = ERANGE;
+    return NULL;
+  }
+  return (uint8_t*)pe->stream + raw;
+}
+
+uint8_t* pe_stream_by_rva(int fd, rva_t rva)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  raw_t raw = rva_to_raw(fd, rva);
+  if (raw == INVALID_RAW) {
+    return NULL;
+  }
+
+  return pe_stream_by_raw(fd, raw);
+}
+
 /***********************************************************************
  *
  *  pe export
