@@ -7,6 +7,7 @@ if(NOT DEFINED PE_FOUND)
   FIND_PATH(PE_INCLUDE_DIRS 
     NAMES pe.h
     PATHS ${PE_DIR}
+    NO_DEFAULT_PATH
   )
 
   # Common name for exported library targets.
@@ -28,4 +29,7 @@ if(NOT DEFINED PE_FOUND)
     ${PE_DIR}
     ${CMAKE_BINARY_DIR}/pe
   )
+
+  SET(PE_LIBRARY ${PROCESS_LIBRARIES})
+  SET(PE_INCLUDE_DIR ${PROCESS_INCLUDE_DIRS})
 endif()

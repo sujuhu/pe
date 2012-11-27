@@ -15,7 +15,7 @@ GNU General Public License for more details.
 #ifndef LIB_PE_H_
 #define LIB_PE_H_
 
-#include "petype.h"
+//#include "petype.h"
 #include "peformat.h"
 
 #ifdef __cplusplus

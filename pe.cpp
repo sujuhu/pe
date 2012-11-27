@@ -203,7 +203,7 @@ int  pe_open(const char* stream, size_t size)
 void clean_resource(slist_t* list)
 {
   resource_t* res = NULL;
-  slist_for_each_safe(list, resource_t, node, res) {
+  slist_for_each_safe(res, list, resource_t, node) {
     if (!slist_empty(&res->child))
       clean_resource(&res->child);
     free(res);
@@ -220,15 +220,15 @@ void  pe_close(int  fd)
 
   pe_t* pe = (pe_t*)fd;
   export_api_t* item = NULL;
-  slist_for_each_safe(&pe->export_apis, export_api_t, node, item) {
+  slist_for_each_safe(item, &pe->export_apis, export_api_t, node) {
     free(item);
     item = NULL;
   }
 
   import_dll_t* dll = NULL;
-  slist_for_each_safe(&pe->import_dlls, import_dll_t, node, dll) {
+  slist_for_each_safe(dll, &pe->import_dlls, import_dll_t, node) {
     import_api_t* api = NULL;
-    slist_for_each_safe(&dll->api_list, import_api_t, node, api) {
+    slist_for_each_safe(api, &dll->api_list, import_api_t, node) {
       free(api);
       api = NULL;
     }
@@ -237,19 +237,19 @@ void  pe_close(int  fd)
   }
 
   version_t* ver = NULL;
-  slist_for_each_safe(&pe->version, version_t, node, ver) {
+  slist_for_each_safe(ver, &pe->version, version_t, node) {
     free(ver);
     ver = NULL;
   }
 
   bound_t* bound = NULL;
-  slist_for_each_safe(&pe->bound_list, bound_t, node, bound) {
+  slist_for_each_safe(bound, &pe->bound_list, bound_t, node) {
     free(bound);
     bound = NULL;
   }
 
   reloc_t* reloc = NULL;
-  slist_for_each_safe(&pe->reloc_list, reloc_t, node, reloc) {
+  slist_for_each_safe(reloc, &pe->reloc_list, reloc_t, node) {
     free(reloc);
     reloc = NULL;
   }
