@@ -5,8 +5,9 @@
 //#include <stdlib.h>
 //#include <string>
 #include <Python.h>
-#include <structmember.h>  
+#include <structmember.h>
 #include "util/filemap.h"
+#include "petype.h"
 #include "pe.h"
 
 typedef struct _PE 
