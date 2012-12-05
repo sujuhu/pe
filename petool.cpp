@@ -80,13 +80,13 @@ void dump_overlay(int pe)
 void dump_section(int pe)
 {
   //dump节表
-  IMAGE_NT_HEADERS* nt = pe_nt_header(pe);
+  IMAGE_NT_HEADERS32* nt = pe_nt_header(pe);
   short i = 0;
   for( ; i < nt->FileHeader.NumberOfSections; i++ ) {
     IMAGE_SECTION_HEADER header;
     memset(&header, 0, sizeof(IMAGE_SECTION_HEADER));
     if( copy_section_header(pe, i, &header)) {
-      printf( "%-8s\t%08X\t%08X\t%08X\t%08X",
+      printf( "%-8s\t%08X\t%08X\t%08X\t%08X\n",
         header.Name,
         (unsigned int)header.VirtualAddress,
         (size_t)header.Misc.VirtualSize, 
@@ -134,7 +134,7 @@ void dump_import(int pe)
 void dump_entry(int pe)
 {
     //dump入口点
-    IMAGE_NT_HEADERS* nt = pe_nt_header(pe);
+    IMAGE_NT_HEADERS32* nt = pe_nt_header(pe);
     rva_t rva = nt->OptionalHeader.AddressOfEntryPoint;
     //计算入口点在第几个节中
     int iSection = pe_section_by_rva(pe, rva);
@@ -146,9 +146,9 @@ void dump_icon(int pe,const char* ico_file)
 {
     printf("Icon File: %s\n", ico_file);
     if( !pe_icon_file(pe, ico_file)) {
-      printf("GetIcon failed");
+      printf("GetIcon failed\n");
     } else {
-      printf("GetIcon successed");
+      printf("GetIcon successed\n");
     } 
 }
 

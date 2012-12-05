@@ -58,7 +58,7 @@ int   pe_open(const char* stream, size_t size);
 void  pe_close(int  fd);
 
 
-IMAGE_NT_HEADERS*  pe_nt_header(int fd);
+IMAGE_NT_HEADERS32*  pe_nt_header(int fd);
 
 
 IMAGE_DOS_HEADER* pe_dos_header(int fd);

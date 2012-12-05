@@ -65,19 +65,19 @@ GNU General Public License for more details.
 #define GET_DOS_HEADER( s )  ((IMAGE_DOS_HEADER*)s)
 
 #define GET_NT_HEADER( s )   \
-  ((IMAGE_NT_HEADERS*)((const char*)(s)+GET_DOS_HEADER(s)->e_lfanew ))
+  ((IMAGE_NT_HEADERS32*)((const char*)(s)+GET_DOS_HEADER(s)->e_lfanew ))
 
 #define GET_SECTION_HEADER(nt, i) \
   ((IMAGE_SECTION_HEADER*)((char*)nt + sizeof(int) + sizeof(IMAGE_FILE_HEADER) + nt->FileHeader.SizeOfOptionalHeader+(i)*sizeof(IMAGE_SECTION_HEADER)))
 
 //获取基地址
 #define GET_IMAGE_BASE( s ) \
- (unsigned int)(/*1*/(/*2*/(IMAGE_NT_HEADERS*)((const char*)s + ((IMAGE_DOS_HEADER*)s)->e_lfanew) /*2*/ )->OptionalHeader.ImageBase/*1*/)
+ (unsigned int)(/*1*/(/*2*/(IMAGE_NT_HEADERS32*)((const char*)s + ((IMAGE_DOS_HEADER*)s)->e_lfanew) /*2*/ )->OptionalHeader.ImageBase/*1*/)
 
 
 typedef struct _pe_t{
   IMAGE_DOS_HEADER* dos;   //dos header
-  IMAGE_NT_HEADERS*  nt;    //nt header
+  IMAGE_NT_HEADERS32*  nt;    //nt header
   const char* stream;
   size_t      size;
   const char* dll_name;     //export dll name
@@ -260,7 +260,7 @@ void  pe_close(int  fd)
   pe = NULL;
 } 
 
-IMAGE_NT_HEADERS*  pe_nt_header(int fd)
+IMAGE_NT_HEADERS32*  pe_nt_header(int fd)
 {
   if (fd == INVALID_PE) {
     errno = EINVAL;
@@ -404,9 +404,10 @@ bool parse_export(int fd)
     errno = EINVAL;
     return false;
   }
+
   pe->dll_name =  (const char*)(pe->stream + raw_name);
 
-  if (export_header->NumberOfFunctions > 2048){
+  if (export_header->NumberOfFunctions > 1024){
     errno = EINVAL;
     return false;
   }
@@ -441,7 +442,7 @@ bool parse_export(int fd)
     memset(api, 0, sizeof(export_api_t));
 
     api->data.FunctionVirtualAddress = ((rva_t*)(pe->stream + raw_functions))[i];
-    api->data.Ordinal = export_header->Base + i;
+    api->data.Ordinal = export_header->Base + (int32_t)i;
     //api name
     for(size_t j = 0; i < export_header->NumberOfNames; j++) {
       int oridinal = (int)(((uint16_t*)(pe->stream + raw_name_ordinals))[j]);
@@ -571,13 +572,13 @@ bool parse_import(int fd)
       return false;
     }
 
-    IMAGE_THUNK_DATA* thunks = (IMAGE_THUNK_DATA*)(pe->stream + raw_thunk);
-    size_t num_api = 0;
+    IMAGE_THUNK_DATA32* thunks = (IMAGE_THUNK_DATA32*)(pe->stream + raw_thunk);
+    uint32_t num_api = 0;
     do {
       //最后一个全零的IMAGE_THUNK_DATA表示结束
-      IMAGE_THUNK_DATA zero;
-      memset(&zero, 0, sizeof(IMAGE_THUNK_DATA));
-      if (0 == memcmp(&thunks[num_api], &zero, sizeof(IMAGE_THUNK_DATA)))
+      IMAGE_THUNK_DATA32 zero;
+      memset(&zero, 0, sizeof(IMAGE_THUNK_DATA32));
+      if (0 == memcmp(&thunks[num_api], &zero, sizeof(IMAGE_THUNK_DATA32)))
         break;
 
       import_api_t* api = (import_api_t*)malloc(sizeof(import_api_t));
@@ -586,9 +587,9 @@ bool parse_import(int fd)
       }
       memset(api, 0, sizeof(import_api_t));
 
-      api->data.ThunkOffset = (size_t)((char*)&thunks[num_api] - pe->stream);
+      api->data.ThunkOffset = (uint32_t)((char*)&thunks[num_api] - pe->stream);
       api->data.ThunkRVA
-        = raw_to_rva(fd, raw_thunk + num_api*sizeof(IMAGE_THUNK_DATA));
+        = raw_to_rva(fd, raw_thunk + num_api*sizeof(IMAGE_THUNK_DATA32));
       api->data.ThunkValue = thunks[num_api].u1.Function;
       if (thunks[num_api].u1.Ordinal & IMAGE_ORDINAL_FLAG32)  {
         //最高位为1, 表示序号方式导入函数, 函数名称
@@ -599,6 +600,8 @@ bool parse_import(int fd)
         //字符串类型导入函数
         raw_t raw_name = rva_to_raw(fd, thunks[num_api].u1.AddressOfData);
         if (raw_name == INVALID_RAW) {
+          free(api);
+          api = NULL;
           errno = ERANGE;
           continue;
         }
@@ -1257,7 +1260,7 @@ bool parse_overlay(int fd)
 
   pe_t* pe = (pe_t*)(intptr_t)fd;
   //将所有的节的长度进行累加
-  size_t image_size = 0;
+  uint32_t image_size = 0;
   for(int i = 0; i < pe->nt->FileHeader.NumberOfSections; i++) {
     IMAGE_SECTION_HEADER section;
     memset(&section, 0, sizeof(IMAGE_SECTION_HEADER));
@@ -1278,7 +1281,7 @@ bool parse_overlay(int fd)
     pe->overlay.size = 0;
   } else {
     pe->overlay.offset_in_file = image_size;
-    pe->overlay.size = pe->size - image_size;
+    pe->overlay.size = (uint32_t)pe->size - image_size;
   }
   return true;
 }
@@ -1393,7 +1396,7 @@ bool pe_icon_file(int fd, const char* ico_file)
     return false;
   }
 
-  fseek(fp, ico_header_size, SEEK_SET);
+  fseek(fp, (long)ico_header_size, SEEK_SET);
   for (int i=0; i<icon_dir->idCount; i++) {
     ico_header->idEntries[i].bWidth = icon_dir->idEntries[i].bWidth;
     ico_header->idEntries[i].bHeigh = icon_dir->idEntries[i].bHeigh;
@@ -1832,7 +1835,7 @@ int parse_gap(int fd)
   pe_t* pe = (pe_t*)fd;
   int cMaxGap = pe->size / sizeof(SECTION_GAP);
   IMAGE_DOS_HEADER *dos_header = GET_DOS_HEADER(pe->stream);
-  IMAGE_NT_HEADERS *nt_header = GET_NT_HEADER(pe->stream);
+  IMAGE_NT_HEADERS32 *nt_header = GET_NT_HEADER(pe->stream);
   size_t dwActualHeaderSize = dos_header->e_lfanew
                 + sizeof(int)
                 + sizeof(IMAGE_FILE_HEADER)
@@ -1908,7 +1911,7 @@ bool LoadPERelocRoutine(
     void* lpParam )
 {
   char* image = (char*)lpParam;
-  IMAGE_NT_HEADERS *nt = (IMAGE_NT_HEADERS*)image;
+  IMAGE_NT_HEADERS32 *nt = (IMAGE_NT_HEADERS32*)image;
   rva_t delta = (rva_t)image - (rva_t)nt->OptionalHeader.ImageBase;
   *(rva_t*)(image +pItem->rva) += delta;
   return true;
@@ -1923,7 +1926,7 @@ bool LoadPE_IATRoutine(
   return false;
 #else
   char* image = (char*)lpParam;
-  IMAGE_NT_HEADERS *nt = (IMAGE_NT_HEADERS*)image;
+  IMAGE_NT_HEADERS32 *nt = (IMAGE_NT_HEADERS32*)image;
 
   HMODULE hModule = LoadLibrary(pImportModule->ModuleName);
   if (hModule == NULL) {
@@ -1960,7 +1963,7 @@ bool pe_load(int fd, char* image, size_t image_size)
   //load pe headers
   memcpy(image, pe->stream, pe->nt.OptionalHeader.SizeOfHeaders);
 
-  IMAGE_NT_HEADERS *image_nt = GET_NT_HEADER(image);
+  IMAGE_NT_HEADERS32 *image_nt = GET_NT_HEADER(image);
 
   //load all sections
   for (int i=0; i < pe->nt.FileHeader.NumberOfSections; i++) {

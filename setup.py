@@ -7,12 +7,15 @@ if osname == "Windows":
     defines = [ ('WIN32',None),
                 ("_CRT_SECURE_NO_DEPRECATE",None),
                 ("_CRT_NONSTDC_NO_DEPRECATE",None)]
+    sources = [ 'pype.cpp', 'pe.cpp', 'util/strconv.cpp',
+                'util/filemap.cpp']
 else:
     defines = []
+    sources = [ 'pype.cpp', 'pe.cpp', 'util/strconv.cpp',
+                'util/filemap.cpp']
 
 module1 = Extension('pype',
-                    sources = ['pype.cpp', 'pe.cpp', 'util/strconv.cpp',
-                        'util/filemap.cpp'],
+                    sources = sources,
                     include_dirs = ['./util', './struct'],
                     define_macros = defines,
                     #library_dirs=[r'c:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib',
