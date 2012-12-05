@@ -1626,15 +1626,15 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
 #define ROUND_POS(b, a, r)    (((uint8_t*)(a)) + ROUND_OFFSET(a, b, r))
 
 // 获取版本号信息入口点
-IMAGE_RESOURCE_DATA_ENTRY* get_version_block(
-    PIMAGE_RESOURCE_DIRECTORY pRootRec )
+IMAGE_RESOURCE_DATA_ENTRY* 
+get_version_block(PIMAGE_RESOURCE_DIRECTORY pRootRec)
 {
     uint16_t nCount = pRootRec->NumberOfIdEntries + pRootRec->NumberOfNamedEntries;
     for ( uint16_t i = 0; i < nCount; ++i )
     {
         IMAGE_RESOURCE_DIRECTORY_ENTRY* pFirstEntry 
-          = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)((uint32_t*)pRootRec +
-            sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(uint32_t) ) + i;
+          = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)((uint8_t*)pRootRec +
+            sizeof(IMAGE_RESOURCE_DIRECTORY)) + i;
         
         uint16_t id_ver = pFirstEntry->Id;
         if (  id_ver != 16 )
@@ -1649,8 +1649,8 @@ IMAGE_RESOURCE_DATA_ENTRY* get_version_block(
             // 第二层目录(资源代码页)
             for ( uint16_t nIndex = 0; nIndex < nDirCount; ++nIndex )
             {
-                IMAGE_RESOURCE_DIRECTORY_ENTRY* pSecondEntry = (IMAGE_RESOURCE_DIRECTORY_ENTRY*)( (uint32_t)(intptr_t)pFirstDir +
-                    sizeof(IMAGE_RESOURCE_DIRECTORY) / sizeof(uint32_t) ) + nIndex;
+                IMAGE_RESOURCE_DIRECTORY_ENTRY* pSecondEntry = (IMAGE_RESOURCE_DIRECTORY_ENTRY*)( (uint8_t*)pFirstDir +
+                    sizeof(IMAGE_RESOURCE_DIRECTORY) ) + nIndex;
 
                 // 取第三层目录(资源数据入口)
                 if ( pSecondEntry->DataIsDirectory == 1 )
@@ -1711,6 +1711,7 @@ bool parse_version(int fd)
   dwOffset = rva_to_raw(fd, pVersionEntry->OffsetToData);
   if ( 0 == dwOffset )
       return false;
+
 
   const char* version = pe->stream + dwOffset;
   //size_t versize = pVersionEntry->Size;

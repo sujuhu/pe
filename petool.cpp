@@ -161,6 +161,7 @@ void dump_resource(int pe)
 void dump_version(int pe)
 {
   //dump版本信息
+  printf("VERSION: \n");
   IMAGE_VERSION* version = pe_version_first(pe);
   for (; version != NULL; version = pe_version_next(version)) {
     printf("%S: %S\n", version->name, version->value);
@@ -174,7 +175,7 @@ int main(int argc, char* argv[])
     return 0;
   }
 
-  while(true) {
+  //while(true) {
   MAPPED_FILE view = {0};
   if( 0 != map_file( argv[1], &view ) ) {
     printf( "open file failed: %s\n", argv[2]);
@@ -203,7 +204,7 @@ int main(int argc, char* argv[])
   pe_close(pe);
 
   unmap_file(&view);
-  }
+  //}
  
   system("pause");
   return 0;
