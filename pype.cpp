@@ -107,7 +107,7 @@ PyObject* PE_sections(PE* self, PyObject* args)
   int fd = self->m_fd;
 
   PyObject* pTuple = NULL;
-  IMAGE_NT_HEADERS*nt = pe_nt_header(fd);
+  IMAGE_NT_HEADERS32*nt = pe_nt_header(fd);
   //Py_RETURN_NONE;
   pTuple = PyTuple_New( nt->FileHeader.NumberOfSections );
   assert(PyTuple_Size(pTuple) == nt->FileHeader.NumberOfSections );
@@ -269,7 +269,7 @@ PyObject* PE_entrypoint(PE* self, PyObject* args )
   int fd = self->m_fd;
 
   //dump入口点
-  IMAGE_NT_HEADERS* nt = pe_nt_header(fd);
+  IMAGE_NT_HEADERS32* nt = pe_nt_header(fd);
   if (nt == NULL) {
     PyErr_SetString(PyExc_ValueError, "can not found nt_header in pe");
     return NULL;    

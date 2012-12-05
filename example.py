@@ -1,7 +1,12 @@
 import os, sys
 import platform
-if platform.system() == "Window":
-    sys.path.append("./build/python/lib.win32-2.7")
+print platform.system()
+if platform.system() == "Windows":
+    print "windows"
+    if platform.architecture()[0] == '64bit':
+        sys.path.append("./build/python/lib.win-amd64-2.7")
+    else:
+        sys.path.append("./build/python/lib.win32-2.7")
 else:
     sys.path.append("./build/python/lib.linux-i686-2.7")
 import pype
@@ -9,7 +14,7 @@ import pype
 #test_file = r'../examples/0c94b325dca948dcdf81036a5306901b.sample'
 #test_file = r'../examples/87f6447ba9b75486969b59e1c911ac72.sample'
 #test_file = r'../examples/test.bin'
-test_file = r'./examples/kernel32.dll'
+test_file = r'./test/kernel32.dll'
 test_file = os.path.abspath(test_file)
 
 def dump_pe(filename):
@@ -64,6 +69,7 @@ def dump_pe(filename):
         print ico_file
 
     pe.close()
+    del pe
 
 while True:
     dump_pe(test_file)
