@@ -2,13 +2,15 @@ import os, sys
 import platform
 print platform.system()
 if platform.system() == "Windows":
-    print "windows"
     if platform.architecture()[0] == '64bit':
         sys.path.append("./build/python/lib.win-amd64-2.7")
     else:
         sys.path.append("./build/python/lib.win32-2.7")
 else:
-    sys.path.append("./build/python/lib.linux-i686-2.7")
+    if platform.architecture()[0] == '64bit':
+        sys.path.append("./build/python/lib.linux-x86_64-2.7")
+    else:
+        sys.path.append("./build/python/lib.linux-i686-2.7")
 import pype
 
 #test_file = r'../examples/0c94b325dca948dcdf81036a5306901b.sample'
@@ -17,9 +19,9 @@ import pype
 test_file = r'./test/kernel32.dll'
 test_file = os.path.abspath(test_file)
 
+print "load ok"
 def dump_pe(filename):
     pe = pype.PE(test_file)
-
     sections = pe.sections()
 
     if sections is not None:

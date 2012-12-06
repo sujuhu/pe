@@ -88,10 +88,10 @@ void dump_section(int pe)
     if( copy_section_header(pe, i, &header)) {
       printf( "%-8s\t%08X\t%08X\t%08X\t%08X\n",
         header.Name,
-        (unsigned int)header.VirtualAddress,
-        (size_t)header.Misc.VirtualSize, 
-        (unsigned int)header.PointerToRawData,
-        (unsigned int)header.SizeOfRawData );
+        (uint32_t)header.VirtualAddress,
+        (uint32_t)header.Misc.VirtualSize, 
+        (uint32_t)header.PointerToRawData,
+        (uint32_t)header.SizeOfRawData );
     }
   }  
 }
