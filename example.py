@@ -24,6 +24,7 @@ def dump_pe(filename):
     pe = pype.PE(test_file)
     sections = pe.sections()
 
+    print "file size:%d\n" % pe.file_size()
     if sections is not None:
         for section in sections:
             print "%-8s\t%08X\t%08X\t%08X\t%08X\t%08X" % ( section['name'],

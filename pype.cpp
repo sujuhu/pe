@@ -159,7 +159,7 @@ PyObject* PE_open(PE* self, PyObject* args)
 extern "C"
 PyObject* PE_filesize(PE* self, PyObject* args)
 {
-  return self.m_view.size;
+  return Py_BuildValue("I", self->m_view.size);
 }
 
 extern "C"
