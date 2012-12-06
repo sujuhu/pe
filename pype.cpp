@@ -157,6 +157,12 @@ PyObject* PE_open(PE* self, PyObject* args)
 }
 
 extern "C"
+PyObject* PE_filesize(PE* self, PyObject* args)
+{
+  return self.m_view.size;
+}
+
+extern "C"
 PyObject* PE_close(PE* self, PyObject* args)
 {
   if (self->m_fd != INVALID_PE) {
@@ -376,7 +382,8 @@ PyObject* PE_verinfo(PE* self, PyObject* args )
 static PyMethodDef PE_methods[] =
 {
   {"open",    (PyCFunction)PE_open, METH_VARARGS,     "open(filename)"},  
-  {"close",    (PyCFunction)PE_close, METH_NOARGS,     "close()"},  
+  {"close",    (PyCFunction)PE_close, METH_NOARGS,     "close()"},
+  {"file_size", (PyCFunction)PE_filesize, METH_NOARGS,  "file_size()"},  
   {"sections", (PyCFunction)PE_sections, METH_NOARGS,  ""},  
   {"imports",    (PyCFunction)PE_imports, METH_NOARGS,    ""},  
   {"exports", (PyCFunction)PE_exports, METH_NOARGS, ""},  
