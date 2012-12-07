@@ -26,7 +26,12 @@ void WalkResource(int pe, IMAGE_RESOURCE_DIRECTORY_ENTRY* parent, char* prefix )
         pe_resource_name(pe, res, name, sizeof(name) - 1);
         printf("%s%s", prefix, name);
       } else {
-        printf("%s%d", prefix, res->Id);
+        if (parent == NULL && pe_restype_name(res->Id) != NULL) {
+          printf("%s%s", prefix, pe_restype_name(res->Id));
+        } else {
+          printf("%s%d", prefix, res->Id);
+        }
+
       }
 
       if (IS_RESOURCE_DIRECTORY(res)) {

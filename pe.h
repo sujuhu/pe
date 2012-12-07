@@ -159,6 +159,8 @@ uint8_t* pe_stream_by_raw(int fd, raw_t raw);
 
 uint8_t* pe_stream_by_rva(int fd, rva_t rva);
 
+char* pe_restype_name(int res_type);
+
 #ifdef __cplusplus
 }
 #endif

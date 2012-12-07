@@ -698,7 +698,7 @@ IMAGE_IMPORT_FUNCTION* pe_import_api_next(IMAGE_IMPORT_FUNCTION* iter)
  *
  **********************************************************************/
 
-char* get_restype_name(int res_type)
+char* pe_restype_name(int res_type)
 {
   switch(res_type)
   {

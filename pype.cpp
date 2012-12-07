@@ -326,7 +326,11 @@ void WalkResource(
     if (res->NameIsString) {
       pe_resource_name(pe, res, name, sizeof(name) - 1);
     } else {
-      snprintf(name,sizeof(name)-1, "%d", res->Id);
+      if (parent == NULL && pe_restype_name(res->Id) != NULL) {
+        snprintf(name, sizeof(name)-1, pe_restype_name(res->Id));
+      } else {
+        snprintf(name,sizeof(name)-1, "%d", res->Id);  
+      }
     }
 
     if (IS_RESOURCE_DIRECTORY(res)) {
