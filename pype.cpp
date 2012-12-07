@@ -330,7 +330,13 @@ void WalkResource(
     }
 
     if (IS_RESOURCE_DIRECTORY(res)) {
-      WalkResource(pe, res, PyList);
+      PyObject* sublist = PyList_New(0);
+      WalkResource(pe, res, sublist);
+      PyObject* PyDict = PyDict_New();
+      PyDict_SetItem(PyDict, Py_BuildValue("s", "name"), 
+          Py_BuildValue("s", name));
+      PyDict_SetItem(PyDict, Py_BuildValue("s", "sub"), sublist);
+      PyList_Append( PyList, PyDict );
     } else{
       IMAGE_RESOURCE_DATA_ENTRY* data = pe_resource_data(pe, res);
       if (data == NULL) {
@@ -338,11 +344,12 @@ void WalkResource(
       }
 
       PyObject* PyDict = PyDict_New();
-      PyDict_SetItem(PyDict, Py_BuildValue("s", "name"), Py_BuildValue("s", name));
+      PyDict_SetItem(PyDict, Py_BuildValue("s", "name"), 
+          Py_BuildValue("s", name));
       PyDict_SetItem(PyDict, Py_BuildValue("s", "offset"),
           Py_BuildValue( "l", data->OffsetToData ) );
       PyDict_SetItem( PyDict, Py_BuildValue( "s", "size"),
-        Py_BuildValue( "l", data->Size ) );
+          Py_BuildValue( "l", data->Size ) );
       PyList_Append( PyList, PyDict );
     }
   }
@@ -372,8 +379,8 @@ PyObject* PE_verinfo(PE* self, PyObject* args )
 
   for (; version != NULL; version = pe_version_next(version)) {
     PyDict_SetItem(pDict, 
-      Py_BuildValue("u", version->name), 
-      Py_BuildValue("u", version->value));
+      Py_BuildValue("s", version->name), 
+      Py_BuildValue("s", version->value));
   }
 
   return pDict;

@@ -1,3 +1,4 @@
+#coding = utf-8
 import os, sys
 import platform
 print platform.system()
@@ -19,7 +20,15 @@ import pype
 test_file = r'./test/kernel32.dll'
 test_file = os.path.abspath(test_file)
 
-print "load ok"
+def dump_resource(red_dir, prefix):
+    for item in red_dir:
+        if item.has_key('sub'):
+            print "%s\n" % item['name']
+            dump_resource(item['sub'], prefix + "\t")
+        else:
+            print "%sName: %s, Offset:0x%08X Size:0x%08X\n" % ( prefix,
+                item['name'], item['offset'], item['size'] )
+
 def dump_pe(filename):
     pe = pype.PE(test_file)
     sections = pe.sections()
@@ -34,17 +43,15 @@ def dump_pe(filename):
                                                      section['rawsize'],
                                                      section['characteristics'] )
     
-    imports = pe.imports()
-    if imports is not None:
-        for item in imports:
-            print "%-32s%s" % ( item['module'], item['function'] )
-    exports = pe.exports()
-
-    
-    if exports is not None:
-        print "DllName: %s" % exports['dllname']
-        for symbol in exports['symbols']:
-            print "%s" % symbol['name']
+    # imports = pe.imports()
+    # if imports is not None:
+    #     for item in imports:
+    #         print "%-32s%s" % ( item['module'], item['function'] )
+    # exports = pe.exports()    
+    # if exports is not None:
+    #     print "DllName: %s" % exports['dllname']
+    #     for symbol in exports['symbols']:
+    #         print "%s" % symbol['name']
     overlay = pe.overlay()
     if overlay is not None:
         print "Overlay Offset: 0x%08X, Size: 0x%08X" % (overlay['offset'], overlay['size'] )
@@ -54,16 +61,15 @@ def dump_pe(filename):
     verinfo = pe.verinfo()
     if verinfo is not None:
         for item in verinfo.items():
-            print "%-32s = %s" %( item[0], item[1] )
+            print "%-32s = %s" %( item[0], item[1])
     else:
         print "version is none"
     entry = pe.entrypoint()
     print "ENTRY RVA:0x%08X, SectionIndex: %d" % entry
 
     res = pe.resource()
-    for item in res:
-        print "\tName: %s, Offset:0x%08X Size:0x%08X\n" %( item['name'], item['offset'],
-                                                                   item['size'] )
+    dump_resource(res, "")
+
 
     ico_file = r"../examples/test.ico"
     if not pe.icon(os.path.abspath(ico_file)):
@@ -74,6 +80,6 @@ def dump_pe(filename):
     pe.close()
     del pe
 
-while True:
-    dump_pe(test_file)
+#while True:
+dump_pe(test_file)
 print "test passed"

@@ -816,7 +816,7 @@ bool pe_resource_name(int fd,  IMAGE_RESOURCE_DIRECTORY_ENTRY* res,
   } else {
     cch = max_len;
   }
-  _wcstombs(name, (wchar_t*)pString->NameString, cch);
+  ucs2tombs(name, (ucs2_t*)pString->NameString, cch);
   return true; 
 }
 
@@ -1718,8 +1718,6 @@ bool parse_version(int fd)
   
   const char* version = pe->stream + dwOffset;
   //size_t versize = pVersionEntry->Size;
-  printf("wchar_t: %d\n", sizeof(wchar_t));
-  printf("szKey Offset:%d\n", offset_of(VS_VERSIONINFO, szKey));
   VS_VERSIONINFO* pVS = (VS_VERSIONINFO*)version;
   char szkey[32] = {0};
   ucs2tombs(szkey, (ucs2_t*)pVS->szKey, sizeof(szkey) - 1);
@@ -1727,19 +1725,13 @@ bool parse_version(int fd)
     return false;
   }
 
-  printf("wValueLength:%d", pVS->wValueLength);
-  printf("match");
-
   //printf(" (type:%d)\n", pVS->wType);
   uint8_t* pVt = (uint8_t*)&pVS->szKey[strlen(szkey) + 1];
   VS_FIXEDFILEINFO* pValue = (VS_FIXEDFILEINFO*)ROUND_POS(pVt, pVS, 4);
-  printf("Sign: %08x", pValue->dwSignature);
   if ( pVS->wValueLength ) {
       parse_fixed_version(pe, pValue);
   }
 
-  printf("wcslen:%d\n", wcslen(L"ABCD"));
-  fflush(stdout);
   // 遍历 VS_VERSIONINFO 子节点元素
   StringFileInfo* pSFI = 
     (StringFileInfo*)ROUND_POS(((uint8_t*)pValue) + pVS->wValueLength, pValue, 4);
