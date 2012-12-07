@@ -4,6 +4,11 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 PROJECT(pe) 
 
+#IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+#	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fshort-wchar")
+#	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fshort-wchar")
+#ENDIF()
+
 #util
 SET(UTIL_DIR ${CMAKE_SOURCE_DIR}/util)
 FIND_PACKAGE(UTIL)

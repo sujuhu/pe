@@ -137,7 +137,7 @@ extern "C" {
 #define FILE_VER_GET_PREFETCHED 0x04
 
 /* ----- Types and structures ----- */
-
+#pragma pack(push, 2)
 typedef struct tagVS_FIXEDFILEINFO
 {
     uint32_t   dwSignature;            /* e.g. 0xfeef04bd */
@@ -154,6 +154,8 @@ typedef struct tagVS_FIXEDFILEINFO
     uint32_t   dwFileDateMS;           /* e.g. 0 */
     uint32_t   dwFileDateLS;           /* e.g. 0 */
 } VS_FIXEDFILEINFO;
+
+#pragma pack(pop)
 
 #ifdef __cplusplus
 }

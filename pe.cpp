@@ -23,7 +23,7 @@ GNU General Public License for more details.
 #include <assert.h>
 #include <strconv.h>
 #include "petype.h"
-
+#include <locale.h>
 
 #include <slist.h>
 #include "petype.h"
@@ -816,7 +816,7 @@ bool pe_resource_name(int fd,  IMAGE_RESOURCE_DIRECTORY_ENTRY* res,
   } else {
     cch = max_len;
   }
-  _wcstombs(name, pString->NameString, cch);
+  _wcstombs(name, (wchar_t*)pString->NameString, cch);
   return true; 
 }
 
@@ -1487,12 +1487,15 @@ ret_door:
  * pe version
  *
  **********************************************************************/
+
+ #pragma pack(push)
+ #pragma pack(1)
 typedef struct _VS_VERSIONINFO
 {
     uint16_t  wLength;
     uint16_t  wValueLength;
     uint16_t  wType;
-    wchar_t   szKey[1];
+    uint16_t   szKey[1];
     uint16_t  Padding1[1];
     VS_FIXEDFILEINFO Value;
     uint16_t  Padding2[1];
@@ -1504,7 +1507,7 @@ typedef struct _String
     uint16_t   wLength;
     uint16_t   wValueLength;
     uint16_t   wType;
-    wchar_t    szKey[1];
+    uint16_t    szKey[1];
     uint16_t   Padding[1];
     uint16_t   Value[1];
 }String;
@@ -1514,7 +1517,7 @@ typedef struct _StringTable
     uint16_t   wLength;
     uint16_t   wValueLength;
     uint16_t   wType;
-    wchar_t    szKey[1];
+    uint16_t    szKey[1];
     uint16_t   Padding[1];
     String     Children[1];
 }StringTable;
@@ -1524,7 +1527,7 @@ typedef struct _StringFileInfo
     uint16_t   wLength;
     uint16_t   wValueLength;
     uint16_t   wType;
-    wchar_t    szKey[1];
+    uint16_t    szKey[1];
     uint16_t   Padding[1];
     StringTable Children[1];
 }StringFileInfo;
@@ -1534,7 +1537,7 @@ typedef struct _Var
     uint16_t  wLength;
     uint16_t  wValueLength;
     uint16_t  wType;
-    wchar_t   szKey[1];
+    uint16_t  szKey[1];
     uint16_t  Padding[1];
     uint32_t  Value[1];
 }Var;
@@ -1544,11 +1547,11 @@ typedef struct _VarFileInfo
     uint16_t  wLength;
     uint16_t  wValueLength;
     uint16_t  wType;
-    wchar_t   szKey[1];
+    uint16_t   szKey[1];
     uint16_t  Padding[1];
     Var   Children[1];
 }VarFileInfo; 
-
+#pragma pack(pop) 
 
 bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
 {
@@ -1566,8 +1569,8 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->data.name, L"Signature", MAX_VER_NAME_LEN - 1);
-    _snwprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%d.%d", 
+    _wcstombs(version->data.name, L"Signature", MAX_VER_NAME_LEN - 1);
+    _snprintf(version->data.value, MAX_VER_VALUE_LEN - 1, "%d.%d", 
       pValue->dwStrucVersion >> 16,
       pValue->dwStrucVersion & 0xFFFF);
     slist_add(&pe->version, &version->node);
@@ -1577,8 +1580,8 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->data.name, L"FileVersion", MAX_VER_NAME_LEN - 1);
-    _snwprintf(version->data.value, MAX_VER_VALUE_LEN - 1,  L"%d.%d.%d.%d",
+    _wcstombs(version->data.name, L"FileVersion", MAX_VER_NAME_LEN - 1);
+    _snprintf(version->data.value, MAX_VER_VALUE_LEN - 1,  "%d.%d.%d.%d",
         pValue->dwFileVersionMS >> 16,
         pValue->dwFileVersionMS & 0xFFFF,
         pValue->dwFileVersionLS >> 16,
@@ -1590,8 +1593,8 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->data.name, L"ProductVersion", MAX_VER_NAME_LEN - 1);
-    _snwprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%d.%d.%d.%d",
+    _wcstombs(version->data.name, L"ProductVersion", MAX_VER_NAME_LEN - 1);
+    _snprintf(version->data.value, MAX_VER_VALUE_LEN - 1, "%d.%d.%d.%d",
         pValue->dwProductVersionMS >> 16,
         pValue->dwProductVersionMS & 0xFFFF,
         pValue->dwProductVersionLS >> 16,
@@ -1603,8 +1606,8 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->data.name, L"FileFlagsMask", MAX_VER_NAME_LEN -1);
-    _snwprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%s%x", 
+    _wcstombs(version->data.name, L"FileFlagsMask", MAX_VER_NAME_LEN -1);
+    _snprintf(version->data.value, MAX_VER_VALUE_LEN - 1, "%s%x", 
         pValue->dwFileFlagsMask ? "0x" : "",
         pValue->dwFileFlagsMask);
     slist_add(&pe->version, &version->node);
@@ -1614,8 +1617,8 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
       return false;
     }
     memset(version, 0, sizeof(version_t));
-    wcsncpy(version->data.name, L"FileDate", MAX_VER_NAME_LEN - 1);
-    _snwprintf(version->data.value, MAX_VER_VALUE_LEN - 1, L"%x.%x", 
+    _wcstombs(version->data.name, L"FileDate", MAX_VER_NAME_LEN - 1);
+    _snprintf(version->data.value, MAX_VER_VALUE_LEN - 1, "%x.%x", 
         pValue->dwFileDateMS, 
         pValue->dwFileDateLS);
     slist_add(&pe->version, &version->node);
@@ -1629,9 +1632,9 @@ bool parse_fixed_version(pe_t* pe, VS_FIXEDFILEINFO* pValue)
 IMAGE_RESOURCE_DATA_ENTRY* 
 get_version_block(PIMAGE_RESOURCE_DIRECTORY pRootRec)
 {
-    uint16_t nCount = pRootRec->NumberOfIdEntries + pRootRec->NumberOfNamedEntries;
-    for ( uint16_t i = 0; i < nCount; ++i )
-    {
+    uint16_t nCount = pRootRec->NumberOfIdEntries 
+      + pRootRec->NumberOfNamedEntries;
+    for ( uint16_t i = 0; i < nCount; ++i ) {
         IMAGE_RESOURCE_DIRECTORY_ENTRY* pFirstEntry 
           = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)((uint8_t*)pRootRec +
             sizeof(IMAGE_RESOURCE_DIRECTORY)) + i;
@@ -1641,14 +1644,12 @@ get_version_block(PIMAGE_RESOURCE_DIRECTORY pRootRec)
             continue;
 
         // 进入目录
-        if ( pFirstEntry->DataIsDirectory == 0x01 )
-        {
+        if ( pFirstEntry->DataIsDirectory == 0x01 ) {
             IMAGE_RESOURCE_DIRECTORY* pFirstDir = (IMAGE_RESOURCE_DIRECTORY*) ( (uint8_t*)pRootRec + pFirstEntry->OffsetToDirectory );
             uint16_t nDirCount = pFirstDir->NumberOfNamedEntries + pFirstDir->NumberOfIdEntries;
 
             // 第二层目录(资源代码页)
-            for ( uint16_t nIndex = 0; nIndex < nDirCount; ++nIndex )
-            {
+            for ( uint16_t nIndex = 0; nIndex < nDirCount; ++nIndex ) {
                 IMAGE_RESOURCE_DIRECTORY_ENTRY* pSecondEntry = (IMAGE_RESOURCE_DIRECTORY_ENTRY*)( (uint8_t*)pFirstDir +
                     sizeof(IMAGE_RESOURCE_DIRECTORY) ) + nIndex;
 
@@ -1686,6 +1687,7 @@ bool parse_version(int fd)
     return false;
   }
 
+  //setlocale(LC_ALL, "zh_CN.GBK");
   pe_t* pe = (pe_t*)(intptr_t)fd;
 
   // 获取资源目录
@@ -1707,27 +1709,37 @@ bool parse_version(int fd)
       return false;
   }
 
+
   // 得到文件中的偏移地址
   dwOffset = rva_to_raw(fd, pVersionEntry->OffsetToData);
   if ( 0 == dwOffset )
       return false;
 
-
+  
   const char* version = pe->stream + dwOffset;
   //size_t versize = pVersionEntry->Size;
-
+  printf("wchar_t: %d\n", sizeof(wchar_t));
+  printf("szKey Offset:%d\n", offset_of(VS_VERSIONINFO, szKey));
   VS_VERSIONINFO* pVS = (VS_VERSIONINFO*)version;
-  if( 0 != wcscmp(pVS->szKey, L"VS_VERSION_INFO") ) {
+  char szkey[32] = {0};
+  ucs2tombs(szkey, (ucs2_t*)pVS->szKey, sizeof(szkey) - 1);
+  if( 0 != strcmp(szkey, "VS_VERSION_INFO")) {
     return false;
   }
 
+  printf("wValueLength:%d", pVS->wValueLength);
+  printf("match");
+
   //printf(" (type:%d)\n", pVS->wType);
-  uint8_t* pVt = (uint8_t*)&pVS->szKey[wcslen(pVS->szKey) + 1];
+  uint8_t* pVt = (uint8_t*)&pVS->szKey[strlen(szkey) + 1];
   VS_FIXEDFILEINFO* pValue = (VS_FIXEDFILEINFO*)ROUND_POS(pVt, pVS, 4);
+  printf("Sign: %08x", pValue->dwSignature);
   if ( pVS->wValueLength ) {
       parse_fixed_version(pe, pValue);
   }
 
+  printf("wcslen:%d\n", wcslen(L"ABCD"));
+  fflush(stdout);
   // 遍历 VS_VERSIONINFO 子节点元素
   StringFileInfo* pSFI = 
     (StringFileInfo*)ROUND_POS(((uint8_t*)pValue) + pVS->wValueLength, pValue, 4);
@@ -1735,13 +1747,15 @@ bool parse_version(int fd)
       pSFI = (StringFileInfo*)ROUND_POS((((uint8_t*) pSFI) + pSFI->wLength), pSFI, 4))
   {
     // StringFileInfo / VarFileInfo
-    if ( 0 == wcscmp(pSFI->szKey, L"StringFileInfo") ){
+    char sfi_key[32] = {0};
+    ucs2tombs(sfi_key, (ucs2_t*)pSFI->szKey, sizeof(sfi_key) - 1);
+    if ( 0 == strncmp(sfi_key, "StringFileInfo", strlen("StringFileInfo"))){
       // 当前子节点元素是 StringFileInfo
       //_ASSERT(1 == pSFI->wType);
       //_ASSERT(!pSFI->wValueLength);
 
           // 遍历字串信息 STRINGTABLE 元素
-      StringTable* pST = (StringTable*)ROUND_POS(&pSFI->szKey[wcslen(pSFI->szKey) + 1], pSFI, 4);
+      StringTable* pST = (StringTable*)ROUND_POS(&pSFI->szKey[strlen(sfi_key) + 1], pSFI, 4);
       for ( ; ((uint8_t*) pST) < (((uint8_t*) pSFI) + pSFI->wLength);
           pST = (StringTable*)ROUND_POS((((uint8_t*) pST) + pST->wLength), pST, 4))
       {
@@ -1749,11 +1763,11 @@ bool parse_version(int fd)
         //_ASSERT( !pST->wValueLength );
 
         // 遍历字符串元素的 STRINGTABLE
-        String* pS = (String*)ROUND_POS(&pST->szKey[wcslen(pST->szKey) + 1], pST, 4);
+        String* pS = (String*)ROUND_POS(&pST->szKey[ucs2len(pST->szKey) + 1], pST, 4);
         for ( ; ((uint8_t*) pS) < (((uint8_t*) pST) + pST->wLength);
           pS = (String*)ROUND_POS((((uint8_t*) pS) + pS->wLength), pS, 4))
         {
-          wchar_t* psVal = (wchar_t*)ROUND_POS(&pS->szKey[wcslen(pS->szKey) + 1], pS, 4);
+          ucs2_t* psVal = (ucs2_t*)ROUND_POS(&pS->szKey[ucs2len(pS->szKey) + 1], pS, 4);
           // 打印 <sKey> : <sValue>
           //printf("  %-18S: %.*S\n", pS->szKey, pS->wValueLength, psVal);
           version_t* item = (version_t*)malloc(sizeof(version_t));
@@ -1764,11 +1778,11 @@ bool parse_version(int fd)
 
           //_snwprintf(verinfo.name, (sizeof(verinfo.name) / 2) -1 , L"%S", pS->szKey);
           //memcpy(item->name, pS->szKey, sizeof(item->name) - sizeof(wchar_t));
-          wcsncpy(item->data.name, pS->szKey, MAX_VER_NAME_LEN - 1);
+          ucs2tombs(item->data.name, (ucs2_t*)pS->szKey, MAX_VER_NAME_LEN - 1);
           //_snwprintf(verinfo.value, (sizeof(verinfo.value) / 2) - 1, L"%.*S", 
           //    pS->wValueLength, psVal);
           //memcpy(item->value, psVal, sizeof(item->value) - sizeof(wchar_t));
-          wcsncpy(item->data.value, psVal, MAX_VER_NAME_LEN - 1);
+          ucs2tombs(item->data.value, psVal, MAX_VER_NAME_LEN - 1);
           slist_add(&pe->version, &item->node);
         }
       }
@@ -1780,14 +1794,14 @@ bool parse_version(int fd)
       //_ASSERT( !pVFI->wValueLength );
 
       // var元素VarFileInfo遍历（应该只有一个，但以防万一...）
-      Var* pV = (Var*)ROUND_POS(&pVFI->szKey[wcslen(pVFI->szKey) + 1], pVFI, 4);
+      Var* pV = (Var*)ROUND_POS(&pVFI->szKey[ucs2len(pVFI->szKey) + 1], pVFI, 4);
       for ( ; ((uint8_t*) pV) < (((uint8_t*) pVFI) + pVFI->wLength);
           pV = (Var*)ROUND_POS((((uint8_t*) pV) + pV->wLength), pV, 4)) {
         //printf(" %S: ", pV->szKey);
         
         // 对16位的语言ID值，弥补标准的“翻译”VarFileInfo的元素的数组的遍历。
-        wchar_t* pwV = (wchar_t*) ROUND_POS(&pV->szKey[wcslen(pV->szKey) + 1], pV, 4);
-        for (wchar_t* wpos = pwV ; ((uint8_t*) wpos) < (((uint8_t*) pwV) + pV->wValueLength); wpos += 2)
+        ucs2_t* pwV = (ucs2_t*) ROUND_POS(&pV->szKey[ucs2len(pV->szKey) + 1], pV, 4);
+        for (ucs2_t* wpos = pwV ; ((uint8_t*) wpos) < (((uint8_t*) pwV) + pV->wValueLength); wpos += 2)
         {
             //printf("%04x%04x ", (int)*wpos++, (int)(*(wpos + 1)));
         }

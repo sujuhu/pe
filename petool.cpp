@@ -1,6 +1,7 @@
 ﻿// pefile.cpp : Defines the entry point for the console application.
 //
 #pragma  warning(disable:4996)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -8,8 +9,11 @@
 #include <direct.h>
 #else
 #include <unistd.h>
+//#include <locale.h>
 #endif
 #include <filemap.h>
+#include <wchar.h>
+#include <string.h>
 #include "petype.h"
 #include "pe.h"
 
@@ -164,7 +168,7 @@ void dump_version(int pe)
   printf("VERSION: \n");
   IMAGE_VERSION* version = pe_version_first(pe);
   for (; version != NULL; version = pe_version_next(version)) {
-    printf("%S: %S\n", version->name, version->value);
+    printf("%s: %s\n", version->name, version->value);
   }    
 }
 
@@ -181,7 +185,6 @@ int main(int argc, char* argv[])
     printf( "open file failed: %s\n", argv[2]);
     return -1;
   }
-
 
   int pe = pe_open((const char*)view.data, view.size);
   if (pe == INVALID_PE) {

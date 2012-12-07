@@ -1427,7 +1427,7 @@ typedef struct _IMAGE_RESOURCE_DIRECTORY_STRING {
 
 typedef struct _IMAGE_RESOURCE_DIR_STRING_U {
 	uint16_t    Length;
-	wchar_t   NameString[ 1 ];
+	uint16_t   NameString[ 1 ];
 } IMAGE_RESOURCE_DIR_STRING_U, *PIMAGE_RESOURCE_DIR_STRING_U;
 
 
@@ -1882,8 +1882,8 @@ typedef struct _IMAGE_OVERLAY
 #define MAX_VER_VALUE_LEN  512
 typedef struct _IMAGE_VERSION
 {
-  wchar_t name[MAX_VER_NAME_LEN];
-  wchar_t value[MAX_VER_VALUE_LEN];
+  char name[MAX_VER_NAME_LEN];
+  char value[MAX_VER_VALUE_LEN];
 } IMAGE_VERSION;
 
 typedef struct _IMAGE_RELOCATION_ITEM
