@@ -26,6 +26,7 @@ GNU General Public License for more details.
 #include <locale.h>
 
 #include <slist.h>
+#include <filemap.h>
 #include "petype.h"
 #include "peformat.h"
 #include "verfmt.h"
@@ -87,6 +88,8 @@ typedef struct _pe_t{
   slist_t reloc_list;
   slist_t resource;
   slist_t bound_list;
+  bool  open_by_file;
+  MAPPED_FILE view;
   IMAGE_OVERLAY   overlay;
 }pe_t;
 
@@ -144,43 +147,27 @@ bool parse_resource(int fd);
 
 bool parse_bound(int fd);
 
-int  pe_open(const char* stream, size_t size)
-{      
-  if (stream==NULL || size == 0){
-    errno = EINVAL;
-    return INVALID_PE;
-  }
-
-  pe_t* pe = (pe_t*)malloc(sizeof(pe_t));
-  if (pe==NULL) {
-    return INVALID_PE;
-  }
-  memset(pe, 0, sizeof(pe_t));
-
+bool pe_init(pe_t* pe, const char* stream, int size)
+{
   pe->stream = stream;
   pe->size = size;
+
   pe->dos = GET_DOS_HEADER(stream);
   pe->nt  = GET_NT_HEADER(stream);
 
   //读取PE头部数据
   if (pe->dos->e_magic != IMAGE_DOS_SIGNATURE) {
-    free(pe);
-    pe = NULL;
-    return INVALID_PE;
+    return false;
   }
 
   if ((size_t)pe->dos->e_lfanew >= (size_t)size)  {
-    free(pe);
-    pe = NULL;
-    return INVALID_PE;
+    return false;
   }
 
   if (pe->nt->Signature != IMAGE_NT_SIGNATURE
    || pe->nt->FileHeader.Machine != IMAGE_FILE_MACHINE_I386
    || pe->nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ) {
-    free(pe);
-    pe = NULL;
-    return INVALID_PE;
+    return false;
   }
 
   parse_export((intptr_t)pe);
@@ -197,7 +184,70 @@ int  pe_open(const char* stream, size_t size)
 
   parse_bound((intptr_t)pe);
 
-  return (intptr_t)pe;
+  return true;
+}
+
+int  pe_open_file(const char* file)
+{
+  if (file == NULL) {
+    errno = EINVAL;
+    return INVALID_PE;
+  }
+
+  pe_t* pe = (pe_t*)malloc(sizeof(pe_t));
+  if (pe == NULL) {
+    return INVALID_PE;
+  }
+  memset((uint8_t*)pe, 0, sizeof(pe_t));
+
+  if (0 != map_file(file, &pe->view)) {
+    free(pe);
+    pe = NULL;
+    return INVALID_PE;
+  }
+
+  pe->open_by_file = true;
+
+  if(!pe_init(pe, (const char*)pe->view.data, pe->view.size)) {
+    free(pe);
+    pe = NULL;
+    return INVALID_PE;
+  }
+
+  return (intptr_t)pe; 
+}
+
+int  pe_open(const char* stream, size_t size)
+{      
+  if (stream==NULL || size == 0){
+    errno = EINVAL;
+    return INVALID_PE;
+  }
+
+  pe_t* pe = (pe_t*)malloc(sizeof(pe_t));
+  if (pe==NULL) {
+    return INVALID_PE;
+  }
+  memset(pe, 0, sizeof(pe_t));
+
+  if (!pe_init(pe, stream, size)) {
+    free(pe);
+    pe = NULL;
+    return INVALID_PE;
+  }
+
+  return (intptr_t)pe; 
+}
+
+int pe_size(int fd)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  return pe->size;
 }
 
 void clean_resource(slist_t* list)
@@ -255,6 +305,11 @@ void  pe_close(int  fd)
   }
 
   clean_resource(&pe->resource);
+
+  if (pe->open_by_file) {
+    unmap_file(&pe->view);
+    memset(&pe->view, 0, sizeof(MAPPED_FILE));
+  }
 
   free(pe);
   pe = NULL;

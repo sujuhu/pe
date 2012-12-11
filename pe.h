@@ -49,6 +49,11 @@ typedef uint32_t va_t;
  */
 int   pe_open(const char* stream, size_t size);
 
+
+int   pe_open_file(const char* file);
+
+int   pe_size(int fd);
+
 /**
  * Description: clean and close pe format
  * Parameter:   fd        pe descriptor, return by pe_open()          

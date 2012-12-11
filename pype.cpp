@@ -10,13 +10,6 @@
 #include "petype.h"
 #include "pe.h"
 
-typedef struct _PE 
-{  
-    PyObject_HEAD      // == PyObject ob_base;  定义一个PyObject对象.  
-    int m_fd;  
-    MAPPED_FILE m_view;
-}PE; 
-
 /*
   Check whether we got a Python Object
 */
@@ -34,77 +27,50 @@ PyObject *check_object(PyObject *pObject)
   return pObject;
 }
 
-static PyObject *PE_new(PyTypeObject *type, PyObject *args, PyObject *kw) {
-    PE *self = (PE*)type->tp_alloc(type, 0);
-    return (PyObject *)self;
-}
-
-static int PE_init(PE *self, PyObject *args, PyObject *kwds)    //构造方法.  
-{  
+extern "C"
+PyObject* pype_open(PyObject* self, PyObject* args)
+{
   const char* filename = NULL;  
   if(!PyArg_ParseTuple(args, "s", &filename)) {  
       PyErr_SetString(PyExc_TypeError, 
         "Parse the argument FAILED! You should pass correct values!");  
-      return -1;  
+      return NULL;  
   } 
 
-  if (0 != map_file(filename, &self->m_view)) {
-    PyErr_SetString(PyExc_IOError, "open file failed");
-    return -1;
+  int fd = pe_open_file(filename);
+  if (fd == INVALID_PE) {
+    PyErr_SetString(PyExc_TypeError, "invalid pe file");
+    return NULL;
   }
 
-  self->m_fd = pe_open((const char*)self->m_view.data, self->m_view.size);
-  if (self->m_fd == INVALID_PE) {
-    PyErr_SetString(PyExc_TypeError, "invalid pe format");
-    return -1;
-  }
+  return Py_BuildValue("I", fd);
+}
 
-  return 0;
-} 
+extern "C"
+PyObject* pype_close(PyObject* self, PyObject* args)
+{
+  int fd = INVALID_PE;  
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
-static void PE_destruct(PE* self)                   //析构方法.  
-{  
-  if (self->m_fd != INVALID_PE) {
-    pe_close(self->m_fd);
-    self->m_fd = INVALID_PE;  
-  }
-
-  if (self->m_view.data != NULL) {
-    unmap_file(&self->m_view);
-    self->m_view.data = NULL;
-  }
-  
-  //如果还有PyObject*成员的话，要一并释放之.  
-  //如：Py_XDECREF(self->Member);  
-  self->ob_type->tp_free(self);
-  //Py_TYPE(self)->tp_free((PyObject*)self);      //释放对象/实例.  
-}  
-    /*
-static PyObject* PE_Str(PE* self)             //调用str/print时自动调用此函数.  
-{  
-
-       ostringstream OStr;  
-       OStr<<"Name    : "<<Self->m_szName<<endl  
-           <<"Math    : "<<Self->m_dMath<<endl  
-           <<"English : "<<Self->m_dEnglish<<endl  
-       string Str = OStr.str();  
-       return Py_BuildValue("s", Str.c_str());  
-
+  pe_close(fd);
   Py_RETURN_NONE;
-}  
-   */ 
-/*
-static PyObject* PE_Repr(PE* self)            //调用repr内置函数时自动调用.  
-{  
-  return PE_Str(self);  
-} 
-*/ 
+}
+
 
 //dump节表
 extern "C"
-PyObject* PE_sections(PE* self, PyObject* args)
+PyObject* pype_sections(PyObject* self, PyObject* args)
 {
-  int fd = self->m_fd;
+  int fd = INVALID_PE;  
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
   PyObject* pTuple = NULL;
   IMAGE_NT_HEADERS32*nt = pe_nt_header(fd);
@@ -132,64 +98,24 @@ PyObject* PE_sections(PE* self, PyObject* args)
   return pTuple;
 }
 
+
+//枚举导入函数回调函数
 extern "C"
-PyObject* PE_open(PE* self, PyObject* args)
+PyObject* pype_imports(PyObject* self, PyObject* args)
 {
-  const char* filename = NULL;  
-  if(!PyArg_ParseTuple(args, "s", &filename)) {  
+  int fd = INVALID_PE;  
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
       PyErr_SetString(PyExc_TypeError, 
         "Parse the argument FAILED! You should pass correct values!");  
       return NULL;  
   } 
 
-  if (0 == map_file(filename, &self->m_view)) {
-    PyErr_SetString(PyExc_TypeError, "open file failed");
-    return NULL;
-  }
-
-  self->m_fd = pe_open((const char*)self->m_view.data, self->m_view.size);
-  if (self->m_fd == INVALID_PE) {
-    PyErr_SetString(PyExc_TypeError, "invalid pe format");
-    return NULL;
-  }
-
-  Py_RETURN_NONE;
-}
-
-extern "C"
-PyObject* PE_filesize(PE* self, PyObject* args)
-{
-  return Py_BuildValue("I", self->m_view.size);
-}
-
-extern "C"
-PyObject* PE_close(PE* self, PyObject* args)
-{
-  if (self->m_fd != INVALID_PE) {
-    pe_close(self->m_fd);
-    self->m_fd = INVALID_PE;  
-  }
-
-  if (self->m_view.data != NULL) {
-    unmap_file(&self->m_view);
-    self->m_view.data = NULL;
-  }
-  Py_RETURN_NONE;
-}
-
-//枚举导入函数回调函数
-extern "C"
-PyObject* PE_imports(PE* self, PyObject* args)
-{
-  int pe = self->m_fd;
   PyObject* pList = PyList_New( 0 );
 
-  IMAGE_IMPORT_DESCRIPTOR* dll = pe_import_dll_first(pe);
+  IMAGE_IMPORT_DESCRIPTOR* dll = pe_import_dll_first(fd);
   for (; dll != NULL; dll = pe_import_dll_next(dll)) {
-    
-
     char dllname[256] = {0};
-    if (!pe_import_dllname(pe, dll, dllname, sizeof(dllname) - 1)) {
+    if (!pe_import_dllname(fd, dll, dllname, sizeof(dllname) - 1)) {
       continue;
     }
 
@@ -215,9 +141,14 @@ PyObject* PE_imports(PE* self, PyObject* args)
 }
 
 extern "C"
-PyObject* PE_exports(PE* self, PyObject* args)
+PyObject* pype_exports(PyObject* self, PyObject* args)
 {
-  int fd = self->m_fd;
+  int fd = INVALID_PE;  
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
   PyObject* pDict = PyDict_New();
   const char* dllname = pe_export_dllname(fd);
@@ -248,9 +179,14 @@ PyObject* PE_exports(PE* self, PyObject* args)
 }
 
 extern "C"
-PyObject* PE_overlay( PE* self, PyObject* args )
+PyObject* pype_overlay(PyObject* self, PyObject* args )
 {
-  int fd = self->m_fd;
+  int fd = INVALID_PE;  
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
   IMAGE_OVERLAY* overlay = pe_overlay(fd);
   if (overlay == NULL) {
@@ -270,9 +206,14 @@ PyObject* PE_overlay( PE* self, PyObject* args )
 }
 
 extern "C"
-PyObject* PE_entrypoint(PE* self, PyObject* args )
+PyObject* pype_entrypoint(PyObject* self, PyObject* args )
 {
-  int fd = self->m_fd;
+  int fd = INVALID_PE;  
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
   //dump入口点
   IMAGE_NT_HEADERS32* nt = pe_nt_header(fd);
@@ -291,22 +232,21 @@ PyObject* PE_entrypoint(PE* self, PyObject* args )
 }
 
 extern "C"
-PyObject* PE_icon(PE* self, PyObject* args )
+PyObject* pype_icon(PyObject* self, PyObject* args )
 {
-  if (!args || PyObject_Length(args) != 1) {
+  if (!args || PyObject_Length(args) != 2) {
     PyErr_SetString(PyExc_TypeError,
-      "Invalid number of arguments, 1 expected:(char* ico_file)" );
+      "Invalid number of arguments, 2 expected:(int fd, char* ico_file)" );
     return NULL;
   }
 
-  PyObject *py_ico_file = PyTuple_GetItem(args, 0);
-  if (!check_object(py_ico_file)){
-    PyErr_SetString(PyExc_ValueError, "Can't get ico_file from arguments");
-    return NULL;
-  }
-
-  int fd = self->m_fd;
-  char* ico_file = PyString_AsString(py_ico_file);
+  int fd = INVALID_PE;  
+  char* ico_file = NULL;
+  if(!PyArg_ParseTuple(args, "Is", &fd, &ico_file)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
   if (!pe_icon_file(fd, ico_file)){
     Py_RETURN_FALSE;
@@ -360,9 +300,14 @@ void WalkResource(
 }
 
 extern "C"
-PyObject* PE_resource(PE* self, PyObject* args )
+PyObject* pype_resource(PyObject* self, PyObject* args )
 {
-  int fd = self->m_fd;
+  int fd = INVALID_PE;  
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
   PyObject* PyList = PyList_New(0);
   WalkResource(fd, NULL, PyList);
@@ -370,9 +315,14 @@ PyObject* PE_resource(PE* self, PyObject* args )
 }
 
 extern "C"
-PyObject* PE_verinfo(PE* self, PyObject* args )
+PyObject* pype_verinfo(PyObject* self, PyObject* args )
 {
-  int fd = self->m_fd;
+  int fd = INVALID_PE;
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
 
   //dump版本信息
   PyObject* pDict = PyDict_New();
@@ -390,104 +340,53 @@ PyObject* PE_verinfo(PE* self, PyObject* args )
   return pDict;
 }
 
-static PyMethodDef PE_methods[] =
+extern "C"
+PyObject* pype_nt_header(PyObject* self, PyObject* args)
 {
-  {"open",    (PyCFunction)PE_open, METH_VARARGS,     "open(filename)"},  
-  {"close",    (PyCFunction)PE_close, METH_NOARGS,     "close()"},
-  {"file_size", (PyCFunction)PE_filesize, METH_NOARGS,  "file_size()"},  
-  {"sections", (PyCFunction)PE_sections, METH_NOARGS,  ""},  
-  {"imports",    (PyCFunction)PE_imports, METH_NOARGS,    ""},  
-  {"exports", (PyCFunction)PE_exports, METH_NOARGS, ""},  
-  {"overlay",  (PyCFunction)PE_overlay, METH_NOARGS,   ""},  
-  {"verinfo",  (PyCFunction)PE_verinfo, METH_NOARGS,   ""},  
-  {"entrypoint",  (PyCFunction)PE_entrypoint, METH_NOARGS,   ""},  
-  {"resource",  (PyCFunction)PE_resource, METH_NOARGS,   ""},  
-  {"icon",  (PyCFunction)PE_icon, METH_VARARGS,   ""},  
+  int fd = INVALID_PE;
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
+
+  return Py_BuildValue("z", pe_nt_header(fd));
+}
+
+extern "C"
+PyObject* pype_dos_header(PyObject* self, PyObject* args)
+{
+  int fd = INVALID_PE;
+  IMAGE_DOS_HEADER* dos = NULL;
+  if(!PyArg_ParseTuple(args, "Iz", &fd, &dos)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  } 
+
+  memcpy(dos, (char*)pe_dos_header(fd), sizeof(IMAGE_DOS_HEADER));
+  Py_RETURN_TRUE;
+  //return Py_BuildValue("z", );
+}
+
+static PyMethodDef peMethods[] =
+{
+  {"open",    pype_open, METH_VARARGS,     "open(fd, filename)"},  
+  {"close",    pype_close, METH_VARARGS,     "close(fd)"},
+  {"dos_header", pype_dos_header, METH_VARARGS, "dos_header(fd)"},
+  {"nt_header", pype_nt_header, METH_VARARGS, ""},
+  {"sections", pype_sections, METH_VARARGS,  ""},  
+  {"imports",  pype_imports, METH_VARARGS,    ""},  
+  {"exports", pype_exports, METH_VARARGS, ""},  
+  {"overlay",  pype_overlay, METH_VARARGS,   ""},  
+  {"verinfo",  pype_verinfo, METH_VARARGS,   ""},  
+  {"entrypoint",  pype_entrypoint, METH_VARARGS,   ""},  
+  {"resource",  pype_resource, METH_VARARGS,   ""},  
+  {"icon",  pype_icon, METH_VARARGS,   ""},  
   {NULL, NULL, 0, NULL}
-};
-
-static PyMemberDef PE_members[] =         //类/结构的数据成员的说明.  
-{  
-      //{"m_fd",   T_INT, offsetof(pe, m_fd),   0, "The Name of instance"},  
-      //{"m_dMath",    T_FLOAT,  offsetof(CScore, m_dMath),    0, "The Math score of instance."},  
-      //{"m_dEnglish", T_FLOAT,  offsetof(CScore, m_dEnglish), 0, "The English score of instance."},  
-      //{"m_dTotal",   T_FLOAT,  offsetof(CScore, m_dTotal),   0, "The Total score of instance.align"},  
-  
-      {NULL, NULL, NULL, 0, NULL}  
-}; 
-
-static PyTypeObject pyep_PEType =  
-{  
-       PyObject_HEAD_INIT(NULL)
-       0,
-       "pype.PE",                 //可以通过__class__获得这个字符串. CPP可以用类.__name__获取.  
-       sizeof(PE),                 //类/结构的长度.调用PyObject_New时需要知道其大小.  
-   0,                             /* tp_itemsize */
-    (destructor)PE_destruct,   /* tp_dealloc */
-    0,                             /* tp_print */
-    0,                             /* tp_getattr */
-    0,                             /* tp_setattr */
-    0,                             /* tp_compare */
-    0,                             /* tp_repr */
-    0,                             /* tp_as_number */
-    0,                             /* tp_as_sequence */
-    0,                             /* tp_as_mapping */
-    0,                             /* tp_hash */
-    0,                             /* tp_call */
-    0,                             /* tp_str */
-    0,                             /* tp_getattro */
-    0,                             /* tp_setattro */
-    0,                             /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,            /* tp_flags */
-    "My first pe object.",    /* tp_doc */
-    0,                             /* tp_traverse */
-    0,                             /* tp_clear */
-    0,                             /* tp_richcompare */
-    0,                             /* tp_weaklistoffset */
-    0,                             /* tp_iter */
-    0,                             /* tp_iternext */
-    PE_methods,               /* tp_methods */
-    PE_members,                             /* tp_members */
-    0,                             /* tp_getset */
-    0,                             /* tp_base */
-    0,                             /* tp_dict */
-    0,                             /* tp_descr_get */
-    0,                             /* tp_descr_set */
-    0,                             /* tp_dictoffset */
-    (initproc)PE_init,        /* tp_init */
-    0,                             /* tp_alloc */
-    PE_new,                   /* tp_new */
-    NULL,                             /* tp_free */
-}; 
-
-/*
-static PyModuleDef ModuleInfo =  
-{  
-       PyModuleDef_HEAD_INIT,  
-       "My C++ Class Module",               //模块的内置名--__name__.  
-       "This Module Created By C++--extension a class to Python!",                 //模块的DocString.__doc__  
-       -1,  
-       NULL, NULL, NULL, NULL, NULL  
-};  
-*/
-
-
-static PyMethodDef pype_methods[] = {
-    { NULL, NULL, 0, NULL }
 };
 
 PyMODINIT_FUNC initpype()
 {
-  //Py_InitModule("pype", peMethods);
-    if (PyType_Ready(&pyep_PEType) < 0) {
-        return;
-    }
-    PyObject * m = Py_InitModule3("pype", pype_methods, "My third LAME module.");
-    Py_INCREF(&pyep_PEType);
-    PyModule_AddObject(m, "PE", (PyObject *)&pyep_PEType);
+  Py_InitModule("pype", peMethods);
 }
-
-
-
-
-
