@@ -156,13 +156,17 @@ IMAGE_RESOURCE_DIRECTORY_ENTRY* pe_resource_first(
 IMAGE_RESOURCE_DIRECTORY_ENTRY* pe_resource_next(
   IMAGE_RESOURCE_DIRECTORY_ENTRY* prev);
 
+IMAGE_GAP* pe_gap_first(int fd);
+
+IMAGE_GAP* pe_gap_next(IMAGE_GAP* iter);
+
 bool copy_section_header(int fd,int sect_id, IMAGE_SECTION_HEADER *sect_header);
 
 IMAGE_SECTION_HEADER* pe_section_header(int fd, int sect_id);
 
-uint8_t* pe_stream_by_raw(int fd, raw_t raw);
+uint8_t* pe_data_by_raw(int fd, raw_t raw);
 
-uint8_t* pe_stream_by_rva(int fd, rva_t rva);
+uint8_t* pe_data_by_rva(int fd, rva_t rva);
 
 char* pe_restype_name(int res_type);
 

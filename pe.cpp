@@ -88,6 +88,7 @@ typedef struct _pe_t{
   slist_t reloc_list;
   slist_t resource;
   slist_t bound_list;
+  slist_t gap_list;
   bool  open_by_file;
   MAPPED_FILE view;
   IMAGE_OVERLAY   overlay;
@@ -132,6 +133,10 @@ typedef struct _bound_t{
   snode_t node;
 }bound_t;
 
+typedef struct _gap_t{
+  IMAGE_GAP data;
+  snode_t node;
+}gap_t;
 
 bool parse_export(int fd);
 
@@ -146,6 +151,8 @@ bool parse_overlay(int fd);
 bool parse_resource(int fd);
 
 bool parse_bound(int fd);
+
+bool parse_gap(pe_t* pe);
 
 bool pe_init(pe_t* pe, const char* stream, int size)
 {
@@ -183,6 +190,8 @@ bool pe_init(pe_t* pe, const char* stream, int size)
   parse_resource((intptr_t)pe);
 
   parse_bound((intptr_t)pe);
+
+  parse_gap(pe);
 
   return true;
 }
@@ -298,6 +307,12 @@ void  pe_close(int  fd)
     bound = NULL;
   }
 
+  gap_t* gap = NULL;
+  slist_for_each_safe(gap, &pe->gap_list, gap_t, node) {
+    free(gap);
+    gap = NULL;
+  }
+
   reloc_t* reloc = NULL;
   slist_for_each_safe(reloc, &pe->reloc_list, reloc_t, node) {
     free(reloc);
@@ -391,7 +406,7 @@ rva_t raw_to_rva(int fd, raw_t raw)
   return INVALID_RVA;
 }
 
-uint8_t* pe_stream_by_raw(int fd, raw_t raw)
+uint8_t* pe_data_by_raw(int fd, raw_t raw)
 {
   if (fd == INVALID_PE) {
     errno = EINVAL;
@@ -406,7 +421,7 @@ uint8_t* pe_stream_by_raw(int fd, raw_t raw)
   return (uint8_t*)pe->stream + raw;
 }
 
-uint8_t* pe_stream_by_rva(int fd, rva_t rva)
+uint8_t* pe_data_by_rva(int fd, rva_t rva)
 {
   if (fd == INVALID_PE) {
     errno = EINVAL;
@@ -418,7 +433,7 @@ uint8_t* pe_stream_by_rva(int fd, rva_t rva)
     return NULL;
   }
 
-  return pe_stream_by_raw(fd, raw);
+  return pe_data_by_raw(fd, raw);
 }
 
 /***********************************************************************
@@ -1886,16 +1901,19 @@ IMAGE_VERSION* pe_version_next(IMAGE_VERSION* iter)
   return slist_next_entry(iter, version_t, data, node);
 }
 
-/*
-int parse_gap(int fd)
+
+/**********************************************************************
+ *
+ * pe gap
+ *
+ **********************************************************************/
+bool parse_gap(pe_t* pe)
 {
-  if (fd == INVALID_PE) {
+  if (pe == NULL || pe == (pe_t*)-1) {
     errno = INVALID_PE;
-    return EINVAL;
+    return false;
   }
 
-  pe_t* pe = (pe_t*)fd;
-  int cMaxGap = pe->size / sizeof(SECTION_GAP);
   IMAGE_DOS_HEADER *dos_header = GET_DOS_HEADER(pe->stream);
   IMAGE_NT_HEADERS32 *nt_header = GET_NT_HEADER(pe->stream);
   size_t dwActualHeaderSize = dos_header->e_lfanew
@@ -1905,33 +1923,64 @@ int parse_gap(int fd)
                 + nt_header->FileHeader.NumberOfSections
                 * sizeof(IMAGE_SECTION_HEADER);
 
-  int cGap = 0;
   if (dwActualHeaderSize != nt_header->OptionalHeader.SizeOfHeaders) {
-    pSectionGaps[cGap].offset = dwActualHeaderSize;
-    pSectionGaps[cGap].length = nt_header->OptionalHeader.SizeOfHeaders
+    gap_t* gap = (gap_t*)malloc(sizeof(gap_t));
+    if (gap == NULL) {
+      return false;
+    }
+    memset(gap, 0, sizeof(gap_t));
+
+    gap->data.offset = dwActualHeaderSize;
+    gap->data.size = nt_header->OptionalHeader.SizeOfHeaders
                               - dwActualHeaderSize;
+    slist_add(&pe->gap_list, &gap->node);
   }
-  cGap++;
 
   for (int i= 0;
-     i < nt_header->FileHeader.NumberOfSections && cGap < cMaxGap ;
+     i < nt_header->FileHeader.NumberOfSections ;
      i++ ) {
     IMAGE_SECTION_HEADER Header = {0};
-    GetSectionHeader(stream, i, &Header);
+    copy_section_header((intptr_t)pe, i, &Header);
 
     if (Header.Misc.VirtualSize < Header.SizeOfRawData) {
-      pSectionGaps[cGap].offset = Header.PointerToRawData
-                                + Header.Misc.VirtualSize;
-      pSectionGaps[cGap].length = Header.SizeOfRawData
-                                - Header.Misc.VirtualSize;
-      cGap++;
+      gap_t* gap = (gap_t*)malloc(sizeof(gap_t));
+      if (gap == NULL) {
+        return false;
+      }
+      memset(gap, 0, sizeof(gap_t));
+
+      gap->data.offset = Header.PointerToRawData + Header.Misc.VirtualSize;
+      gap->data.size = Header.SizeOfRawData - Header.Misc.VirtualSize;
+      slist_add(&pe->gap_list, &gap->node);
     }
   }
 
-  return cGap * sizeof(SECTION_GAP);
+  return true;
 }
-*/
 
+
+IMAGE_GAP* pe_gap_first(int fd)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  return slist_first_entry(&pe->gap_list, gap_t, data, node);
+}
+
+IMAGE_GAP* pe_gap_next(IMAGE_GAP* iter)
+{
+  if (iter == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  return slist_next_entry(iter, gap_t, data, node);
+}
+
+/*
 bool pe_remove_last_section(int fd)
 {
   if (fd == INVALID_PE) {
@@ -1966,7 +2015,7 @@ bool pe_remove_last_section(int fd)
   return true;
 }
 
-/*
+
 bool LoadPERelocRoutine(
     rva_t rvaOwnerBlock,
     IMAGE_RELOCATION_ITEM* pItem,

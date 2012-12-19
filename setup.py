@@ -7,12 +7,10 @@ if osname == "Windows":
     defines = [ ('WIN32',None),
                 ("_CRT_SECURE_NO_DEPRECATE",None),
                 ("_CRT_NONSTDC_NO_DEPRECATE",None)]
-    sources = [ 'pype.cpp', 'pe.cpp', 'util/strconv.cpp',
-                'util/filemap.cpp']
 else:
     defines = []
-    sources = [ 'pype.cpp', 'pe.cpp', 'util/strconv.cpp',
-                'util/filemap.cpp']
+sources = [ 'pype.cpp', 'pe.cpp', 'util/strconv.cpp',
+            'util/filemap.cpp', 'util/memhelp.cpp']
 
 module1 = Extension('pype',
                     sources = sources,

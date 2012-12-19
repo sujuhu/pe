@@ -7,6 +7,7 @@
 #include <Python.h>
 #include <structmember.h>
 #include "util/filemap.h"
+#include "util/memhelp.h"
 #include "petype.h"
 #include "pe.h"
 
@@ -369,6 +370,41 @@ PyObject* pype_dos_header(PyObject* self, PyObject* args)
   //return Py_BuildValue("z", );
 }
 
+extern "C"
+PyObject* pype_gaps(PyObject* self, PyObject* args)
+{
+  int fd = INVALID_PE;
+  if(!PyArg_ParseTuple(args, "I", &fd)) {  
+      PyErr_SetString(PyExc_TypeError, 
+        "Parse the argument FAILED! You should pass correct values!");  
+      return NULL;  
+  }
+
+  IMAGE_GAP* gap = pe_gap_first(fd);
+  PyObject* pList = PyList_New(0);
+  for (; gap != NULL; gap = pe_gap_next(gap)) {
+    uint8_t* data = pe_data_by_raw(fd, gap->offset);
+    if (data = NULL) {
+      continue;
+    }
+
+
+    PyObject* item = PyDict_New();
+    PyDict_SetItem( item,
+      Py_BuildValue( "s", "offset" ),
+      Py_BuildValue( "I", gap->offset));
+    PyDict_SetItem( item,
+      Py_BuildValue( "s", "size" ),
+      Py_BuildValue( "I", gap->size ));
+    PyDict_SetItem(item,
+      Py_BuildValue( "s", "zero" ),
+      Py_BuildValue( "I", is_zero_memory((const char*)data, gap->size)));
+    PyList_Append( pList, item );
+  }
+
+  return pList;
+}
+
 static PyMethodDef peMethods[] =
 {
   {"open",    pype_open, METH_VARARGS,     "open(fd, filename)"},  
@@ -383,6 +419,7 @@ static PyMethodDef peMethods[] =
   {"entrypoint",  pype_entrypoint, METH_VARARGS,   ""},  
   {"resource",  pype_resource, METH_VARARGS,   ""},  
   {"icon",  pype_icon, METH_VARARGS,   ""},  
+  {"gaps", pype_gaps, METH_VARARGS, ""},
   {NULL, NULL, 0, NULL}
 };
 

@@ -1878,6 +1878,12 @@ typedef struct _IMAGE_OVERLAY
   uint32_t  size;
 } IMAGE_OVERLAY;
 
+typedef struct _IMAGE_GAP
+{
+	uint32_t offset;
+	uint32_t size;
+}IMAGE_GAP;
+
 #define MAX_VER_NAME_LEN   128
 #define MAX_VER_VALUE_LEN  512
 typedef struct _IMAGE_VERSION
