@@ -1072,7 +1072,8 @@ bool parse_reloc(int fd)
     = (IMAGE_BASE_RELOCATION*)(pe->stream + raw);
 
   //获取重定位项的总数
-  while(base_relocation->SizeOfBlock != 0) {
+  while(((const char*)base_relocation < (pe->stream + raw + block_size))
+    && (base_relocation->SizeOfBlock != 0)) {
     //rva_t block_rva = base_relocation->VirtualAddress;
     int block_cItem = (base_relocation->SizeOfBlock
                  - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(uint16_t);
@@ -1704,6 +1705,10 @@ get_version_block(PIMAGE_RESOURCE_DIRECTORY pRootRec)
 {
     uint16_t nCount = pRootRec->NumberOfIdEntries 
       + pRootRec->NumberOfNamedEntries;
+    if (nCount >= 512) {
+      return NULL;
+    }
+
     for ( uint16_t i = 0; i < nCount; ++i ) {
         IMAGE_RESOURCE_DIRECTORY_ENTRY* pFirstEntry 
           = (PIMAGE_RESOURCE_DIRECTORY_ENTRY)((uint8_t*)pRootRec +
