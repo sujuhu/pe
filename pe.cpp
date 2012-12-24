@@ -89,6 +89,7 @@ typedef struct _pe_t{
   slist_t resource;
   slist_t bound_list;
   slist_t gap_list;
+  slist_t section_list;
   bool  open_by_file;
   MAPPED_FILE view;
   IMAGE_OVERLAY   overlay;
@@ -138,6 +139,13 @@ typedef struct _gap_t{
   snode_t node;
 }gap_t;
 
+typedef struct _section_t{
+  IMAGE_SECTION_HEADER data;
+  snode_t node;
+}section_t;
+
+bool parse_section(int fd);
+
 bool parse_export(int fd);
 
 bool parse_import(int fd);
@@ -176,6 +184,8 @@ bool pe_init(pe_t* pe, const char* stream, int size)
    || pe->nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC ) {
     return false;
   }
+
+  parse_section((intptr_t)pe);
 
   parse_export((intptr_t)pe);
 
@@ -321,6 +331,12 @@ void  pe_close(int  fd)
 
   clean_resource(&pe->resource);
 
+  section_t* section = NULL;
+  slist_for_each_safe(section, &pe->section_list, section_t, node) {
+    free(section);
+    section = NULL;
+  }
+
   if (pe->open_by_file) {
     unmap_file(&pe->view);
     memset(&pe->view, 0, sizeof(MAPPED_FILE));
@@ -434,6 +450,56 @@ uint8_t* pe_data_by_rva(int fd, rva_t rva)
   }
 
   return pe_data_by_raw(fd, raw);
+}
+
+/***********************************************************************
+ *
+ *  pe section
+ *
+ **********************************************************************/
+bool parse_section(int fd)
+{
+  if (fd== INVALID_PE) {
+    errno = EINVAL;
+    return false;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  int count = pe->nt->FileHeader.NumberOfSections;
+  for(int i=0; i<count; i++) {
+    IMAGE_SECTION_HEADER* header = GET_SECTION_HEADER(pe->nt, i);
+    section_t* section = (section_t*)malloc(sizeof(section_t));
+    if (section == NULL) {
+      return false;
+    }
+    memset(section, 0, sizeof(sizeof(section_t)));
+
+    memcpy(&section->data, header, sizeof(IMAGE_SECTION_HEADER));
+    slist_add(&pe->section_list, &section->node);
+  }
+
+  return true;
+}
+
+IMAGE_SECTION_HEADER* pe_section_first(int fd)
+{
+  if (fd == INVALID_PE){
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  return slist_first_entry(&pe->section_list, section_t, data, node);
+}
+
+IMAGE_SECTION_HEADER* pe_section_next(IMAGE_SECTION_HEADER* it)
+{
+  if (it == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  return slist_next_entry(it, section_t, data, node);
 }
 
 /***********************************************************************
@@ -716,6 +782,8 @@ bool pe_import_dllname(
   return true; 
 }
 
+
+
 IMAGE_IMPORT_DESCRIPTOR* pe_import_dll_first(int fd)
 {
   if (fd == INVALID_PE) {
@@ -735,6 +803,23 @@ IMAGE_IMPORT_DESCRIPTOR* pe_import_dll_next(IMAGE_IMPORT_DESCRIPTOR* iter)
   }
 
   return slist_next_entry(iter, import_dll_t, data, node);
+}
+
+int pe_import_dll_count(int fd)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  int count = 0;
+  IMAGE_IMPORT_DESCRIPTOR* dll = pe_import_dll_first(fd);
+  for(; dll != NULL; dll = pe_import_dll_next(dll)) {
+    count++;
+  }
+  
+  return count;
 }
 
 IMAGE_IMPORT_FUNCTION* pe_import_api_first(IMAGE_IMPORT_DESCRIPTOR* import_dll)
@@ -760,6 +845,22 @@ IMAGE_IMPORT_FUNCTION* pe_import_api_next(IMAGE_IMPORT_FUNCTION* iter)
   }
 
   return slist_next_entry(iter, import_api_t, data, node);
+}
+
+int pe_import_api_count(IMAGE_IMPORT_DESCRIPTOR* dll)
+{
+  if (dll == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  int count = 0;
+  IMAGE_IMPORT_FUNCTION* api = pe_import_api_first(dll);
+  for(; api != NULL; api = pe_import_api_next(api)) {
+    count ++;
+  }
+
+  return count;
 }
 
 /**********************************************************************

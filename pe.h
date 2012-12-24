@@ -104,9 +104,13 @@ bool pe_import_dllname(
     char* dllname, 
     int name_len);
 
+int pe_import_dll_count(int fd);
+
 IMAGE_IMPORT_DESCRIPTOR* pe_import_dll_first(int fd);
 
 IMAGE_IMPORT_DESCRIPTOR* pe_import_dll_next(IMAGE_IMPORT_DESCRIPTOR* iter);
+
+int pe_import_api_count(IMAGE_IMPORT_DESCRIPTOR* dll);
 
 IMAGE_IMPORT_FUNCTION* pe_import_api_first(IMAGE_IMPORT_DESCRIPTOR* import_dll);
 
@@ -126,6 +130,10 @@ IMAGE_BOUND_IMPORT_DESCRIPTOR* pe_bound_import_first(int fd);
 
 IMAGE_BOUND_IMPORT_DESCRIPTOR* pe_bound_import_next(
     IMAGE_BOUND_IMPORT_DESCRIPTOR* iter);
+
+IMAGE_SECTION_HEADER* pe_section_first(int fd);
+
+IMAGE_SECTION_HEADER* pe_section_next(IMAGE_SECTION_HEADER* it);
 
 int pe_section_by_rva(int fd, rva_t rva);
 
