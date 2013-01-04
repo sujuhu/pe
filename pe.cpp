@@ -205,7 +205,7 @@ bool pe_init(pe_t* pe, const char* stream, int size)
   parse_bound((intptr_t)pe);
 
   parse_gap(pe);
-
+  
   parse_signature(pe);
 
   return true;
@@ -1927,7 +1927,7 @@ bool parse_version(int fd)
   // 遍历 VS_VERSIONINFO 子节点元素
   StringFileInfo* pSFI = 
     (StringFileInfo*)ROUND_POS(((uint8_t*)pValue) + pVS->wValueLength, pValue, 4);
-  for ( ; ((uint8_t*) pSFI) < (((uint8_t*)pVS) + pVS->wLength);
+  for ( ; ((uint8_t*) pSFI) < (((uint8_t*)pVS) + pVS->wLength) && pSFI->wLength != 0;
       pSFI = (StringFileInfo*)ROUND_POS((((uint8_t*) pSFI) + pSFI->wLength), pSFI, 4))
   {
     // StringFileInfo / VarFileInfo
@@ -1940,15 +1940,14 @@ bool parse_version(int fd)
 
           // 遍历字串信息 STRINGTABLE 元素
       StringTable* pST = (StringTable*)ROUND_POS(&pSFI->szKey[strlen(sfi_key) + 1], pSFI, 4);
-      for ( ; ((uint8_t*) pST) < (((uint8_t*) pSFI) + pSFI->wLength);
+      for ( ; ((uint8_t*) pST) < (((uint8_t*) pSFI) + pSFI->wLength) && pST->wLength != 0;
           pST = (StringTable*)ROUND_POS((((uint8_t*) pST) + pST->wLength), pST, 4))
       {
         //printf(" LangID: %S\n", pST->szKey);
         //_ASSERT( !pST->wValueLength );
-
         // 遍历字符串元素的 STRINGTABLE
         String* pS = (String*)ROUND_POS(&pST->szKey[ucs2len(pST->szKey) + 1], pST, 4);
-        for ( ; ((uint8_t*) pS) < (((uint8_t*) pST) + pST->wLength);
+        for ( ; ((uint8_t*) pS) < (((uint8_t*) pST) + pST->wLength) && pS->wLength != 0;
           pS = (String*)ROUND_POS((((uint8_t*) pS) + pS->wLength), pS, 4))
         {
           ucs2_t* psVal = (ucs2_t*)ROUND_POS(&pS->szKey[ucs2len(pS->szKey) + 1], pS, 4);
@@ -1971,6 +1970,7 @@ bool parse_version(int fd)
         }
       }
     } else {
+      /*
       // 当前子节点元素是 VarFileInfos
       //_ASSERT( 1 == pSFI->wType );
       VarFileInfo* pVFI = (VarFileInfo*) pSFI;
@@ -1982,7 +1982,6 @@ bool parse_version(int fd)
       for ( ; ((uint8_t*) pV) < (((uint8_t*) pVFI) + pVFI->wLength);
           pV = (Var*)ROUND_POS((((uint8_t*) pV) + pV->wLength), pV, 4)) {
         //printf(" %S: ", pV->szKey);
-        
         // 对16位的语言ID值，弥补标准的“翻译”VarFileInfo的元素的数组的遍历。
         ucs2_t* pwV = (ucs2_t*) ROUND_POS(&pV->szKey[ucs2len(pV->szKey) + 1], pV, 4);
         for (ucs2_t* wpos = pwV ; ((uint8_t*) wpos) < (((uint8_t*) pwV) + pV->wValueLength); wpos += 2)
@@ -1992,6 +1991,7 @@ bool parse_version(int fd)
 
         //printf("\n");
       }
+      */
     }
   }
 
