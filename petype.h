@@ -1,5 +1,5 @@
-#ifndef _PE_TYPE_DEFINE_H_
-#define _PE_TYPE_DEFINE_H_
+#ifndef _TYPE_DEFINE_H_
+#define _TYPE_DEFINE_H_
 
 #ifdef _MSC_VER
 #if _MSC_VER >= 1600    /*Visual C++ 2010*/
@@ -145,4 +145,4 @@ typedef unsigned long long uintmax_t;
 #include <stdint.h>
 #endif /*_MSC_VER*/
 
-#endif /*_PE_TYPE_DEFINE_H_*/
+#endif /*_TYPE_DEFINE_H_*/

@@ -93,6 +93,7 @@ typedef struct _pe_t{
   bool  open_by_file;
   MAPPED_FILE view;
   IMAGE_OVERLAY   overlay;
+  IMAGE_SIGNATURE sign;
 }pe_t;
 
 typedef struct _export_api_t{
@@ -162,6 +163,8 @@ bool parse_bound(int fd);
 
 bool parse_gap(pe_t* pe);
 
+bool parse_signature(pe_t* pe);
+
 bool pe_init(pe_t* pe, const char* stream, int size)
 {
   pe->stream = stream;
@@ -202,6 +205,8 @@ bool pe_init(pe_t* pe, const char* stream, int size)
   parse_bound((intptr_t)pe);
 
   parse_gap(pe);
+
+  parse_signature(pe);
 
   return true;
 }
@@ -267,6 +272,17 @@ int pe_size(int fd)
 
   pe_t* pe = (pe_t*)(intptr_t)fd;
   return pe->size;
+}
+
+uint8_t* pe_stream(int fd)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  return (uint8_t*)pe->stream;
 }
 
 void clean_resource(slist_t* list)
@@ -2005,6 +2021,58 @@ IMAGE_VERSION* pe_version_next(IMAGE_VERSION* iter)
   }
 
   return slist_next_entry(iter, version_t, data, node);
+}
+
+/**********************************************************************
+ *
+ * pe signature
+ *
+ **********************************************************************/
+bool parse_signature(pe_t* pe)
+{
+  if (pe == NULL || pe == (pe_t*)-1) {
+    errno = INVALID_PE;
+    return false;
+  }
+
+  raw_t raw
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_SECURITY)->VirtualAddress;
+  size_t size
+    = DIRECTORY_ENTRY(pe->stream, IMAGE_DIRECTORY_ENTRY_SECURITY)->Size;
+
+  if (raw == 0 || size == 0) {
+    return false;
+  }
+
+  if (raw >= pe->size) {
+    //SetLastError(ERROR_BAD_EXE_FORMAT);
+    return false;
+  }
+
+  uint32_t sign_size = *(uint32_t*)(pe->stream + raw);
+  uint32_t magic = *(uint32_t*)(pe->stream + raw + sizeof(uint32_t));
+  if (magic != 0x00020200) {
+    return false;
+  }
+
+  if (sign_size != size) {
+    return false;
+  }
+
+  pe->sign.offset = raw + sizeof(magic) + sizeof(sign_size);
+  pe->sign.size = sign_size - sizeof(magic) - sizeof(sign_size);
+  return true;
+} 
+
+IMAGE_SIGNATURE* pe_sign(int fd)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  return &pe->sign;
 }
 
 

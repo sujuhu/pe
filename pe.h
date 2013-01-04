@@ -54,6 +54,8 @@ int   pe_open_file(const char* file);
 
 int   pe_size(int fd);
 
+uint8_t* pe_stream(int fd);
+
 /**
  * Description: clean and close pe format
  * Parameter:   fd        pe descriptor, return by pe_open()          
@@ -175,6 +177,8 @@ IMAGE_SECTION_HEADER* pe_section_header(int fd, int sect_id);
 uint8_t* pe_data_by_raw(int fd, raw_t raw);
 
 uint8_t* pe_data_by_rva(int fd, rva_t rva);
+
+IMAGE_SIGNATURE* pe_sign(int fd);
 
 char* pe_restype_name(int res_type);
 
