@@ -143,6 +143,10 @@ int  pe_section_by_raw(int fd, raw_t raw);
 
 bool pe_icon_file(int fd, const char* ico_file);
 
+IMAGE_ICON_ENTRY* pe_icon_first(int fd);
+
+IMAGE_ICON_ENTRY* pe_icon_next(IMAGE_ICON_ENTRY* iter);
+
 IMAGE_VERSION* pe_version_first(int fd);
 
 IMAGE_VERSION* pe_version_next(IMAGE_VERSION* iter);

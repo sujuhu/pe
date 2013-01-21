@@ -1921,6 +1921,19 @@ typedef struct _IMAGE_IMPORT_FUNCTION
   uint32_t     iat;                  //导入函数地址实际填入的位置. RVA
 }IMAGE_IMPORT_FUNCTION;
 
+
+typedef struct _IMAGE_ICON_ENTRY
+{
+  uint8_t   bWidth;
+  uint8_t   bHeigh;
+  uint8_t   bColorCount;
+  uint8_t   bReserved;
+  uint16_t  wPlanes;
+  uint16_t  wBitCount;
+  uint32_t  Offset;
+  uint32_t  Size;
+}IMAGE_ICON_ENTRY;
+
 typedef struct _ICON_ENTRY
 {
   uint8_t   bWidth;
@@ -1960,6 +1973,7 @@ typedef struct _GRPICONDIR
   uint16_t    idCount;
   GRPICON_DIR_ENTRY idEntries[1];
 }GRPICONDIR;
+
 
 #pragma pack(pop)
 

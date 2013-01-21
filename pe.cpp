@@ -90,6 +90,7 @@ typedef struct _pe_t{
   slist_t bound_list;
   slist_t gap_list;
   slist_t section_list;
+  slist_t icon_list;
   bool  open_by_file;
   MAPPED_FILE view;
   IMAGE_OVERLAY   overlay;
@@ -145,6 +146,11 @@ typedef struct _section_t{
   snode_t node;
 }section_t;
 
+typedef struct _icon_t{
+  IMAGE_ICON_ENTRY data;
+  snode_t   node;
+}icon_t;
+
 bool parse_section(int fd);
 
 bool parse_export(int fd);
@@ -164,6 +170,8 @@ bool parse_bound(int fd);
 bool parse_gap(pe_t* pe);
 
 bool parse_signature(pe_t* pe);
+
+bool parse_icon(pe_t* pe);
 
 bool pe_init(pe_t* pe, const char* stream, int size)
 {
@@ -203,6 +211,8 @@ bool pe_init(pe_t* pe, const char* stream, int size)
   parse_resource((intptr_t)pe);
 
   parse_bound((intptr_t)pe);
+
+  parse_icon(pe);
 
   parse_gap(pe);
   
@@ -319,6 +329,12 @@ void  pe_close(int  fd)
     }
     free(dll);
     dll = NULL;
+  }
+
+  icon_t* icon = NULL;
+  slist_for_each_safe(icon, &pe->icon_list, icon_t, node) {
+    free(icon);
+    icon = NULL;
   }
 
   version_t* ver = NULL;
@@ -1490,7 +1506,6 @@ IMAGE_OVERLAY* pe_overlay(int fd)
  * pe icon
  *
  **********************************************************************/
-
 bool pe_icon_file(int fd, const char* ico_file)
 {
   if (fd == INVALID_PE || ico_file == NULL) {
@@ -1669,6 +1684,157 @@ ret_door:
   return is_success;
 }
 
+bool parse_icon(pe_t* pe)
+{
+  //遍历资源, 找到ICON GROUPS资源 
+  IMAGE_RESOURCE_DIRECTORY_ENTRY *res = NULL;
+  IMAGE_RESOURCE_DATA_ENTRY* icon_group = NULL;
+  slist_for_each_entry(res, &pe->resource, resource_t, data, node) {
+    if (res->Id == 14 && IS_RESOURCE_DIRECTORY(res)) {
+      resource_t* node = container_of(res, resource_t, data);
+      slist_t* res_list = &node->child;
+      IMAGE_RESOURCE_DIRECTORY_ENTRY* res_2 = NULL;
+      slist_for_each_entry(res_2, res_list, resource_t, data, node) {
+        if (IS_RESOURCE_DIRECTORY(res_2)) {
+          resource_t* node = container_of(res_2, resource_t, data);
+          slist_t* res_3_list = &node->child;
+          IMAGE_RESOURCE_DIRECTORY_ENTRY* res_3 = NULL;
+          slist_for_each_entry(res_3, res_3_list, resource_t, data, node) {
+            if (!IS_RESOURCE_DIRECTORY(res_3)) {
+              icon_group = pe_resource_data((intptr_t)pe, res_3);
+              if (icon_group != NULL){
+                break;
+              }
+            }
+          }
+        }
+
+        if (icon_group != NULL) {
+          break;
+        }
+      }
+    }
+
+    if (icon_group != NULL) {
+      break;
+    }
+  }
+
+  if (icon_group == NULL || icon_group->OffsetToData == 0 || icon_group->Size == 0 ) {
+    errno = ENOENT;
+    return false;
+  }
+
+  raw_t raw = rva_to_raw((intptr_t)pe, icon_group->OffsetToData);
+  if (raw == INVALID_RAW) {
+    //printf("invalid icon group raw");
+    return false;
+  }
+
+  GRPICONDIR* icon_dir = (GRPICONDIR*)(pe->stream + raw);
+  if (icon_group->Size != sizeof(GRPICONDIR)
+                         + (icon_dir->idCount-1)*sizeof(GRPICON_DIR_ENTRY)) {
+    //printf("invalid icon group size");
+    return false;
+  }
+
+  //获取资源的位置和长度
+  IMAGE_RESOURCE_DIRECTORY_ENTRY* res_icon = NULL;
+  slist_for_each_entry(res_icon, &pe->resource, resource_t, data, node) {
+    if (res_icon->Id == 3) {
+      break;
+    }
+  }
+
+  if (res_icon == NULL) {
+    errno = ENOENT;
+    return false;
+  }
+
+  for (int i=0; i<icon_dir->idCount; i++) {
+
+
+    resource_t* res = container_of(res_icon, resource_t, data);
+    IMAGE_RESOURCE_DIRECTORY_ENTRY* entry = NULL;
+    slist_for_each_entry(entry, &res->child, resource_t, data, node) {
+      if (entry->Id == icon_dir->idEntries[i].nID 
+        && IS_RESOURCE_DIRECTORY(entry)) {
+        break;
+      }
+    }
+
+    if(entry == NULL) {
+      //在ICON资源目录下没有找到目标图标资源
+      continue;
+    }
+
+    resource_t* node = container_of(entry, resource_t, data);
+    entry = NULL;
+    slist_for_each_entry(entry, &node->child, resource_t, data, node) {
+      if (!IS_RESOURCE_DIRECTORY(entry)) {
+        break;
+      }
+    }
+
+    if (entry == NULL) {
+      continue;
+    }
+
+    icon_t* item = (icon_t*)malloc(sizeof(icon_t));
+    if (item == NULL) {
+      return false;
+    }
+    memset(item, 0, sizeof(icon_t));
+
+    item->data.bWidth = icon_dir->idEntries[i].bWidth;
+    item->data.bHeigh = icon_dir->idEntries[i].bHeigh;
+    item->data.bColorCount = icon_dir->idEntries[i].bColorCount;
+    item->data.wPlanes = icon_dir->idEntries[i].wPlanes;
+    item->data.wBitCount = icon_dir->idEntries[i].wBitCount;
+
+    IMAGE_RESOURCE_DATA_ENTRY* icon = pe_resource_data((intptr_t)pe, entry);
+    if (icon->Size != 0) {
+      raw_t icon_raw = rva_to_raw((intptr_t)pe, icon->OffsetToData);
+      if (icon_raw != INVALID_RAW) {
+        item->data.Size = icon->Size;
+        item->data.Offset = icon_raw;
+      } else {
+        //ico data overrun
+        //printf("ico data overrun");
+        item->data.Size = 0;
+        item->data.Offset = 0;
+      }
+    } else {
+      //ico data not found
+      //printf("ico data not found");
+      item->data.Size = 0;
+      item->data.Offset = 0;
+    }
+
+    slist_add(&pe->icon_list, &item->node);
+  }
+}
+
+IMAGE_ICON_ENTRY* pe_icon_first(int fd)
+{
+  if (fd == INVALID_PE) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  pe_t* pe = (pe_t*)(intptr_t)fd;
+  return slist_first_entry(&pe->icon_list, icon_t, data, node);
+}
+
+IMAGE_ICON_ENTRY* pe_icon_next(IMAGE_ICON_ENTRY* iter)
+{
+  if (iter == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  return slist_next_entry(iter, icon_t, data, node);
+}
 
 /**********************************************************************
  *
